@@ -30,22 +30,24 @@ class Admin:
             await self.sparcli.say('You do not have permission to ban members.')
             return
 
-        # Get the top role of the two users, make sure the user would be able to ban
+        # Get the top role of the two users, make sure the user would be able
+        # to ban
         topRoles = [ctx.message.author.top_role.position,
-                    taggedUser.top_role.permission]
+                    taggedUser[0].top_role.position]
         if topRoles[0] <= topRoles[1]:
             await self.sparcli.say('Your role is not high enough to ban that user.')
             return
 
         # Try and ban the user
         try:
-            await self.sparcli.ban(taggedUser)
+            await self.sparcli.ban(taggedUser[0])
         except:
             await self.sparcli.say('I was unable to ban that user.')
             return
 
         # Todo :: make this print out in a config-determined channel
-        await self.sparcli.say('**{}** has been banned.'.format(taggedUser))
+        await self.sparcli.say('**{}** has been banned.'.format(taggedUser[0]))
+
 
 def setup(bot):
     bot.add_cog(Admin(bot))
