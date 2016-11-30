@@ -5,7 +5,7 @@
 [ ] Pun (Use beautifulsoup4)
 [ ] Cat (Web scraping)
 [ ] Lenny (Simple reply feature)
-[ ] Game (Change bot presence(
+[X] Game (Change bot presence)
 [ ] Restart/Kill (Can use sys)
 [ ] Info (Give information on a tagged user)
 [ ] Clean/Purge (Delete messages through a channel)

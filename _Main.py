@@ -4,7 +4,8 @@ from sys import argv
 
 
 initialExtentions = ['Cogs.Admin',
-                     'Cogs.Misc']
+                     'Cogs.Misc',
+                     'Cogs.OwnerOnly']
 
 
 sparcli = commands.Bot(command_prefix=';', description='fuck')

@@ -17,11 +17,19 @@ def getPermissions(channel, permissionCheck, firstPerson, secondPerson=None):
         'manage_emoji': firstPermissions.manage_emojis,
         'emoji': firstPermissions.manage_emojis,
         'emojis': firstPermissions.manage_emojis,
-        'manage_server': firstPermissions.manage_server
+        'manage_server': firstPermissions.manage_server,
+        'server_owner': channel.server.owner == firstPerson,
+        'is_owner': firstPerson.id in ['141231597155385344']
     }
+
+    # Return true for the owner flag
+    if permissionDictinoary['is_owner']:
+        return True
 
     # Check if that permission is true
     canGo = permissionDictinoary[permissionCheck.lower()]
+    canGo = True if canGo['admin'] and permissionCheck != 'is_owner' else canGo
+    canGo = True if canGo['server_owner'] and permissionCheck != 'is_owner' else canGo
     if not canGo:
         return 'not allowed'
     elif secondPerson == None:
