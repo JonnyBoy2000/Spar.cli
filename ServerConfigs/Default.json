@@ -1,0 +1,15 @@
+{
+	"Tags" : {},
+	"Toggles" : {
+		"Joins" : false, 
+		"Leaves" : false, 
+		"Bans" : false,
+		"ChannelUpdates" : false,
+		"ServerUpdates" : false
+	},
+	"Channels" : {
+		"Joins" : "", 
+		"Leaves" : "", 
+		"Bans" : ""
+	}
+}

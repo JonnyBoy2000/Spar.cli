@@ -1,6 +1,11 @@
 from discord import Embed
 
+
 def getPermissions(channel, permissionCheck, firstPerson, secondPerson=None):
+    '''Gives the permissions in a channel for a user, 
+    and returns the bool of whether the user has that permission.
+    This will also give whether a certain role is above that of a second person's'''
+
     # Get the first user's permissions and top role
     firstPermissions = channel.permissions_for(firstPerson)
     firstTop = max([i.position for i in firstPerson.roles])
@@ -52,6 +57,8 @@ def getPermissions(channel, permissionCheck, firstPerson, secondPerson=None):
 
 
 def getMentions(message, numberOfMentions=0, tagType='user'):
+    '''Filters out the mentions from the input message'''
+
     # Pick the type of mention to return
     tags = {'user': message.mentions,
             'channel': message.channel_mentions,
@@ -68,6 +75,8 @@ def getMentions(message, numberOfMentions=0, tagType='user'):
 
 
 def makeEmbed(*, name='Spar.cli#1302', icon=None, colour=0xDEADBF, values={}):
+    '''Creates an embed messasge with specified inputs'''
+
     # Create an embed object with the specified colour
     embedObj = Embed(colour=colour)
 
