@@ -15,7 +15,11 @@ class Misc:
         '''Gives the bot's invite link
         Usage :: invite'''
 
-        await self.sparcli.say('https://discordapp.com/oauth2/authorize?client_id=252880131540910080&scope=sparcli&permissions=0')
+        # https://discordapi.com/permissions.html
+        clientID = '252880131540910080'
+        permissionsID = '469888119'
+        baseLink = 'https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions={}'
+        await self.sparcli.say(baseLink.format(clientID, permissionsID))
 
     @commands.command()
     async def git(self):
