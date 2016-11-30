@@ -10,10 +10,14 @@ class OwnerOnly:
     def __init__(self, bot):
         self.sparcli = bot
 
-    @commands.command(pass_context=True, hidden=True)
-    async def game(self, ctx, *, game: str):
+    @commands.command(pass_context=True, hidden=True, aliases=['playing'])
+    async def game(self, ctx, *, game: str=None):
+        '''Change what the bot is playing
+        Usage :: game <Content>'''
+
         # Check if the owner is calling the command
-        permReturn = getPermissions(ctx.message.channel, 'is_owner', ctx.message.author)
+        permReturn = getPermissions(
+            ctx.message.channel, 'is_owner', ctx.message.author)
 
         # Throw non-owners out
         if not permReturn:

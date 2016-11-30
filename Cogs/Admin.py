@@ -11,8 +11,8 @@ class Admin:
 
     @commands.command(pass_context=True)
     async def ban(self, ctx):
-        '''ban <Mention>
-        Bans a user from the server.'''
+        '''Bans a user from the server.
+        Usage :: ban <Mention>'''
 
         # Get the tagged users from the message
         taggedUser = ctx.message.mentions
