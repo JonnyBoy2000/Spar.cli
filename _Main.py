@@ -8,7 +8,7 @@ initialExtentions = ['Cogs.Admin',
                      'Cogs.OwnerOnly']
 
 
-sparcli = commands.Bot(command_prefix=';', description='fuck')
+sparcli = commands.Bot(command_prefix=[';', '👌'], description='fuck')
 
 
 @sparcli.command(pass_context=True)
