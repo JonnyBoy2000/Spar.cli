@@ -1,7 +1,7 @@
 from discord.ext import commands
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
-from Utils.Discord import getPermissions
+from Utils.Discord import getPermissions, getMentions
 
 
 class Admin:
@@ -15,26 +15,16 @@ class Admin:
         Usage :: ban <Mention> <Reason...>'''
 
         # Get the tagged users from the message
-        taggedUser = ctx.message.mentions
-
-        # If nobody was tagged
-        if ctx.message.mentions == []:
-            await self.sparcli.say('You need to tag a user to ban.')
-            return
-
-        # If more than one person is tagged
-        elif len(ctx.message.mentions) > 1:
-            await self.sparcli.say('You can only tag one user to ban.')
+        taggedUser = getMentions(ctx.message, 1)
+        if type(taggedUser) == str:
+            await self.sparcli.say(taggedUser)
             return
 
         permReturn = getPermissions(
             ctx.message.channel, 'ban', ctx.message.author, taggedUser[0])
 
-        if permReturn == 'not allowed':
-            await self.sparcli.say('You do not have permission to ban members.')
-            return
-        elif permReturn == 'too low':
-            await self.sparcli.say('Your role is not high enough to ban that user.')
+        if type(permReturn) == str:
+            await self.sparcli.say(permReturn)
             return
 
         # Try and ban the user
@@ -53,26 +43,16 @@ class Admin:
         Usage :: kick <Mention> <Reason...>'''
 
         # Get the tagged users from the message
-        taggedUser = ctx.message.mentions
-
-        # If nobody was tagged
-        if ctx.message.mentions == []:
-            await self.sparcli.say('You need to tag a user to kick.')
-            return
-
-        # If more than one person is tagged
-        elif len(ctx.message.mentions) > 1:
-            await self.sparcli.say('You can only tag one user to kick.')
+        taggedUser = getMentions(ctx.message, 1)
+        if type(taggedUser) == str:
+            await self.sparcli.say(taggedUser)
             return
 
         permReturn = getPermissions(
             ctx.message.channel, 'kick', ctx.message.author, taggedUser[0])
 
-        if permReturn == 'not allowed':
-            await self.sparcli.say('You do not have permission to kick members.')
-            return
-        elif permReturn == 'too low':
-            await self.sparcli.say('Your role is not high enough to kick that user.')
+        if type(permReturn) == str:
+            await self.sparcli.say(permReturn)
             return
 
         # Try and kick the user

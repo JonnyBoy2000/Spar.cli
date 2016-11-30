@@ -25,13 +25,17 @@ def getPermissions(channel, permissionCheck, firstPerson, secondPerson=None):
     # Return true for the owner flag
     if permissionDictinoary['is_owner']:
         return True
+    elif permissionCheck == 'is_owner':
+        return 'You must be the bot owner to use this command.'
 
     # Check if that permission is true
     canGo = permissionDictinoary[permissionCheck.lower()]
-    canGo = True if permissionDictinoary['admin'] and permissionCheck != 'is_owner' else canGo
-    canGo = True if permissionDictinoary['server_owner'] and permissionCheck != 'is_owner' else canGo
+    canGo = True if permissionDictinoary[
+        'admin'] and permissionCheck != 'is_owner' else canGo
+    canGo = True if permissionDictinoary[
+        'server_owner'] and permissionCheck != 'is_owner' else canGo
     if not canGo:
-        return 'not allowed'
+        return 'You are not permitted to use this command.'
     elif secondPerson == None:
         return True
 
@@ -42,4 +46,20 @@ def getPermissions(channel, permissionCheck, firstPerson, secondPerson=None):
     if firstTop > secondTop:
         return True
     else:
-        return 'too low'
+        return 'Your rank is too low to be able to use this on the tagged user.'
+
+
+def getMentions(message, numberOfMentions, tagType='user'):
+    # Pick the type of mention to return
+    tags = {'user': message.mentions,
+            'channel': message.channel_mentions,
+            'role': message.role_mentions}[tagType]
+
+    # Make sure that it's the right length
+    if len(tags) == 0:
+        return 'You need to tag a {} in your message.'.format(tagType)
+    if len(tags) > numberOfMentions:
+        return 'You have tagged too many {}s.'.format(tagType)
+    if len(tags) < numberOfMentions:
+        return 'You have tagged too few {}s.'.format(tagType)
+    return tags
