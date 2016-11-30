@@ -1,5 +1,6 @@
 from disco.bot import Bot, Plugin
 
+
 class MiscCommands(Plugin):
 
     @Plugin.command('echo', '<content:str...>')
@@ -19,3 +20,9 @@ class MiscCommands(Plugin):
         '''git
         Gives a link to the bot's git repo'''
         event.msg.reply('https://github.com/4Kaylum/Spar.cli/')
+
+    @Plugin.command('ev', '<content:str...>')
+    def on_ev_command(self, event, content):
+        '''ev <Content>
+        Python evaluates the content of the message passed as parameters'''
+        event.msg.reply('```\n{}```'.format(eval(content)))
