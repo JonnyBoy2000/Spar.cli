@@ -27,6 +27,14 @@ class OwnerOnly:
         await self.sparcli.change_presence(game=Game(name=game))
         await self.sparcli.say('Game changed to **{}**.'.format(game))
 
+    @commands.command(pass_context=True)
+    async def ev(self, ctx, *, content: str):
+        permReturn = getPermissions(ctx.message.channel, 'is_owner', ctx.message.author)
+        if permReturn == False:
+            await self.sparcli.say('You must be the bot owner to use this command.')
+            return
+        await self.sparcli.say(eval(content))
+
 
 def setup(bot):
     bot.add_cog(OwnerOnly(bot))

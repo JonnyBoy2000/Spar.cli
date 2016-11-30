@@ -11,14 +11,6 @@ initialExtentions = ['Cogs.Admin',
 sparcli = commands.Bot(command_prefix=[';', '👌'], description='fuck')
 
 
-@sparcli.command(pass_context=True)
-async def ev(ctx, *, content: str):
-    if ctx.message.author.id != '141231597155385344':
-        await sparcli.say('You are not permitted to use this command.')
-        return
-    await sparcli.say(eval(content))
-
-
 @sparcli.event
 async def on_ready():
     print('-----')
