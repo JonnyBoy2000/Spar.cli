@@ -5,10 +5,11 @@ from sys import argv
 
 initialExtentions = ['Cogs.Admin',
                      'Cogs.Misc',
-                     'Cogs.OwnerOnly']
+                     'Cogs.OwnerOnly',
+                     'Cogs.Internet']
 
 
-sparcli = commands.Bot(command_prefix=[';', '👌'], description='fuck')
+sparcli = commands.Bot(command_prefix=[';', '👌'], description='ApplePy 2.0, pretty much.')
 
 
 @sparcli.event

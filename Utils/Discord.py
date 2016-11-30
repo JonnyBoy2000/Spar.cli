@@ -1,3 +1,5 @@
+from discord import Embed
+
 def getPermissions(channel, permissionCheck, firstPerson, secondPerson=None):
     # Get the first user's permissions and top role
     firstPermissions = channel.permissions_for(firstPerson)
@@ -49,7 +51,7 @@ def getPermissions(channel, permissionCheck, firstPerson, secondPerson=None):
         return 'Your rank is too low to be able to use this on the tagged user.'
 
 
-def getMentions(message, numberOfMentions, tagType='user'):
+def getMentions(message, numberOfMentions=0, tagType='user'):
     # Pick the type of mention to return
     tags = {'user': message.mentions,
             'channel': message.channel_mentions,
@@ -63,3 +65,20 @@ def getMentions(message, numberOfMentions, tagType='user'):
     if len(tags) < numberOfMentions:
         return 'You have tagged too few {}s.'.format(tagType)
     return tags
+
+
+def makeEmbed(*, name='Spar.cli#1302', icon=None, colour=0xDEADBF, values={}):
+    # Create an embed object with the specified colour
+    embedObj = Embed(colour=colour)
+
+    # Set the author and URL
+    embedObj.set_author(name=name, icon_url=icon)
+
+    # Create all of the fields
+    for i in values:
+        if values[i] == '':
+            values[i] = 'None'
+        embedObj.add_field(name=i, value='{}'.format(values[i]))
+
+    # Return to user
+    return embedObj
