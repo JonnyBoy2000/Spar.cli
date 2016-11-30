@@ -1,4 +1,7 @@
 from discord.ext import commands
+from sys import path
+path.append('../')  # Move path so you can get the Utils folder
+from Utils.Discord import getPermissions
 
 
 class Admin:
@@ -24,17 +27,13 @@ class Admin:
             await self.sparcli.say('You can only tag one user to ban.')
             return
 
-        # Get the permissions of the calling user in the channel
-        permList = ctx.message.channel.permissions_for(ctx.message.author)
-        if permList.ban_members == False:
+        permReturn = getPermissions(
+            ctx.message.channel, 'ban', ctx.message.author, taggedUser[0])
+
+        if permReturn == 'not allowed':
             await self.sparcli.say('You do not have permission to ban members.')
             return
-
-        # Get the top role of the two users, make sure the user would be able
-        # to ban
-        topRoles = [ctx.message.author.top_role.position,
-                    taggedUser[0].top_role.position]
-        if topRoles[0] <= topRoles[1]:
+        elif permReturn == 'too low':
             await self.sparcli.say('Your role is not high enough to ban that user.')
             return
 
