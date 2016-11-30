@@ -32,6 +32,20 @@ class Internet:
         returnUrl = page.url
         await self.sparcli.say(returnUrl)
 
+    @commands.command()
+    async def pun(self):
+        '''Gives a random pun from the depths of the internet
+        Usage :: pun'''
+
+        # Read from page
+        page = get('http://www.punoftheday.com/cgi-bin/randompun.pl')
+
+        # Scrape the raw HTML
+        rawPun = page.text.split('dropshadow1')[1][6:].split('<')[0]
+        
+        # Boop it out
+        await self.sparcli.say(rawPun)
+
 
 def setup(bot):
     bot.add_cog(Internet(bot))

@@ -2,7 +2,7 @@
 [ ] Config (Server configs - needed for event listeners)
 [ ] CC (Custom commands)
 [X] Eval
-[ ] Pun (Use beautifulsoup4)
+[X] Pun (Use beautifulsoup4)
 [X] Cat (Web scraping)
 [ ] Lenny (Simple reply feature)
 [X] Game (Change bot presence)
