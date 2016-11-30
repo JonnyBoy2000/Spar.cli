@@ -10,17 +10,17 @@ class Tags:
         self.sparcli = sparcli
 
     @commands.command(pass_context=True)
-    async def tag(self, ctx, *, subcom:str=None):
+    async def tag(self, ctx, *, subcom: str=None):
         # See if you're trying to call a subcommand or error
         if subcom == None:
             # Return if sayig nothing
             return
 
         # Work through the functions if trying to call one
-        elif subcom.split(' ',1)[0] in ['add', 'delete', 'del', 'globaladd', 'globaldelete', 'globaldel']:
-            
+        elif subcom.split(' ', 1)[0] in ['add', 'delete', 'del', 'globaladd', 'globaldelete', 'globaldel']:
+
             # Create a dictionary of functions to call for different commands
-            functionDict = {'add':self.tagAdd}
+            functionDict = {'add': self.tagAdd, 'delete': self.tagDelete, 'del': self.tagDelete}
 
             # Get the tag name
             try:
@@ -43,18 +43,40 @@ class Tags:
         try:
             tagOutput = localTags[subcom]
         except KeyError:
-            pass
+            tagOutput = None
 
-        # See if it's a global tag - 
+        # See if it's a global tag -
         # by putting second it takes priority
         try:
             tagOutput = globalTags[subcom]
         except KeyError:
-            pass
+            tagOutput = None if tagOutput == None else tagOutput
 
         # Output to user
-        await self.sparcli.say(tagOutput)
+        if tagOutput != None:
+            await self.sparcli.say(tagOutput)
+        else:
+            await self.sparcli.say('That tag does not exist.')
 
+    async def tagDelete(self, ctx, tagName):
+        # Deal with idiots - trying to make tag without name
+        if tagName == None:
+            await self.sparcli.say('What is the tag name you want to delete?')
+            nameMessage = await self.sparcli.wait_for_message(author=ctx.message.author)
+            tagName = nameMessage.content
+
+        # Save it into the server configs
+        settings = getServerJson(ctx.message.server.id)
+        try:
+            del settings['Tags'][tagName]
+        except KeyError:
+            await self.sparcli.say('This tag does not exist.')
+            return
+
+        saveServerJson(ctx.message.server.id, settings)
+
+        # Respond to the user
+        await self.sparcli.say('This tag has been deleted.')
 
     async def tagAdd(self, ctx, tagName):
         # Deal with idiots - trying to make tag without name
@@ -64,7 +86,7 @@ class Tags:
             tagName = nameMessage.content
 
         # Tell them thhat you're making tag and being nice
-        await self.sparcli.say('Creating tag with name `{}`. What is the indended content?'.format(name))
+        await self.sparcli.say('Creating tag with name `{}`. What is the indended content?'.format(tagName))
         contentMessage = await self.sparcli.wait_for_message(author=ctx.message.author)
         content = contentMessage.content
 
