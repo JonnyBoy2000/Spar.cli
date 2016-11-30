@@ -28,8 +28,8 @@ def getPermissions(channel, permissionCheck, firstPerson, secondPerson=None):
 
     # Check if that permission is true
     canGo = permissionDictinoary[permissionCheck.lower()]
-    canGo = True if canGo['admin'] and permissionCheck != 'is_owner' else canGo
-    canGo = True if canGo['server_owner'] and permissionCheck != 'is_owner' else canGo
+    canGo = True if permissionDictinoary['admin'] and permissionCheck != 'is_owner' else canGo
+    canGo = True if permissionDictinoary['server_owner'] and permissionCheck != 'is_owner' else canGo
     if not canGo:
         return 'not allowed'
     elif secondPerson == None:
