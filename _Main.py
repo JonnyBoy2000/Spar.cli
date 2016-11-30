@@ -9,7 +9,7 @@ initialExtentions = ['Cogs.Admin',
                      'Cogs.Internet']
 
 
-sparcli = commands.Bot(command_prefix=[';', '👌'], description='ApplePy 2.0, pretty much.')
+sparcli = commands.Bot(command_prefix=['👌', ';'], description='ApplePy 2.0, pretty much.')
 
 
 @sparcli.event

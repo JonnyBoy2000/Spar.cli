@@ -3,7 +3,7 @@
 [ ] CC (Custom commands)
 [X] Eval
 [ ] Pun (Use beautifulsoup4)
-[ ] Cat (Web scraping)
+[X] Cat (Web scraping)
 [ ] Lenny (Simple reply feature)
 [X] Game (Change bot presence)
 [ ] Restart/Kill (Can use sys)
