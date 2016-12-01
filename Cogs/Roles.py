@@ -1,5 +1,6 @@
 from discord.ext import commands 
 from discord import Colour
+from discord.errors import NotFound as Forbidden
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import getPermissions, getMentions
@@ -44,7 +45,11 @@ class RoleManagement:
 
         # Change the role colour
         colour = Colour(int(rolecolour, 16))
-        await self.sparcli.edit_role(ctx.message.server, role, colour=colour)
+        try:
+            await self.sparcli.edit_role(ctx.message.server, role, colour=colour)
+        except Forbidden:
+            await self.sparcli.say('I was unable to edit the role.')
+            return
 
         # Print to user
         await self.sparcli.say('The colour of the role `{0.name}` has been changed to value `{1.value}`.'.format(role, colour))
