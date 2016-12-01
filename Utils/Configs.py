@@ -1,5 +1,6 @@
 from json import loads, dumps
 from os.path import realpath, dirname
+from sys import argv
 workingDirectory = dirname(realpath(__file__))
 
 
@@ -43,3 +44,16 @@ def fixJson(inputDictionary, referenceDictionary=getServerJson('Default')):
             else:
                 inputDictionary[i] = referenceDictionary[i]
     return inputDictionary
+
+def getArguments():
+    '''Gives the arguments passed to the bot through CLI'''
+
+    args = {}
+    del argv[0]  # Delete the name from the cli
+
+
+    # Format the args into a dictionary
+    for i in range(0, len(argv), 2):
+        args[argv[i]] = argv[i + 1]
+
+    return args

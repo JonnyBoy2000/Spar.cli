@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from sys import argv
 from Utils.Configs import *
 
 
@@ -60,13 +59,4 @@ async def on_ready():
     saveServerJson('Globals', z)
 
 
-args = {'--token': None}
-del argv[0]  # Delete the name from the cli
-
-
-# Format the args into a dictionary
-for i in range(0, len(argv), 2):
-    args[argv[i]] = argv[i + 1]
-
-
-sparcli.run(args['--token'])
+sparcli.run(getArguments()['--token'])
