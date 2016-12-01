@@ -1,6 +1,8 @@
 {
     "Tags": {
     },
+    "Etags": {
+    },
     "Toggles": {
         "ServerUpdates": false,
         "Leaves": false,

@@ -10,11 +10,24 @@ class Tags:
     def __init__(self, sparcli):
         self.sparcli = sparcli
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, aliases=['t'])
     async def tag(self, ctx, *, subcom: str=None):
-        '''Defines server-specific tags for repeating on the server
+        '''Defines server-specific tags for repeating
         Usage :: tag add
               :: tag del'''
+
+        await self.runTag(ctx, subcom, False)
+
+    @commands.command(pass_context=True, aliases=['et'])
+    async def etag(self, ctx, *, subcom: str = None):
+        '''Defines server-specific tags for evaluating Python expressions
+        Usage :: etag add
+              :: etag del'''
+
+        await self.runTag(ctx, subcom, True)
+
+
+    async def runTag(self, ctx, subcom, runWithExec):
         # See if you're trying to call a subcommand or error
         if subcom == None:
             # Return if sayig nothing
@@ -40,15 +53,15 @@ class Tags:
                 content = None
 
             # Call the function that actually does stuff.
-            await functionDict[subcom.split(' ', 1)[0]](ctx, content)
+            await functionDict[subcom.split(' ', 1)[0]](ctx, content, ctx.message.server.id, runWithExec)
             return
 
         # This is run to actually print a tag
         server = ctx.message.server
 
         # Get both the global and local tags
-        globalTags = getServerJson('Globals')['Tags']
-        localTags = getServerJson(server.id)['Tags']
+        globalTags = getServerJson('Globals')[{False:'Tags', True:'Etags'}[runWithExec]]
+        localTags = getServerJson(server.id)[{False:'Tags', True:'Etags'}[runWithExec]]
 
         # See if it's a local tag
         try:
@@ -61,7 +74,14 @@ class Tags:
         try:
             tagOutput = globalTags[subcom]
         except KeyError:
-            tagOutput = None if tagOutput == None else tagOutput
+            pass
+
+        # Executes output if it's an etag
+        if tagOutput != None and runWithExec == True:
+            try:
+                tagOutput = eval(tagOutput)
+            except Exception as e:
+                tagOutput = repr(e)
 
         # Output to user
         if tagOutput != None:
@@ -69,12 +89,12 @@ class Tags:
         else:
             await self.sparcli.say('That tag does not exist.')
 
-    async def tagInfo(self, ctx, tagName):
+    async def tagInfo(self, ctx, tagName, completelyUnused, runWithExec):
         # Tagname isn't used, but it's kinda necessary because of how I'm calling it
         # Get the local and global tags
         server = ctx.message.server
-        globalTags = getServerJson('Globals')['Tags']
-        localTags = getServerJson(server.id)['Tags']
+        globalTags = getServerJson('Globals')[{False:'Tags', True:'Etags'}[runWithExec]]
+        localTags = getServerJson(server.id)[{False:'Tags', True:'Etags'}[runWithExec]]
 
         # Plonk them into a new list
         sharedDict = []
@@ -90,21 +110,21 @@ class Tags:
         await self.sparcli.say('You have been private messaged a list of all of the commands.')
         await self.sparcli.send_message(ctx.message.author, '```\n' + '\n'.join(sharedDict) + '```')
 
-    async def tagGlobalAdd(self, ctx, tagName):
+    async def tagGlobalAdd(self, ctx, tagName, unusedServerID, runWithExec):
         permThing = getPermissions(ctx.message.channel, 'is_owner', ctx.message.author)
         if type(permThing) == str:
             await self.sparcli.say(permThing)
             return
-        await self.tagAdd(ctx, tagName, 'Globals')
+        await self.tagAdd(ctx, tagName, 'Globals', runWithExec)
 
-    async def tagGlobalDelete(self, ctx, tagName):
+    async def tagGlobalDelete(self, ctx, tagName, unusedServerID, runWithExec):
         permThing = getPermissions(ctx.message.channel, 'is_owner', ctx.message.author)
         if type(permThing) == str:
             await self.sparcli.say(permThing)
             return
-        await self.tagDelete(ctx, tagName, 'Globals')
+        await self.tagDelete(ctx, tagName, 'Globals', runWithExec)
 
-    async def tagDelete(self, ctx, tagName, serverID=None):
+    async def tagDelete(self, ctx, tagName, serverID=None, runWithExec=False):
         # Deal with idiots - trying to make tag without name
         if tagName == None:
             await self.sparcli.say('What is the tag name you want to delete?')
@@ -117,7 +137,7 @@ class Tags:
         # Save it into the server configs
         settings = getServerJson(serverID)
         try:
-            del settings['Tags'][tagName]
+            del settings[{False:'Tags', True:'Etags'}[runWithExec]][tagName]
         except KeyError:
             await self.sparcli.say('This tag does not exist.')
             return
@@ -127,7 +147,7 @@ class Tags:
         # Respond to the user
         await self.sparcli.say('This tag has been deleted.')
 
-    async def tagAdd(self, ctx, tagName, serverID=None):
+    async def tagAdd(self, ctx, tagName, serverID=None, runWithExec=False):
         # Deal with idiots - trying to make tag without name
         if tagName == None:
             await self.sparcli.say('What is the tag name you want to add?')
@@ -148,7 +168,7 @@ class Tags:
 
         # Save it into the server configs
         settings = getServerJson(serverID)
-        settings['Tags'][tagName] = content
+        settings[{False:'Tags', True:'Etags'}[runWithExec]][tagName] = content
         saveServerJson(serverID, settings)
 
         # Respond to the user
