@@ -65,6 +65,25 @@ class Admin:
         # Todo :: make this print out in a config-determined channel
         await self.sparcli.say('**{}** has been kicked.'.format(taggedUser[0]))
 
+    @commands.command(pass_context=True)
+    async def purge(self, ctx, amount: int):
+        '''Deletes a number of messages from a channel
+        Usage :: purge <Number>'''
+
+        # Make sure that the calling user is allowed to manage messages
+        permReturn = getPermissions(
+            ctx.message.channel, 'manage_messages', ctx.message.author)
+
+        if type(permReturn) == str:
+            await self.sparcli.say(permReturn)
+            return
+
+        # Use the API's purge feature
+        amount += 1
+        deleted = await self.sparcli.purge_from(ctx.message.channel, limit=amount)
+        deletedAmount = len(deleted)
+        await self.sparcli.say('Removed `{}` messages.'.format(deletedAmount))
+
 
 def setup(bot):
     bot.add_cog(Admin(bot))

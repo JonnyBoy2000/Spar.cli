@@ -18,8 +18,11 @@ class Random:
         result = coinResultTable[rnum(0, 1)]
 
         # Be a cheeky feck ;3
-        if rnum(0, 100) == 73:
+        cheekinessConstant = rnum(0, 101)
+        if cheekinessConstant == 73:
             result = 'The coin landed on its side .-.'
+        elif cheekinessConstant == 37:
+            result = 'You flipped the coin so hard, it got stuck in the roof .-.'
 
         # Print out to user
         await self.sparcli.say(result)
