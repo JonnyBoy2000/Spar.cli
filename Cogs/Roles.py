@@ -1,4 +1,4 @@
-from discord.ext import commands 
+from discord.ext import commands
 from discord import Colour
 from discord.errors import NotFound as Forbidden
 from sys import path
@@ -11,8 +11,8 @@ class RoleManagement:
     def __init__(self, sparcli):
         self.sparcli = sparcli
 
-    @commands.command(pass_context=True, aliases=['changecolour','changerolecolour','changerole'])
-    async def rolecolour(self, ctx, rolecolour:str, *, rolename:str):
+    @commands.command(pass_context=True, aliases=['changecolour', 'changerolecolour', 'changerole', 'rolecolor', 'changecolor', 'changerolecolor'])
+    async def rolecolour(self, ctx, rolecolour: str, *, rolename: str):
         '''Changes the colour of a specified role
         Usage :: rolecolour <HexValue> <RoleName>
                  rolecolour <HexValue> <RolePing>'''
@@ -34,7 +34,8 @@ class RoleManagement:
         # Get the role itself
         role = getMentions(ctx.message, 1, 'role')
         if role == 'You need to tag a role in your message.':
-            tempRole = [i for i in ctx.message.server.roles if rolename.lower() in i.name.lower()]
+            tempRole = [
+                i for i in ctx.message.server.roles if rolename.lower() in i.name.lower()]
             if len(tempRole) == 0:
                 await self.sparcli.say(role)
                 return
