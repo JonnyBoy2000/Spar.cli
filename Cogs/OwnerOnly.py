@@ -16,12 +16,10 @@ class OwnerOnly:
         Usage :: game <Content>'''
 
         # Check if the owner is calling the command
-        permReturn = getPermissions(
-            ctx.message.channel, 'is_owner', ctx.message.author)
-
-        # Throw non-owners out
-        if not permReturn:
-            await self.sparcli.say('You are not permitted to use that command.')
+        permReturn = getPermissions(ctx.message.channel, 'is_owner', ctx.message.author)
+        if type(permReturn) == str:
+            await self.sparcli.say(permReturn)
+            return
 
         # Change the game
         await self.sparcli.change_presence(game=Game(name=game))
@@ -29,10 +27,13 @@ class OwnerOnly:
 
     @commands.command(pass_context=True)
     async def ev(self, ctx, *, content: str):
+        # Check if the owner is calling the command
         permReturn = getPermissions(ctx.message.channel, 'is_owner', ctx.message.author)
-        if permReturn == False:
-            await self.sparcli.say('You must be the bot owner to use this command.')
+        if type(permReturn) == str:
+            await self.sparcli.say(permReturn)
             return
+
+        # Eval and print the answer
         await self.sparcli.say(eval(content))
 
 

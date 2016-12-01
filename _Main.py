@@ -12,7 +12,7 @@ initialExtentions = ['Cogs.Admin',
 
 
 sparcli = commands.Bot(
-    command_prefix=['👌', ';'], description='ApplePy 2.0, pretty much.')
+    command_prefix=['👌', ';'], description='ApplePy 2.0, pretty much.', pm_help=True)
 
 
 @sparcli.event 
@@ -34,6 +34,9 @@ async def on_ready():
     print('User :: {}'.format(sparcli.user))
     print('ID :: {}'.format(sparcli.user.id))
     print('-----')
+
+    game = ';help'
+    await sparcli.change_presence(game=discord.Game(name=game))
 
     # Load the extentions
     for extension in initialExtentions:

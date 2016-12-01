@@ -26,7 +26,7 @@ def getPermissions(channel, permissionCheck, firstPerson, secondPerson=None):
         'emojis': firstPermissions.manage_emojis,
         'manage_server': firstPermissions.manage_server,
         'server_owner': channel.server.owner == firstPerson,
-        'is_owner': firstPerson.id in ['141231597155385344']
+        'is_owner': firstPerson.id in ['141231597155385344', '155459369545367552']
     }
 
     # Return true for the owner flag
