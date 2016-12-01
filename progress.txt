@@ -1,10 +1,10 @@
 [X] Ban
 [ ] Config (Server configs - needed for event listeners)
-[ ] CC (Custom commands)
+[X] CC (Custom commands) [Added with tags]
 [X] Eval
 [X] Pun (Use beautifulsoup4)
 [X] Cat (Web scraping)
-[ ] Lenny (Simple reply feature)
+[X] Lenny (Simple reply feature) [Added with tags]
 [X] Game (Change bot presence)
 [ ] Restart/Kill (Can use sys)
 [X] Info (Give information on a tagged user)

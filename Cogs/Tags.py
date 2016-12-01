@@ -21,7 +21,7 @@ class Tags:
             return
 
         # Work through the functions if trying to call one
-        elif subcom.split(' ', 1)[0] in ['add', 'delete', 'del', 'globaladd', 'globaldelete', 'globaldel']:
+        elif subcom.split(' ', 1)[0] in ['add', 'delete', 'del', 'globaladd', 'globaldelete', 'globaldel', 'list']:
 
             # Create a dictionary of functions to call for different commands
             functionDict = {'add': self.tagAdd,
@@ -29,7 +29,8 @@ class Tags:
                             'del': self.tagDelete,
                             'globaladd': self.tagGlobalAdd,
                             'globaldel': self.tagGlobalDelete,
-                            'globaldelete': self.tagGlobalDelete
+                            'globaldelete': self.tagGlobalDelete,
+                            'list': self.tagInfo
                             }
 
             # Get the tag name
@@ -67,6 +68,27 @@ class Tags:
             await self.sparcli.say(tagOutput)
         else:
             await self.sparcli.say('That tag does not exist.')
+
+    async def tagInfo(self, ctx, tagName):
+        # Tagname isn't used, but it's kinda necessary because of how I'm calling it
+        # Get the local and global tags
+        server = ctx.message.server
+        globalTags = getServerJson('Globals')['Tags']
+        localTags = getServerJson(server.id)['Tags']
+
+        # Plonk them into a new list
+        sharedDict = []
+        for i in localTags:
+            if i in globalTags:
+                pass
+            else:
+                sharedDict.append('{} :: {}'.format(i, localTags[i]))
+        for i in globalTags:
+            sharedDict.append('{} :: {}'.format(i, globalTags[i]))
+
+        # PM it to the user
+        await self.sparcli.say('You have been private messaged a list of all of the commands.')
+        await self.sparcli.send_message(ctx.message.author, '```\n' + '\n'.join(sharedDict) + '```')
 
     async def tagGlobalAdd(self, ctx, tagName):
         permThing = getPermissions(ctx.message.channel, 'is_owner', ctx.message.author)
