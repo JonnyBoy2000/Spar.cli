@@ -1,15 +1,16 @@
 {
-	"Tags" : {},
-	"Toggles" : {
-		"Joins" : false, 
-		"Leaves" : false, 
-		"Bans" : false,
-		"ChannelUpdates" : false,
-		"ServerUpdates" : false
-	},
-	"Channels" : {
-		"Joins" : "", 
-		"Leaves" : "", 
-		"Bans" : ""
-	}
+    "Tags": {
+    },
+    "Toggles": {
+        "ServerUpdates": false,
+        "Leaves": false,
+        "ChannelUpdates": false,
+        "Joins": false,
+        "Bans": false
+    },
+    "Channels": {
+        "Bans": "",
+        "Leaves": "",
+        "Joins": ""
+    }
 }

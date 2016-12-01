@@ -52,6 +52,10 @@ async def on_ready():
         z = fixJson(z)
         saveServerJson(server.id, z)
 
+    z = getServerJson('Globals')
+    z = fixJson(z)
+    saveServerJson('Globals', z)
+
 
 args = {'--token': None}
 del argv[0]  # Delete the name from the cli
