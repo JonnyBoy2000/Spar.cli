@@ -38,11 +38,14 @@ async def on_message_edit(before, after):
         await sparcli.process_commands(after)
 
 
-@sparcli.event 
+@sparcli.event
 async def on_message(message):
     # Make the bot not respond to itself
     if message.author.bot:
         return
+
+    # Process commands
+    await sparcli.process_commands(message)
 
 
 @sparcli.event
