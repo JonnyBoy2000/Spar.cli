@@ -51,7 +51,6 @@ def getArguments():
     args = {}
     del argv[0]  # Delete the name from the cli
 
-
     # Format the args into a dictionary
     for i in range(0, len(argv), 2):
         args[argv[i]] = argv[i + 1]
