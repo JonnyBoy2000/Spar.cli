@@ -14,17 +14,28 @@ sparcli = commands.Bot(
     command_prefix=['👌', ';'], description='ApplePy 2.0, pretty much.', pm_help=True)
 
 
-@sparcli.event 
+@sparcli.event
+async def on_server_join(server):
+    # Runs when the bot joins a server
+    # Create a config file for the server it joined
+    z = getServerJson(server.id)
+    z = fixJson(z)
+    saveServerJson(server.id, z)
+
+    # Say hi
+    await sparcli.send_message(server, 'Hey! I\'ve just been added to this server. I\'m Spar.cli, and i\'ll try and do a good job c;')
+
+
+@sparcli.event
 async def on_message_edit(before, after):
     # Get the last message from the channel
     async for message in sparcli.logs_from(after.channel, limit=1):
         pass
-    
+
     # Check if the edited message and the last message are the same;
     # if they are you can process that as a command
     if message.id == after.id:
         await sparcli.process_commands(after)
-
 
 
 @sparcli.event
