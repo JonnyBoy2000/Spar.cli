@@ -134,6 +134,10 @@ class Tags:
             nameMessage = await self.sparcli.wait_for_message(author=ctx.message.author)
             tagName = nameMessage.content
 
+            # If someone tries to tag a command
+            if tagName[0] in [',', '👌']:
+                return
+
         # Tell them thhat you're making tag and being nice
         await self.sparcli.say('Creating tag with name `{}`. What is the indended content?'.format(tagName))
         contentMessage = await self.sparcli.wait_for_message(author=ctx.message.author)
