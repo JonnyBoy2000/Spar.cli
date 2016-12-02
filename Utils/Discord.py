@@ -74,6 +74,28 @@ def getMentions(message, numberOfMentions=0, tagType='user'):
     return tags
 
 
+def getNonTaggedMentions(server, toFind, tagType='user', *, caseSensitive=False):
+    '''Filters through the server to the name of a thing that was tagged'''
+
+    # Set what to iterate through
+    tags = {'user': server.members,
+            'channel': server.channels,
+            'role': server.roles}[tagType]
+
+    # Alter the toFind string if caseSensitive
+    if caseSensitive:
+
+        # Iterate through each tag to see if it applies
+        retThings = [i for i in tags if toFind in i.name]
+
+    else:
+        retThings = [i for i in tags if toFind.lower() in i.name.lower()]
+
+    if len(retThings) > 1:
+        return 'There are too many possibilities for this search term - try narrowing your search or tagging your {}.'.format(tagType)
+    return retThings
+
+
 def makeEmbed(*, name='Spar.cli#1302', icon=None, colour=0xDEADBF, values={}):
     '''Creates an embed messasge with specified inputs'''
 

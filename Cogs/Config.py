@@ -59,6 +59,9 @@ class Config:
         await self.toggleSetting(ctx, toChange.title(), False)
 
     async def toggleSetting(self, ctx, whatToSet, toSetTo):
+        '''Sets a server config messagetype to true or false depending on the
+        command that called it'''
+
         # Make line length shorter
         serverID = ctx.message.server.id
 
@@ -72,7 +75,7 @@ class Config:
 
     @commands.command(pass_context=True)
     async def set(self, ctx, toChange: str):
-        '''Sets a certain messagetype's output to a certain channel
+        '''Sets a messagetype's output to a certain channel
         Usage :: set <MessageType> <Channel>
         MessageTypes :: joins, leaves, bans'''
 
@@ -95,6 +98,8 @@ class Config:
         await self.setSettings(ctx, toChange.title())
 
     async def setSettings(self, ctx, whatToSet):
+        '''Sets a certain server config to a string'''
+
         # Get any tagged channels
         mentions = getMentions(ctx.message, 1, 'channel')
         if type(mentions) == str:
