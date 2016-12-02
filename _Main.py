@@ -24,7 +24,7 @@ def getCommandPrefix(bot, message):
         return ';'
 
     # Load the server prefix as defined
-    return [';', serverPrefix]
+    return serverPrefix
 
 
 sparcli = commands.Bot(
