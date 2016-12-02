@@ -16,7 +16,7 @@ class RoleManagement:
     async def rolecolour(self, ctx, rolecolour: str, *, rolename: str):
         '''Changes the colour of a specified role
         Usage :: rolecolour <HexValue> <RoleName>
-                 rolecolour <HexValue> <RolePing>'''
+              :: rolecolour <HexValue> <RolePing>'''
 
         # Make sure that the calling user is allowed to manage roles
         permReturn = getPermissions(
@@ -35,15 +35,11 @@ class RoleManagement:
         # Get the role itself
         role = getMentions(ctx.message, 1, 'role')
         if role == 'You need to tag a role in your message.':
-            tempRole = [
-                i for i in ctx.message.server.roles if rolename.lower() in i.name.lower()]
-            if len(tempRole) == 0:
+            role = getNonTaggedMentions(ctx.message.server, rolename, 'role')
+            if type(role) == str:
                 await self.sparcli.say(role)
                 return
-            if len(tempRole) > 1:
-                await self.spacli.say('There are multiple roles by this name - try tagging one.')
-                return
-            role = tempRole[0]
+        role = tempRole[0]
 
         # Change the role colour
         colour = Colour(int(rolecolour, 16))
