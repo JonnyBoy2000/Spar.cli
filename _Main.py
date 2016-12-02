@@ -10,7 +10,8 @@ initialExtentions = ['Cogs.Admin',
                      'Cogs.Internet',
                      'Cogs.Tags',
                      'Cogs.Random',
-                     'Cogs.Roles']
+                     'Cogs.Roles',
+                     'Cogs.Config']
 
 
 sparcli = commands.Bot(

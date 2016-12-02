@@ -4,9 +4,9 @@
     "Etags": {
     },
     "Toggles": {
-        "ServerUpdates": false,
+        "Serverupdates": false,
         "Leaves": false,
-        "ChannelUpdates": false,
+        "Channelupdates": false,
         "Joins": false,
         "Bans": false
     },
