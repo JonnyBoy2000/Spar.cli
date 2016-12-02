@@ -7,7 +7,7 @@ except ImportError:
     translatorImported = True
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
-from Utils.Configs import getArguments
+from Utils.Configs import getTokens
 
 
 class Internet:
@@ -17,12 +17,14 @@ class Internet:
         self.translator = None
 
         # Set up the translator, if you can
-        tokens = getArguments()
+        if translatorImported == False:
+            return
         try:
-            secret = tokens['--transSecret']
-            transid = tokens['--transID']
+            tokens = getTokens()
+            secret = tokens['Microsoft Translate']['Secret']
+            transid = tokens['Microsoft Translate']['ID']
             self.translator = Translator(transid, secret)
-        except:
+        except KeyError:
             pass
 
     @commands.command()
@@ -72,8 +74,16 @@ class Internet:
 
         # See if the translator has been logged into
         if self.translator == None:
-            await self.sparcli.say('Translation has not been set up for this bot.')
-            return
+            try:
+                if translatorImported == False:
+                    raise KeyError
+                tokens = getTokens()
+                secret = tokens['Microsoft Translate']['Secret']
+                transid = tokens['Microsoft Translate']['ID']
+                self.translator = Translator(transid, secret)
+            except KeyError:
+                await self.sparcli.say('Translation has not been set up for this bot.')
+                return
 
         # Make sure that the language is supported
         if langTo not in self.translator.get_languages():

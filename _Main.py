@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from sys import argv
 from Utils.Configs import *
 from Utils.Updates import *
 
@@ -114,4 +115,4 @@ async def on_ready():
     saveServerJson('Globals', z)
 
 
-sparcli.run(getArguments()['--token'])
+sparcli.run(argv[1])

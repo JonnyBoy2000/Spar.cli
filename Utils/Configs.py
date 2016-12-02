@@ -46,14 +46,25 @@ def fixJson(inputDictionary, referenceDictionary=getServerJson('Default')):
     return inputDictionary
 
 
-def getArguments():
+def getTokens():
     '''Gives the arguments passed to the bot through CLI'''
 
-    args = {}
-    del argv[0]  # Delete the name from the cli
+    # Get the filename of the tokensheet
+    tokenJson = argv[-1]
 
-    # Format the args into a dictionary
-    for i in range(0, len(argv), 2):
-        args[argv[i]] = argv[i + 1]
+    # Remove it if it's the bot token
+    if tokenJson == argv[1]:
+        return False
 
-    return args
+    # Make sure you get the fileformat
+    if tokenJson[-5:] == '.json':
+        pass
+    else:
+        tokenJson = tokenJson + '.json'
+
+    # Parse it as JSON data
+    with open(workingDirectory + '\\..\\{}'.format(tokenJson)) as a:
+        tokenReading = loads(a.read())
+
+    # Return it to user
+    return tokenReading
