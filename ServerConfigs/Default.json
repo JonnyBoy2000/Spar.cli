@@ -8,12 +8,14 @@
         "Leaves": false,
         "Channelupdates": false,
         "Joins": false,
-        "Bans": false
+        "Bans": false,
+        "Starboard": false
     },
     "Channels": {
         "Bans": "",
         "Leaves": "",
-        "Joins": ""
+        "Joins": "",
+        "Starboard": ""
     },
     "Messages": {
         "Bans": "**{name}** has been banned!",

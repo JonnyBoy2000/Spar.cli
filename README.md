@@ -35,6 +35,8 @@ Leaves|When a user leaves the server|:heavy_check_mark:|:heavy_check_mark:
 Bans|When a user is banned|:heavy_check_mark:|:heavy_check_mark:
 ChannelUpdate|When a channel is updated|:heavy_multiplication_x:|:heavy_multiplication_x:
 ServerUpdate|When a server is updated|:heavy_check_mark:|:heavy_multiplication_x:
+Starboard|When a star is added to a message - quotes|:heavy_check_mark:|:heavy_multiplication_x:
+
 
 Name|Argument(s)|Description|Requirements|Aliases
 ---|---|---|---|---

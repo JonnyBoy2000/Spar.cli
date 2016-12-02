@@ -1,4 +1,5 @@
 from discord import Embed
+from time import strftime
 
 
 def getPermissions(channel, permissionCheck, firstPerson, secondPerson=None):
@@ -115,3 +116,32 @@ def makeEmbed(*, name='Spar.cli#1302', icon=None, colour=0xDEADBF, values={}):
 
     # Return to user
     return embedObj
+
+def messageToStarboard(message):
+    '''Created an embeddable message as a quote for use of the starboard event reference'''
+
+    # Get the amount of stars on the message
+    starAmount = [i.count for i in message.reactions if i.emoji == '⭐']
+    try:
+        starAmount = starAmount[0]
+    except IndexError:
+        return False, False
+
+    # Thus, make the text from the message
+    starboardText = '⭐ **{0}** from `{1.id}` in {2.mention}'.format(starAmount, message, message.channel)
+
+    # From here, make the embed
+    embedObj = Embed(colour=0xFFA930)
+    user = message.author
+    embedIcon = user.avatar_url if user.avatar_url != None else user.default_avatar_url
+    embedObj.set_author(name=str(user), icon_url=embedIcon)
+
+    # Get timestamp
+    date = message.timestamp
+    formtattedDate = date.strftime('%c')
+
+    # Add content
+    embedObj.add_field(name=message.content, value=formtattedDate)
+
+    # Return to user
+    return starboardText, embedObj

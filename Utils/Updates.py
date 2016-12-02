@@ -16,19 +16,27 @@ def serverEnables(serverID, typeOfEnable):
         ifEnabled = None
 
     # See if there's a channel that the bot should send to
-    ifSendTo = serverConfig['Channels'][typeOfEnable]
+    try:
+        ifSendTo = serverConfig['Channels'][typeOfEnable]
+    except KeyError:
+        ifSendTo = None
     if ifSendTo == '':
         ifSendTo = None
 
     # Get the message said by the server
-    sendMessage = serverConfig['Messages'][typeOfEnable]
+    try:
+        sendMessage = serverConfig['Messages'][typeOfEnable]
+    except KeyError:
+        sendMessage = None
+    if sendMessage == '':
+        sendMessage = None
 
     # Return what the bot should do
     # [ifYouShouldSend=TrueFalseNone, whereToSendTo=SnowflakeNone, sendMessage=StringNone]
     return [ifEnabled, ifSendTo, sendMessage]
 
 
-async def sendIfEnabled(sparcli, serverOrChannel, typeOfEnable, messageToSend, *, overrideMessage=None, overrideEnable=False, overrideChannel=None):
+async def sendIfEnabled(sparcli, serverOrChannel, typeOfEnable, *, embed=None, overrideMessage=None, overrideEnable=False, overrideChannel=None, edit=None):
     '''Sends a message if the server wants it to happen'''
 
     # Set up some stuff
@@ -55,8 +63,18 @@ async def sendIfEnabled(sparcli, serverOrChannel, typeOfEnable, messageToSend, *
         pass
     else:
         toSendTo = Object(ifShouldSend[1])
+
+    # Reformat a send message, if it has one
+    if type(ifShouldSend[2]) == str:
+        ifShouldSend[2].replace('{mention}', member.mention).replace(
+            '{name}', str(member))
+
+    # Fill in the overrides
     toSendTo = overrideChannel if overrideChannel != None else toSendTo
     messageToSend = overrideMessage if overrideMessage != None else messageToSend
 
     # Send the specified message
-    await sparcli.send_message(toSendTo, messageToSend)
+    if edit == None:
+        await sparcli.send_message(toSendTo, messageToSend, embed=embed)
+    else:
+        await sparcli.edit_message(edit, messageToSend, embed=embed)
