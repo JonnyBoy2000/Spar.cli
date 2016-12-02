@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from Utils.Configs import *
+from Utils.Updates import *
 
 
 initialExtentions = ['Cogs.Admin',
@@ -48,6 +49,20 @@ async def on_message(message):
 
     # Process commands
     await sparcli.process_commands(message)
+
+
+@sparcli.event
+async def on_member_join(member):
+    messageSend = serverEnables(member.server, 'Joins')[2]
+    messageSend = messageSend.replace('{mention}', member.mention).replace('{name}', str(member))
+    await sendIfEnabled(sparcli, member.server, 'Joins', messageSend)
+
+
+@sparcli.event 
+async def on_member_remove(member):
+    messageSend = serverEnables(member.server, 'Leaves')[2]
+    messageSend = messageSend.replace('{mention}', member.mention).replace('{name}', str(member))
+    await sendIfEnabled(sparcli, member.server, 'Leaves', messageSend)
 
 
 @sparcli.event
