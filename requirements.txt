@@ -2,3 +2,4 @@ discord.py[voice]
 requests
 microsofttranslator
 requests
+cleverbot

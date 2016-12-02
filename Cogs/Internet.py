@@ -5,6 +5,11 @@ try:
     translatorImported = True
 except ImportError:
     translatorImported = True
+try:
+    from cleverbot import Cleverbot
+    cleverbotImported = True
+except ImportError:
+    cleverbotImported = False
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Configs import getTokens
@@ -15,6 +20,7 @@ class Internet:
     def __init__(self, sparcli):
         self.sparcli = sparcli
         self.translator = None
+        self.cb = Cleverbot()
 
         # Set up the translator, if you can
         if translatorImported == False:
@@ -93,6 +99,18 @@ class Internet:
         # If so, translate it
         translatedText = self.translator.translate(toChange, langTo.lower())
         await self.sparcli.say(translatedText)
+
+    @commands.command(name='c')
+    async def clevertalk(self, *, message:str):
+        if cleverbotImported == False:
+            await self.sparcli.say('Cleverbot has not been set up for this bot.')
+            return 
+
+        # Get the response from Cleverbot
+        response = self.cb.ask(message)
+
+        # Respond nicely
+        await self.sparcli.say(response)
 
 
 def setup(bot):
