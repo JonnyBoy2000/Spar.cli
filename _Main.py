@@ -17,10 +17,14 @@ initialExtentions = ['Cogs.Admin',
 def getCommandPrefix(bot, message):
     # Returns the command prefix of the server
     # Get the settings for the server
-    serverSettings = getServerJson(message.server.id)
+    try:
+        serverSettings = getServerJson(message.server.id)
+        serverPrefix = serverSettings['CommandPrefix']
+    except AttributeError:
+        return ';'
 
     # Load the server prefix as defined
-    return [';', serverSettings['CommandPrefix']]
+    return [';', serverPrefix]
 
 
 sparcli = commands.Bot(
