@@ -42,6 +42,7 @@ set|\<Server Event> \<Channel Mention>|Sets the output text of the server event 
 youare|\<Now/Not> \<Role Name/Mention>|Will set which roles the user is allowed to self-assign|Admin|
 enable|\<Server Event>|Enables the server event output|Admin|
 disable|\<Server Event>|Disables the server event output|Admin|
+prefix|\<Content>|Sets the server's command prefix to whatever you pass as an argument|Admin|setprefix, prefixset
 
 ### Internet
 

@@ -187,6 +187,30 @@ class Config:
         await self.sparcli.say('The role `{0.name}` with ID `{0.id}` {1} self-assigned.'.format(
             roleToGive, {False: 'can now be', True: 'can no longer be'}[calledSubcommand]))
 
+    @commands.command(pass_context=True, aliases=['setprefix', 'prefixset'])
+    async def prefix(self, ctx, prefix: str):
+        '''Changes the command prefix for the server
+        Usage :: prefix <New Preifx>'''
+
+        # Set up some variables to keep line length short
+        author = ctx.message.author
+        channel = ctx.message.channel
+        serverID = ctx.message.server.id
+
+        # Get the permissions of the calling user
+        userPerms = getPermissions(channel, 'admin', author)
+        if type(userPerms) == str:
+            await self.sparcli.say(userPerms)
+            return
+
+        # Load and save the command prefix
+        serverSettings = getServerJson(serverID)
+        serverSettings['CommandPrefix'] = prefix
+        saveServerJson(serverID, serverSettings)
+
+        # Print out to the user
+        await self.sparcli.say('The command prefix for this server has been set to `{}`'.format(prefix))
+
 
 def setup(bot):
     bot.add_cog(Config(bot))

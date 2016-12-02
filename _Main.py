@@ -14,8 +14,17 @@ initialExtentions = ['Cogs.Admin',
                      'Cogs.Config']
 
 
+def getCommandPrefix(bot, message):
+    # Returns the command prefix of the server
+    # Get the settings for the server
+    serverSettings = getServerJson(message.server.id)
+
+    # Load the server prefix as defined
+    return [';', serverSettings['CommandPrefix']]
+
+
 sparcli = commands.Bot(
-    command_prefix=['👌', ';'], description='ApplePy 2.0, pretty much.', pm_help=True)
+    command_prefix=getCommandPrefix, description='ApplePy 2.0, pretty much.', pm_help=True)
 
 
 @sparcli.event
