@@ -60,7 +60,8 @@ class Misc:
         userIcon = userOne.avatar_url if userOne.avatar_url != None else userOne.default_avatar_url
 
         # Create an embed out of it
-        embedMessage = makeEmbed(name='{}'.format(userOne), icon=userIcon, values=userInfo)
+        embedMessage = makeEmbed(name='{}'.format(
+            userOne), icon=userIcon, values=userInfo)
 
         # Send it out to the user
         await self.sparcli.say('', embed=embedMessage)

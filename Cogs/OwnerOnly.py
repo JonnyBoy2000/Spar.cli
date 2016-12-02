@@ -46,7 +46,8 @@ class OwnerOnly:
               :: av <ImageUpload>'''
 
         # Check if the owner is calling the command
-        permReturn = getPermissions(ctx.message.channel, 'is_owner', ctx.message.author)
+        permReturn = getPermissions(
+            ctx.message.channel, 'is_owner', ctx.message.author)
         if type(permReturn) == str:
             await self.sparcli.say(permReturn)
             return
@@ -61,7 +62,7 @@ class OwnerOnly:
             return
 
         # Load up the image
-        imageData = get(avatarUrl).content 
+        imageData = get(avatarUrl).content
 
         # Set profile picture
         await self.sparcli.edit_profile(avatar=imageData)

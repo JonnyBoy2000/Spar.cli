@@ -19,13 +19,12 @@ class Tags:
         await self.runTag(ctx, subcom, False)
 
     @commands.command(pass_context=True, aliases=['et'])
-    async def etag(self, ctx, *, subcom: str = None):
+    async def etag(self, ctx, *, subcom: str=None):
         '''Defines server-specific tags for evaluating Python expressions
         Usage :: etag add
               :: etag del'''
 
         await self.runTag(ctx, subcom, True)
-
 
     async def runTag(self, ctx, subcom, runWithExec):
         # See if you're trying to call a subcommand or error
@@ -60,8 +59,10 @@ class Tags:
         server = ctx.message.server
 
         # Get both the global and local tags
-        globalTags = getServerJson('Globals')[{False:'Tags', True:'Etags'}[runWithExec]]
-        localTags = getServerJson(server.id)[{False:'Tags', True:'Etags'}[runWithExec]]
+        globalTags = getServerJson(
+            'Globals')[{False: 'Tags', True: 'Etags'}[runWithExec]]
+        localTags = getServerJson(
+            server.id)[{False: 'Tags', True: 'Etags'}[runWithExec]]
 
         # See if it's a local tag
         try:
@@ -93,8 +94,10 @@ class Tags:
         # Tagname isn't used, but it's kinda necessary because of how I'm calling it
         # Get the local and global tags
         server = ctx.message.server
-        globalTags = getServerJson('Globals')[{False:'Tags', True:'Etags'}[runWithExec]]
-        localTags = getServerJson(server.id)[{False:'Tags', True:'Etags'}[runWithExec]]
+        globalTags = getServerJson(
+            'Globals')[{False: 'Tags', True: 'Etags'}[runWithExec]]
+        localTags = getServerJson(
+            server.id)[{False: 'Tags', True: 'Etags'}[runWithExec]]
 
         # Plonk them into a new list
         locald = []
@@ -117,14 +120,16 @@ class Tags:
         await self.sparcli.send_message(ctx.message.author, formatted)
 
     async def tagGlobalAdd(self, ctx, tagName, unusedServerID, runWithExec):
-        permThing = getPermissions(ctx.message.channel, 'is_owner', ctx.message.author)
+        permThing = getPermissions(
+            ctx.message.channel, 'is_owner', ctx.message.author)
         if type(permThing) == str:
             await self.sparcli.say(permThing)
             return
         await self.tagAdd(ctx, tagName, 'Globals', runWithExec)
 
     async def tagGlobalDelete(self, ctx, tagName, unusedServerID, runWithExec):
-        permThing = getPermissions(ctx.message.channel, 'is_owner', ctx.message.author)
+        permThing = getPermissions(
+            ctx.message.channel, 'is_owner', ctx.message.author)
         if type(permThing) == str:
             await self.sparcli.say(permThing)
             return
@@ -143,7 +148,7 @@ class Tags:
         # Save it into the server configs
         settings = getServerJson(serverID)
         try:
-            del settings[{False:'Tags', True:'Etags'}[runWithExec]][tagName]
+            del settings[{False: 'Tags', True: 'Etags'}[runWithExec]][tagName]
         except KeyError:
             await self.sparcli.say('This tag does not exist.')
             return
@@ -167,14 +172,16 @@ class Tags:
         # Tell them thhat you're making tag and being nice
         await self.sparcli.say('Creating tag with name `{}`. What is the indended content?'.format(tagName))
         contentMessage = await self.sparcli.wait_for_message(author=ctx.message.author)
-        content = contentMessage.content if contentMessage.content != '' else contentMessage.attachments[0]['url']
+        content = contentMessage.content if contentMessage.content != '' else contentMessage.attachments[
+            0]['url']
 
         # Get the serverID
         serverID = ctx.message.server.id if serverID == None else serverID
 
         # Save it into the server configs
         settings = getServerJson(serverID)
-        settings[{False:'Tags', True:'Etags'}[runWithExec]][tagName] = content
+        settings[{False: 'Tags', True: 'Etags'}
+                 [runWithExec]][tagName] = content
         saveServerJson(serverID, settings)
 
         # Respond to the user

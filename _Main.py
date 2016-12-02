@@ -54,14 +54,16 @@ async def on_message(message):
 @sparcli.event
 async def on_member_join(member):
     messageSend = serverEnables(member.server, 'Joins')[2]
-    messageSend = messageSend.replace('{mention}', member.mention).replace('{name}', str(member))
+    messageSend = messageSend.replace(
+        '{mention}', member.mention).replace('{name}', str(member))
     await sendIfEnabled(sparcli, member.server, 'Joins', messageSend)
 
 
-@sparcli.event 
+@sparcli.event
 async def on_member_remove(member):
     messageSend = serverEnables(member.server, 'Leaves')[2]
-    messageSend = messageSend.replace('{mention}', member.mention).replace('{name}', str(member))
+    messageSend = messageSend.replace(
+        '{mention}', member.mention).replace('{name}', str(member))
     await sendIfEnabled(sparcli, member.server, 'Leaves', messageSend)
 
 

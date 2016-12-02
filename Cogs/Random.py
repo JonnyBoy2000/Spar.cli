@@ -7,14 +7,13 @@ class Random:
     def __init__(self, sparcli):
         self.sparcli = sparcli
 
-
     @commands.command()
     async def coinflip(self):
         '''Gives a random result of heads or tails
         Usage :: coinflip'''
 
         # Get the result
-        coinResultTable = {0:'Heads',1:'Tails'}
+        coinResultTable = {0: 'Heads', 1: 'Tails'}
         result = coinResultTable[rnum(0, 1)]
 
         # Be a cheeky feck ;3

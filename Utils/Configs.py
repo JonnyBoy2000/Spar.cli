@@ -45,6 +45,7 @@ def fixJson(inputDictionary, referenceDictionary=getServerJson('Default')):
                 inputDictionary[i] = referenceDictionary[i]
     return inputDictionary
 
+
 def getArguments():
     '''Gives the arguments passed to the bot through CLI'''
 
