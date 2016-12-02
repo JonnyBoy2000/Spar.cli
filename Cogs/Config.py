@@ -76,7 +76,7 @@ class Config:
     @commands.command(pass_context=True)
     async def set(self, ctx, toChange: str):
         '''Sets a messagetype's output to a certain channel
-        Usage :: set <MessageType> <Channel>
+        Usage :: set <MessageType> <ChannelPing>
         MessageTypes :: joins, leaves, bans'''
 
         # Set up some variables to keep line length short

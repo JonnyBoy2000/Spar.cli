@@ -38,7 +38,7 @@ class Misc:
     @commands.command(pass_context=True)
     async def info(self, ctx):
         '''Gives info on the mentioned user
-        Usage :: info <Mention>'''
+        Usage :: info <UserPing>'''
 
         # Get the user who was pinged
         pingedUsers = getMentions(ctx.message, 1)
