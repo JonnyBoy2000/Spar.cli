@@ -1,6 +1,10 @@
 from discord.ext import commands
 from requests import get
-from microsofttranslator import Translator
+try:
+    from microsofttranslator import Translator
+    translatorImported = True
+except ImportError:
+    translatorImported = True
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Configs import getArguments
@@ -11,6 +15,15 @@ class Internet:
     def __init__(self, sparcli):
         self.sparcli = sparcli
         self.translator = None
+
+        # Set up the translator, if you can
+        tokens = getArguments()
+        try:
+            secret = tokens['--transSecret']
+            transid = tokens['--transID']
+            self.translator = Translator(transid, secret)
+        except:
+            pass
 
     @commands.command()
     async def pun(self):
@@ -59,15 +72,8 @@ class Internet:
 
         # See if the translator has been logged into
         if self.translator == None:
-            tokens = getArguments()
-            try:
-                secret = tokens['--transSecret']
-                transid = tokens['--transID']
-            except KeyError:
-                await self.sparcli.say('Translation has not been set up during this runtime.')
-                return
-
-            self.translator = Translator(transid, secret)
+            await self.sparcli.say('Translation has not been set up for this bot.')
+            return
 
         # Make sure that the language is supported
         if langTo not in self.translator.get_languages():
@@ -75,7 +81,7 @@ class Internet:
             return
 
         # If so, translate it
-        translatedText = self.translator.translate(toChange, langTo)
+        translatedText = self.translator.translate(toChange, langTo.lower())
         await self.sparcli.say(translatedText)
 
 
