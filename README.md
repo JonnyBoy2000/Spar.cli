@@ -41,7 +41,7 @@ Name|Argument(s)|Description|Requirements|Aliases
 set|\<Server Event> \<Channel Mention>|Sets the output text of the server event to the mentioned channel|Admin|
 youare|\<Now/Not> \<Role Name/Mention>|Will set which roles the user is allowed to self-assign|Admin|
 enable|\<Server Event>|Enables the server event output|Admin|
-disable\<Server Event>|Disables the server event output|Admin|
+disable|\<Server Event>|Disables the server event output|Admin|
 
 ### Internet
 
@@ -89,7 +89,7 @@ Name|Argument(s)|Description|Requirements|Aliases
 ---|---|---|---|---
 tag add||Adds a server-specific tag||t add
 tag del||Deletes a server-specific tag||t del
-tag|\<Tag Name>|Repeats back a tag to you|t
+tag|\<Tag Name>|Repeats back a tag to you||t
 etag add||Adds a server-specific evaluated tag||et add
 etag del||Deletes a server-specific evaluated tag||et del
-etag|\<Tag Name>|Repeats back an evaluated tag to you|et
+etag|\<Tag Name>|Repeats back an evaluated tag to you||et
