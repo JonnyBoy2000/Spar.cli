@@ -46,12 +46,13 @@ async def on_server_join(server):
 @sparcli.event
 async def on_message_edit(before, after):
     # Get the last message from the channel
-    async for message in sparcli.logs_from(after.channel, limit=1):
-        pass
+    editedIDs = []
+    async for message in sparcli.logs_from(after.channel, limit=3):
+        editedIDs.append(message.id)
 
-    # Check if the edited message and the last message are the same;
+    # Check if the edited message and the last few messages are the same;
     # if they are you can process that as a command
-    if message.id == after.id:
+    if after.id in editedIDs:
         await sparcli.process_commands(after)
 
 
