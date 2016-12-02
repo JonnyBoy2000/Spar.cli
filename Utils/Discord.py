@@ -93,6 +93,8 @@ def getNonTaggedMentions(server, toFind, tagType='user', *, caseSensitive=False)
 
     if len(retThings) > 1:
         return 'There are too many possibilities for this search term - try narrowing your search or tagging your {}.'.format(tagType)
+    elif len(retThings) == 0:
+        return 'There are no {}s with the name `{}`.'.format(tagType, toFind)
     return retThings
 
 

@@ -19,5 +19,7 @@
         "Bans": "**{name}** has been banned!",
         "Leaves": "**{name}** has just left the server!",
         "Joins": "{mention} has just joined the server!"
-    }
+    },
+    "SelfAssignableRoles": [
+    ]
 }
