@@ -97,18 +97,24 @@ class Tags:
         localTags = getServerJson(server.id)[{False:'Tags', True:'Etags'}[runWithExec]]
 
         # Plonk them into a new list
-        sharedDict = []
+        locald = []
         for i in localTags:
             if i in globalTags:
                 pass
             else:
-                sharedDict.append('{} :: {}'.format(i, localTags[i]))
+                locald.append('{} :: {}'.format(i, localTags[i]))
+        globald = []
         for i in globalTags:
-            sharedDict.append('{} :: {}'.format(i, globalTags[i]))
+            globald.append('{} :: {}'.format(i, globalTags[i]))
+
+        # Format them into a string
+        formatLocal = 'Local Tags :: \n```\n{}```'.format('\n'.join(locald))
+        formatGlobal = 'Global Tags :: \n```\n{}```'.format('\n'.join(globald))
+        formatted = '{}\n{}'.format(formatLocal, formatGlobal)
 
         # PM it to the user
         await self.sparcli.say('You have been private messaged a list of all of the commands.')
-        await self.sparcli.send_message(ctx.message.author, '```\n' + '\n'.join(sharedDict) + '```')
+        await self.sparcli.send_message(ctx.message.author, formatted)
 
     async def tagGlobalAdd(self, ctx, tagName, unusedServerID, runWithExec):
         permThing = getPermissions(ctx.message.channel, 'is_owner', ctx.message.author)
