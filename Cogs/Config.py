@@ -1,7 +1,7 @@
 from discord.ext import commands
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
-from Utils.Discord import getPermissions
+from Utils.Discord import getPermissions, getMentions
 from Utils.Configs import getServerJson, saveServerJson
 
 
@@ -69,6 +69,49 @@ class Config:
 
         # Print out to user
         await self.sparcli.say('The messagetype `{}` has been set to `{}`'.format(whatToSet, toSetTo))
+
+    @commands.command(pass_context=True)
+    async def set(self, ctx, toChange: str):
+        '''Sets a certain messagetype's output to a certain channel
+        Usage :: set <MessageType> <Channel>
+        MessageTypes :: joins, leaves, bans'''
+
+        # Set up some variables to keep line length short
+        author = ctx.message.author
+        channel = ctx.message.channel
+
+        # Get the permissions of the calling user
+        userPerms = getPermissions(channel, 'admin', author)
+        if type(userPerms) == str:
+            await self.sparcli.say(userPerms)
+            return
+
+        # If the user can use it, the serverconfig will be changed
+        if toChange.title() not in getServerJson('Default')['Channels']:
+            await self.sparcli.say('That isn\'t a messagetype you can set. Try something from `{}`'.format(
+                ', '.join(getServerJson('Default')['Channels'].keys())))
+
+        # Change the thingy
+        await self.setSettings(ctx, toChange.title())
+
+    async def setSettings(self, ctx, whatToSet):
+        # Get any tagged channels
+        mentions = getMentions(ctx.message, 1, 'channel')
+        if type(mentions) == str:
+            await self.sparcli.say(mentions)
+            return
+        mentions = mentions[0]
+
+        # Make line length shorter
+        serverID = ctx.message.server.id
+
+        # Changes the server settings
+        serverSettings = getServerJson(serverID)
+        serverSettings['Channels'][whatToSet] = mentions.id
+        saveServerJson(serverID, serverSettings)
+
+        # Print out to user
+        await self.sparcli.say('The messagetype `{0}` output has been set to {1.mention}, with ID `{1.id}`'.format(whatToSet, mentions))
 
 
 def setup(bot):
