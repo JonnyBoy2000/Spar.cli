@@ -66,6 +66,29 @@ class Misc:
         # Send it out to the user
         await self.sparcli.say('', embed=embedMessage)
 
+    @commands.command(pass_context=True)
+    async def clean(self, ctx, amount: int=50, user: str=None):
+        '''Checks a given amount of messages, and removes ones from a certain user
+        Defaults to 50, with the user being the bot
+        Usage :: clean
+              :: clean <Number>
+              :: clean <Number> <UserMention>'''
+
+        # Check if the user has mentioned anyone
+        messagePings = getMentions(ctx.message, 1)
+        if type(messagePings) == str:
+            user = self.sparcli.user
+        else:
+            user = messagePings[0]
+
+        # Set up the check
+        def cleanCheck(m):
+            return m.author.id == user.id
+
+        # Purge accurately
+        deleted = await self.sparcli.purge_from(ctx.message.channel, limit=amount, check=cleanCheck)
+        await self.sparcli.say('Cleaned `{}` messages from the channel.'.format(len(deleted)))
+
 
 def setup(bot):
     bot.add_cog(Misc(bot))
