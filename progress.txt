@@ -1,5 +1,5 @@
 [X] Ban
-[ ] Config (Server configs - needed for event listeners)
+[/] Config (Server configs - needed for event listeners)
 [X] CC (Custom commands) [Added with tags]
 [X] Eval
 [X] Pun (Use beautifulsoup4)
@@ -8,4 +8,4 @@
 [X] Game (Change bot presence)
 [ ] Restart/Kill (Can use sys)
 [X] Info (Give information on a tagged user)
-[ ] Clean/Purge (Delete messages through a channel)
+[/] Clean/Purge (Delete messages through a channel)

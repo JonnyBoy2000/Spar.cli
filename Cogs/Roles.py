@@ -18,7 +18,7 @@ class RoleManagement:
         Usage :: rolecolour <HexValue> <RoleName>
                  rolecolour <HexValue> <RolePing>'''
 
-        # Make sure that the calling user is allowed to manage messages
+        # Make sure that the calling user is allowed to manage roles
         permReturn = getPermissions(
             ctx.message.channel, 'manage_roles', ctx.message.author)
 
