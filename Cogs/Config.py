@@ -1,7 +1,7 @@
 from discord.ext import commands
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
-from Utils.Discord import getPermissions, getMentions
+from Utils.Discord import getPermissions, getMentions, getNonTaggedMentions
 from Utils.Configs import getServerJson, saveServerJson
 
 
@@ -117,6 +117,75 @@ class Config:
 
         # Print out to user
         await self.sparcli.say('The messagetype `{0}` output has been set to {1.mention}, with ID `{1.id}`'.format(whatToSet, mentions))
+
+    @commands.group(pass_context=True)
+    async def youare(self, ctx, addRemove: str, *, whatToChange: str):
+        '''Allows you to change which roles are self-assignable
+        Usage :: youare not <RoleName>
+              :: youare not <RolePing>
+              :: youare del <RoleName>
+              :: youare now <RoleName>
+              :: youare add <RolePing>'''
+
+        # Set up some variables to keep line length short
+        author = ctx.message.author
+        channel = ctx.message.channel
+
+        # Get the permissions of the calling user
+        userPerms = getPermissions(channel, 'admin', author)
+        if type(userPerms) == str:
+            await self.sparcli.say(userPerms)
+            return
+
+        # Try and see if the role was pinged
+        roleToGive = getMentions(ctx.message, 1, 'role')
+        if type(roleToGive) == str:
+
+            # If wasn't pinged - see if it exists
+            roleToGive = getNonTaggedMentions(
+                ctx.message.server, whatToChange, 'role')
+            if type(roleToGive) == str:
+
+                # The user hates us
+                await self.sparcli.say(roleToGive)
+                return
+
+        # Turn the role list into a role
+        roleToGive = roleToGive[0]
+
+        # Set up where the subcommand will redirect to
+        subcommands = {'not': True,
+                       'del': True,
+                       'delete': True,
+                       'add': False,
+                       'now': False}
+        calledSubcommand = subcommands[addRemove.lower()]
+
+        # Read from the server configs
+        serverSettings = getServerJson(ctx.message.server.id)
+        allowableIDs = serverSettings['SelfAssignableRoles']
+
+        # Fliter if add or remove
+        if calledSubcommand:
+            try:
+                allowableIDs.remove(roleToGive.id)
+            except ValueError:
+                await self.sparcli.say('This role isn\'t self-assignable.')
+                return
+        else:
+            if roleToGive.id not in allowableIDs:
+                allowableIDs.append(roleToGive.id)
+            else:
+                await self.sparcli.say('This role can already be self-assigned.')
+                return
+
+        # Plonk the settings back into the file storage
+        serverSettings['SelfAssignableRoles'] = allowableIDs
+        saveServerJson(ctx.message.server.id, serverSettings)
+
+        # Print out to the user
+        await self.sparcli.say('The role `{0.name}` with ID `{0.id}` {1} self-assigned.'.format(
+            roleToGive, {False: 'can now be', True: 'can no longer be'}[calledSubcommand]))
 
 
 def setup(bot):

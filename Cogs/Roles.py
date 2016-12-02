@@ -85,6 +85,7 @@ class RoleManagement:
         # See if you can add that
         if roleToGive.id not in allowableIDs:
             await self.sparcli.say('You are not allowed to self-assign that role.')
+            return
 
         # You can - add it to the user
         try:
