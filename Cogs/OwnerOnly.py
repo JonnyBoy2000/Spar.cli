@@ -1,7 +1,8 @@
 from discord.ext import commands
-from discord import Game
+from discord import Game, Status
 from requests import get
-from sys import path
+from random import choice
+from sys import path, exit
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import getPermissions
 
@@ -67,6 +68,32 @@ class OwnerOnly:
         # Set profile picture
         await self.sparcli.edit_profile(avatar=imageData)
         await self.sparcli.say("Profile picture successfully changed.")
+
+    @commands.command(pass_context=True, hidden=True)
+    async def kill(self, ctx):
+        '''Kills the bot. Makes it deaded.
+        Usage :: kill'''
+
+        # Check if the owner is calling the command
+        permReturn = getPermissions(
+            ctx.message.channel, 'is_owner', ctx.message.author)
+        if type(permReturn) == str:
+            await self.sparcli.say(permReturn)
+            return
+
+        # If it is, tell the user the bot it dying
+        killMessages = ['I am deded. Rip me.',
+                        'Killing.',
+                        'And with this, I am ending.',
+                        '*Finally*.',
+                        '\'Bout time, mate.',
+                        'At least it\'s better than how Snape went out.',
+                        'Dead or not, I\'m still more loved than BlackBox.',
+                        'In my culture, this is called "delayed abortion".']
+        toSay = choice(killMessages)
+        await self.sparcli.say(toSay)
+        await self.sparcli.change_presence(status=Status.invisible, game=None)
+        exit()
 
 
 def setup(bot):
