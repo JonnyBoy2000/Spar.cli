@@ -95,6 +95,24 @@ class OwnerOnly:
         await self.sparcli.change_presence(status=Status.invisible, game=None)
         exit()
 
+    @commands.command(pass_context=True, hidden=True)
+    async def loadmessage(self, ctx, messageID:str):
+        '''Loads a message into the bot chache
+        Usage :: loadmessage <MessageID>'''
+
+        # Check if the owner is calling the command
+        permReturn = getPermissions(
+            ctx.message.channel, 'is_owner', ctx.message.author)
+        if type(permReturn) == str:
+            await self.sparcli.say(permReturn)
+            return
+
+        # Find and add the message
+        messageToAdd = await self.sparcli.get_message(ctx.message.channel, messageID)
+        self.sparcli.messages.append(messageToAdd)
+        await self.sparcli.say('This message has been added to the bot\'s cache.')
+
+
 
 def setup(bot):
     bot.add_cog(OwnerOnly(bot))
