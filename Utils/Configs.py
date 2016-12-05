@@ -8,10 +8,10 @@ def getServerJson(serverID):
     '''Returns the JSON config for a server'''
 
     try:
-        with open(workingDirectory + '\\..\\ServerConfigs\\{}.json'.format(serverID)) as a:
+        with open(workingDirectory + '/../ServerConfigs/{}.json'.format(serverID)) as a:
             jsonData = loads(a.read())
     except FileNotFoundError:
-        with open(workingDirectory + '\\..\\\\ServerConfigs\\Default.json') as a:
+        with open(workingDirectory + '/../ServerConfigs/Default.json') as a:
             jsonData = loads(a.read())
     return jsonData
 
@@ -19,7 +19,7 @@ def getServerJson(serverID):
 def saveServerJson(serverID, jsonData):
     '''Writes a JSON file into savedata'''
 
-    with open(workingDirectory + '\\..\\ServerConfigs\\{}.json'.format(serverID), 'w') as a:
+    with open(workingDirectory + '/../ServerConfigs/{}.json'.format(serverID), 'w') as a:
         a.write(dumps(jsonData, indent=4))
 
 
@@ -63,7 +63,7 @@ def getTokens():
         tokenJson = tokenJson + '.json'
 
     # Parse it as JSON data
-    with open(workingDirectory + '\\..\\{}'.format(tokenJson)) as a:
+    with open(workingDirectory + '/../{}'.format(tokenJson)) as a:
         tokenReading = loads(a.read())
 
     # Return it to user
