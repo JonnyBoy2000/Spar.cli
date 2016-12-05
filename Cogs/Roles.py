@@ -39,7 +39,7 @@ class RoleManagement:
             if type(role) == str:
                 await self.sparcli.say(role)
                 return
-        role = tempRole[0]
+        role = role[0]
 
         # Change the role colour
         colour = Colour(int(rolecolour, 16))
