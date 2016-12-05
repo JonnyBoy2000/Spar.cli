@@ -141,7 +141,7 @@ def messageToStarboard(message):
     formtattedDate = date.strftime('%c')
 
     # Add content
-    embedObj.add_field(name=message.content, value=formtattedDate)
+    embedObj.add_field(name=message.clean_content, value=formtattedDate)
 
     # Return to user
     return starboardText, embedObj
