@@ -18,11 +18,18 @@ class Tags:
 
         await self.runTag(ctx, subcom, False)
 
-    @commands.command(pass_context=True, aliases=['et'])
+    @commands.command(pass_context=True, aliases=['et'], hidden=True)
     async def etag(self, ctx, *, subcom: str=None):
         '''Defines server-specific tags for evaluating Python expressions
         Usage :: etag add
               :: etag del'''
+
+        # Check if the owner is calling the command
+        permReturn = getPermissions(
+            ctx.message.channel, 'is_owner', ctx.message.author)
+        if type(permReturn) == str:
+            await self.sparcli.say(permReturn)
+            return
 
         await self.runTag(ctx, subcom, True)
 
