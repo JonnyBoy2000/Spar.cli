@@ -95,6 +95,42 @@ class OwnerOnly:
         await self.sparcli.change_presence(status=Status.invisible, game=None)
         exit()
 
+
+    @commands.command(pass_context=True, hidden=True)
+    async def rld(self, ctx, *, extention:str=None):
+        '''Reload an extention on the bot
+        Usage :: rld <Extention>'''
+        
+        # Check if the owner is calling the command
+        permReturn = getPermissions(
+            ctx.message.channel, 'is_owner', ctx.message.author)
+        if type(permReturn) == str:
+            await self.sparcli.say(permReturn)
+            return
+
+        # Get list of loaded extentions
+        if extention == None:
+            await self.sparcli.say("Currently loaded extentions :: \n```\n{}```".format("\n".join(self.sparcli.cogs)))
+            return
+
+        # Unload the extention
+        await self.sparcli.say("Reloading extension...")
+        try: 
+            self.sparcli.unload_extension('Cogs.' + extention)
+        except: 
+            pass
+
+        # Load the new one
+        try: 
+            self.sparcli.load_extension('Cogs.' + extention)
+        except ImportError:
+            await self.sparcli.say("That extention does not exist.")
+            return
+
+        # Boop the user
+        await self.sparcli.say("Done!")
+
+
     @commands.command(pass_context=True, hidden=True)
     async def loadmessage(self, ctx, messageID:str):
         '''Loads a message into the bot chache
