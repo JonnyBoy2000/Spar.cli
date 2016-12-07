@@ -31,6 +31,7 @@ class RoleManagement:
             rolecolour = rolecolour.replace('#', '')
         if len(rolecolour) != 6:
             await self.sparcli.say('Give the colour of the role to change in the form of a hex code.')
+            return
 
         # Get the role itself
         role = getMentions(ctx.message, 1, 'role')
