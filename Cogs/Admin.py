@@ -14,18 +14,18 @@ class Admin:
         '''Bans a user from the server.
         Usage :: ban <Mention> <Reason...>'''
 
+        # Get the tagged users from the message
+        taggedUser = getMentions(ctx.message, 1)
+        if type(taggedUser) == str:
+            await self.sparcli.say(taggedUser)
+            return
+
         # See if the user is allowed to run the command
         permReturn = getPermissions(
             ctx.message.channel, 'ban', ctx.message.author, taggedUser[0])
 
         if type(permReturn) == str:
             await self.sparcli.say(permReturn)
-            return
-
-        # Get the tagged users from the message
-        taggedUser = getMentions(ctx.message, 1)
-        if type(taggedUser) == str:
-            await self.sparcli.say(taggedUser)
             return
 
         # Try and ban the user
@@ -43,19 +43,18 @@ class Admin:
         '''Kicks a user from the server.
         Usage :: kick <Mention> <Reason...>'''
 
+        # Get the tagged users from the message
+        taggedUser = getMentions(ctx.message, 1)
+        if type(taggedUser) == str:
+            await self.sparcli.say(taggedUser)
+            return
+
         # See if the user is allowed to run the command
         permReturn = getPermissions(
             ctx.message.channel, 'kick', ctx.message.author, taggedUser[0])
 
         if type(permReturn) == str:
             await self.sparcli.say(permReturn)
-            return
-
-
-        # Get the tagged users from the message
-        taggedUser = getMentions(ctx.message, 1)
-        if type(taggedUser) == str:
-            await self.sparcli.say(taggedUser)
             return
 
         # Try and kick the user
