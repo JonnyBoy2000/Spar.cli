@@ -67,7 +67,7 @@ class Misc:
             userOne), icon=userIcon, values=userInfo)
 
         # Send it out to the user
-        await self.sparcli.say('', embed=embedMessage)
+        await self.sparcli.say(userIcon, embed=embedMessage)
 
     @commands.command(pass_context=True)
     async def clean(self, ctx, amount: int=50, user: str=None):
@@ -85,8 +85,7 @@ class Misc:
             user = messagePings[0]
 
         # Set up the check
-        def cleanCheck(m):
-            return m.author.id == user.id
+        cleanCheck = lambda m: m.author.id == user.id
 
         # Purge accurately
         deleted = await self.sparcli.purge_from(ctx.message.channel, limit=amount, check=cleanCheck)
