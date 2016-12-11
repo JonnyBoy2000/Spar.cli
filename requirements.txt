@@ -3,3 +3,4 @@ requests
 microsofttranslator
 requests
 cleverbot
+wolframalpha==2.4

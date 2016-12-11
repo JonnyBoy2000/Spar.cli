@@ -1,6 +1,9 @@
 {
-    "Microsoft Translate": {
-        "ID": "",
-        "Secret": ""
-    }
+	"Microsoft Translate": {
+		"ID": "",
+		"Secret": ""
+	},
+	"WolframAlpha": {
+		"Secret": ""
+	}
 }

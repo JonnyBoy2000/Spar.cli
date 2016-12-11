@@ -10,6 +10,14 @@ try:
     cleverbotImported = True
 except ImportError:
     cleverbotImported = False
+
+# Import WolframAlpha
+try:
+    from wolframalpha import Client
+    wolframalphaImported = True
+except ImportError:
+    wolframalphaImported = False
+
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Configs import getTokens
@@ -21,6 +29,7 @@ class Internet:
         self.sparcli = sparcli
         self.translator = None
         self.cb = Cleverbot()
+        self.wolfClient = None
 
         # Set up the translator, if you can
         if translatorImported == False:
@@ -38,7 +47,14 @@ class Internet:
         '''Grabs a random pun form around the internet
         Usage :: pun'''
 
-        pass
+        # Set up Wolfram
+        if wolframalphaImported == True:
+            try:
+                tokens = getTokens()
+                secret = tokens['WolframAlpha']['Secret']
+                self.wolfClient = Client(secret)
+            except KeyError:
+                pass
 
     @commands.command()
     async def cat(self):
@@ -111,6 +127,57 @@ class Internet:
 
         # Respond nicely
         await self.sparcli.say(response)
+
+    @commands.command(pass_context=True)
+    async def wolfram(self, ctx, *, toDo: str):
+        '''Searches WolframAlpha for the given term. Returns text
+        Usage :: wolfram <SearchTerm>'''
+
+        # Call the internal search function
+        await self.wolframSearch(ctx, toDo, False)
+
+    @commands.command(pass_context=True)
+    async def iwolfram(self, ctx, *, toDo: str):
+        '''Searches WolframAlpha for the given term. Returns images
+        Usage :: iwolfram <SearchTerm>'''
+
+        # Call the internal search function
+        await self.wolframSearch(ctx, toDo, True)
+
+    async def wolframSearch(self, ctx, whatToSearch, displayImages):
+        '''Sends the actual search term to the Wolfram servers'''
+
+        # See if the Wolfram API has been loaded
+        if self.wolfClient == None:
+            try:
+                if wolframalphaImported == False:
+                    raise KeyError
+                tokens = getTokens()
+                secret = tokens['WolframAlpha']['Secret']
+                self.wolfClient = Client(secret)
+            except KeyError:
+                await self.sparcli.say('WolframAlpha has not been set up for this bot.')
+                return
+
+        # Send typing, so you can see it's being processed
+        await self.sparcli.send_typing(ctx.message.server)
+
+        # Sends query to Wolfram
+        wolfResults = self.wolfClient.query(whatToSearch)
+
+        # Set up a filter to remove Nonetype values
+        removeNone = lambda x: [i for i in x if x != None]
+
+        # Fix the results into a list - text or link
+        if displayImages == False:
+            u = '```\n{}```'
+            wolfList = [u.format(i.text) for i in wolfResults.pods]
+            wolfList = removeNone(wolfList)
+        else:
+            wolfList = [i.img for i in wolfResults.pods]
+
+        # Return to user
+        await self.sparcli.say(' '.join(wolfList[0:6]))
 
 
 def setup(bot):
