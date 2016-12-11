@@ -5,6 +5,7 @@ from random import choice
 from sys import path, exit
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import getPermissions
+from Utils.Extentions import q as initialExtentions
 
 
 class OwnerOnly:
@@ -113,16 +114,22 @@ class OwnerOnly:
             await self.sparcli.say("Currently loaded extentions :: \n```\n{}```".format("\n".join(self.sparcli.cogs)))
             return
 
+        # Load a nicer way of sorting out the extentions
+        # Plonk the initial extentions into a dictionary
+        eF = {i.split('.')[1].lower():i for i in initialExtentions}
+        # Finish finish them off to be actual real extentions
+        extention = [eF[i] for i in eF.keys() if extention.lower() in i][0]
+
         # Unload the extention
-        await self.sparcli.say("Reloading extension...")
+        await self.sparcli.say("Reloading extension **{}**...".format(extention))
         try: 
-            self.sparcli.unload_extension('Cogs.' + extention)
+            self.sparcli.unload_extension(extention)
         except: 
             pass
 
         # Load the new one
         try: 
-            self.sparcli.load_extension('Cogs.' + extention)
+            self.sparcli.load_extension(extention)
         except ImportError:
             await self.sparcli.say("That extention does not exist.")
             return

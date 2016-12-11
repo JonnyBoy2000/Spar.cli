@@ -4,16 +4,7 @@ from sys import argv
 from Utils.Configs import *
 from Utils.Updates import *
 from Utils.Discord import messageToStarboard
-
-
-initialExtentions = ['Cogs.Admin',
-                     'Cogs.Misc',
-                     'Cogs.OwnerOnly',
-                     'Cogs.Internet',
-                     'Cogs.Tags',
-                     'Cogs.Random',
-                     'Cogs.Roles',
-                     'Cogs.Config']
+from Utils.Extentions import q as initialExtentions
 
 
 def getCommandPrefix(bot, message):
