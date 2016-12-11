@@ -1,10 +1,14 @@
 from discord.ext import commands
 from requests import get
+
+# Import translator
 try:
     from microsofttranslator import Translator
     translatorImported = True
 except ImportError:
     translatorImported = True
+
+# Import Cleverbot
 try:
     from cleverbot import Cleverbot
     cleverbotImported = True
@@ -28,24 +32,22 @@ class Internet:
     def __init__(self, sparcli):
         self.sparcli = sparcli
         self.translator = None
-        self.cb = Cleverbot()
+        self.cb = None
         self.wolfClient = None
 
         # Set up the translator, if you can
-        if translatorImported == False:
-            return
-        try:
-            tokens = getTokens()
-            secret = tokens['Microsoft Translate']['Secret']
-            transid = tokens['Microsoft Translate']['ID']
-            self.translator = Translator(transid, secret)
-        except KeyError:
-            pass
+        if translatorImported != False:
+            try:
+                tokens = getTokens()
+                secret = tokens['Microsoft Translate']['Secret']
+                transid = tokens['Microsoft Translate']['ID']
+                self.translator = Translator(transid, secret)
+            except KeyError:
+                pass
 
-    @commands.command()
-    async def pun(self):
-        '''Grabs a random pun form around the internet
-        Usage :: pun'''
+        # Set up Cleverbot
+        if cleverbotImported == True:
+            self.cb = Cleverbot()
 
         # Set up Wolfram
         if wolframalphaImported == True:
@@ -56,10 +58,13 @@ class Internet:
             except KeyError:
                 pass
 
-    @commands.command()
-    async def cat(self):
+    @commands.command(pass_context=True)
+    async def cat(self, ctx):
         '''Gives a random picture of a cat
         Usage :: cat'''
+
+        # Send typing, so you can see it's being processed
+        await self.sparcli.send_typing(ctx.message.server)
 
         # Loop to keep track of rate limiting
         while True:
@@ -74,10 +79,13 @@ class Internet:
         returnUrl = page.url
         await self.sparcli.say(returnUrl)
 
-    @commands.command()
-    async def pun(self):
+    @commands.command(pass_context=True)
+    async def pun(self, ctx):
         '''Gives a random pun from the depths of the internet
         Usage :: pun'''
+
+        # Send typing, so you can see it's being processed
+        await self.sparcli.send_typing(ctx.message.server)
 
         # Read from page
         page = get('http://www.punoftheday.com/cgi-bin/randompun.pl')
@@ -88,8 +96,8 @@ class Internet:
         # Boop it out
         await self.sparcli.say(rawPun)
 
-    @commands.command()
-    async def trans(self, langTo: str, *, toChange: str):
+    @commands.command(pass_context=True)
+    async def trans(self, ctx, langTo: str, *, toChange: str):
         '''Translates from one language into another
         Usage :: trans <LanguageShorthand> <Content>
               :: trans en Wie geht es?'''
@@ -107,6 +115,9 @@ class Internet:
                 await self.sparcli.say('Translation has not been set up for this bot.')
                 return
 
+        # Send typing, so you can see it's being processed
+        await self.sparcli.send_typing(ctx.message.server)
+
         # Make sure that the language is supported
         if langTo not in self.translator.get_languages():
             await self.sparcli.say("The language provided is not supported.")
@@ -116,11 +127,14 @@ class Internet:
         translatedText = self.translator.translate(toChange, langTo.lower())
         await self.sparcli.say(translatedText)
 
-    @commands.command(name='c')
-    async def clevertalk(self, *, message:str):
+    @commands.command(pass_context=True, name='c')
+    async def clevertalk(self, ctx, *, message: str):
         if cleverbotImported == False:
             await self.sparcli.say('Cleverbot has not been set up for this bot.')
-            return 
+            return
+
+        # Send typing, so you can see it's being processed
+        await self.sparcli.send_typing(ctx.message.server)
 
         # Get the response from Cleverbot
         response = self.cb.ask(message)
