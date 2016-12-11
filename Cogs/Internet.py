@@ -129,6 +129,10 @@ class Internet:
 
     @commands.command(pass_context=True, name='c')
     async def clevertalk(self, ctx, *, message: str):
+        '''Sends a query to Cleverbot.
+        Usage :: c <Query>'''
+
+        # Return if Cleverbot isn't imported
         if cleverbotImported == False:
             await self.sparcli.say('Cleverbot has not been set up for this bot.')
             return

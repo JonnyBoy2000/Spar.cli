@@ -52,9 +52,12 @@ This is just fun things that the internet has come up with.
 
 Name|Argument(s)|Description|Requirements|Aliases
 ---|---|---|---|---
-trans|\<Language Shorthand> \<Content...>|Translates whatever you tell it to into a language of your choice. Language shorthand refers to things like `en` and `de`, etc||
+iwolfram|\<Query>|Sends a query to WolframAlpha, returns images||
 cat||Gives a random picture of a cat||
 pun||Gives a random pun||
+wolfram|\<Query>|Sends a query to WolframAlpha, returns text||
+c|\<Query>|Sends a query to Cleverbot||
+trans|\<Language Shorthand> \<Content...>|Translates whatever you tell it to into a language of your choice. Language shorthand refers to things like `en` and `de`, etc||
 
 ### Misc
 
@@ -66,6 +69,7 @@ git||Outputs a link to this GitHub repo||
 info|\<User Mention>|Gives information about the mentioned user||
 invite||This will give you a link to invite the bot to your own server||
 echo|\<Content...>|Will repeat back whatever you pass as content||
+clean|\<Amount> \<User Mention>|Removes the last 50 (default) messages from the mentioned user|Manage Messages|
 
 ### Random
 
