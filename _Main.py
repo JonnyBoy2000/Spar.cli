@@ -49,12 +49,7 @@ async def on_message_edit(before, after):
         await sparcli.process_commands(after)
 
 
-@sparcli.event
-async def on_reaction_add(reaction, member):
-    # See if it applies for the starboard
-    if reaction.emoji != '⭐':
-        return
-
+async def starboard(reaction):
     # See if the message is already in the starboard
     whereTo = serverEnables(reaction.message.server.id, 'Starboard')[1]
     channel = [i for i in reaction.message.server.channels if i.id == whereTo][0]
@@ -62,28 +57,7 @@ async def on_reaction_add(reaction, member):
     toEdit = None
     async for message in sparcli.logs_from(channel, limit=10):
         if reaction.message.id in message.content:
-            toEdit = message 
-
-    # Create the embed if it does want to be sent
-    starMes, starEmb = messageToStarboard(reaction.message)
-
-    # Ping a message to the starboard channel
-    await sendIfEnabled(sparcli, reaction.message.server, 'Starboard', overrideMessage=starMes, embed=starEmb, edit=toEdit)
-
-
-@sparcli.event
-async def on_reaction_remove(reaction, member):
-    if reaction.emoji != '⭐':
-        return
-
-    # See if the message is already in the starboard
-    whereTo = serverEnables(reaction.message.server.id, 'Starboard')[1]
-    channel = [i for i in reaction.message.server.channels if i.id == whereTo][0]
-
-    toEdit = None
-    async for message in sparcli.logs_from(channel, limit=10):
-        if reaction.message.id in message.content:
-            toEdit = message 
+            toEdit = message
 
     # Create the embed if it does want to be sent
     starMes, starEmb = messageToStarboard(reaction.message)
@@ -98,8 +72,25 @@ async def on_reaction_remove(reaction, member):
 
 
 @sparcli.event
+async def on_reaction_add(reaction, member):
+    # See if it applies for the starboard
+    if reaction.emoji == '⭐':
+        await starboard(reaction)
+
+
+@sparcli.event
+async def on_reaction_remove(reaction, member):
+    # See if it applies for the starboard
+    if reaction.emoji == '⭐':
+        await starboard(reaction)
+
+
+@sparcli.event
 async def on_message(message):
-    # Make the bot not respond to itself
+    # Print out to console
+    print('{0.timestamp} :: {0.server.id} :: {0.author.id} :: {0.id}'.format(message))
+
+    # Make the bot not respond to other bots
     if message.author.bot:
         return
 
