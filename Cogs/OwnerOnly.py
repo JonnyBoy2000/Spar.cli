@@ -96,12 +96,11 @@ class OwnerOnly:
         await self.sparcli.change_presence(status=Status.invisible, game=None)
         exit()
 
-
     @commands.command(pass_context=True, hidden=True)
-    async def rld(self, ctx, *, extention:str=None):
+    async def rld(self, ctx, *, extention: str=None):
         '''Reload an extention on the bot
         Usage :: rld <Extention>'''
-        
+
         # Check if the owner is calling the command
         permReturn = getPermissions(
             ctx.message.channel, 'is_owner', ctx.message.author)
@@ -116,19 +115,19 @@ class OwnerOnly:
 
         # Load a nicer way of sorting out the extentions
         # Plonk the initial extentions into a dictionary
-        eF = {i.split('.')[1].lower():i for i in initialExtentions}
+        eF = {i.split('.')[1].lower(): i for i in initialExtentions}
         # Finish finish them off to be actual real extentions
         extention = [eF[i] for i in eF.keys() if extention.lower() in i][0]
 
         # Unload the extention
         await self.sparcli.say("Reloading extension **{}**...".format(extention))
-        try: 
+        try:
             self.sparcli.unload_extension(extention)
-        except: 
+        except:
             pass
 
         # Load the new one
-        try: 
+        try:
             self.sparcli.load_extension(extention)
         except ImportError:
             await self.sparcli.say("That extention does not exist.")
@@ -137,9 +136,8 @@ class OwnerOnly:
         # Boop the user
         await self.sparcli.say("Done!")
 
-
     @commands.command(pass_context=True, hidden=True)
-    async def loadmessage(self, ctx, messageID:str):
+    async def loadmessage(self, ctx, messageID: str):
         '''Loads a message into the bot chache
         Usage :: loadmessage <MessageID>'''
 
@@ -154,7 +152,6 @@ class OwnerOnly:
         messageToAdd = await self.sparcli.get_message(ctx.message.channel, messageID)
         self.sparcli.messages.append(messageToAdd)
         await self.sparcli.say('This message has been added to the bot\'s cache.')
-
 
 
 def setup(bot):
