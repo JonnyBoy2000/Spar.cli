@@ -57,7 +57,13 @@ class RoleManagement:
     async def iam(self, ctx, *, whatRoleToAdd: str):
         '''If allowed, the bot will give you a mentioned role
         Usage :: iam <RoleName>
-              :: iam <RolePing>'''
+              :: iam <RolePing>
+              :: iam list'''
+
+        # Get a list if the user wanted to
+        if whatRoleToAdd.lower() == 'list':
+            await self.iamlist(ctx)
+            return
 
         # Try and see if the role was pinged
         roleToGive = getMentions(ctx.message, 1, 'role')
@@ -84,12 +90,30 @@ class RoleManagement:
             await self.sparcli.say('You are not allowed to self-assign that role.')
             return
 
+        # See if the user already has the role
+        if roleToGive.id in [i.id for i in ctx.message.author.roles]:
+            await self.sparcli.say('You already have that role.')
+            return
+
         # You can - add it to the user
         try:
             await self.sparcli.add_roles(ctx.message.author, roleToGive)
             await self.sparcli.say('The role `{0.name}` with ID `{0.id}` has been sucessfully added to you.'.format(roleToGive))
         except Forbidden:
             await self.sparcli.say('I was unable to add that role to you.')
+
+    async def iamlist(self, ctx):
+        '''Gives a list of roles that you can self-assign'''
+
+        # Get all the stuff on the server that you can give to yourself
+        serverSettings = getServerJson(ctx.message.server.id)
+        allowableIDs = serverSettings['SelfAssignableRoles']
+
+        # Get their role names
+        assignableRoles = [i.name for i in ctx.message.server.roles if i.id in allowableIDs]
+
+        # Print back out the user
+        await self.sparcli.say('The following roles are self-assignable: ```\n* {}```'.format('\n* '.join(assignableRoles)))
 
 
 def setup(bot):
