@@ -43,6 +43,7 @@ Name|Argument(s)|Description|Requirements|Aliases
 set|\<Server Event> \<Channel Mention>|Sets the output text of the server event to the mentioned channel|Admin|
 youare|\<Now/Not> \<Role Name/Mention>|Will set which roles the user is allowed to self-assign|Admin|
 enable|\<Server Event>|Enables the server event output|Admin|
+setup||Goes through all of the different events and allows you to set them graphically|Admin|
 disable|\<Server Event>|Disables the server event output|Admin|
 prefix|\<Content>|Sets the server's command prefix to whatever you pass as an argument|Admin|setprefix, prefixset
 

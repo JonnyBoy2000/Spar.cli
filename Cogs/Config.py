@@ -3,6 +3,7 @@ from sys import path
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import getPermissions, getMentions, getNonTaggedMentions
 from Utils.Configs import getServerJson, saveServerJson
+from Utils.GuiConfig import addEmojiList, updateFromEmoji, updateFromMessage
 
 
 class Config:
@@ -210,6 +211,55 @@ class Config:
 
         # Print out to the user
         await self.sparcli.say('The command prefix for this server has been set to `{}`'.format(prefix))
+
+    @commands.command(pass_context=True)
+    async def setup(self, ctx):
+        '''Gives you a reaction-based configuration dialogue
+        Usage :: setup'''
+
+        # Set up some variables to keep line length short
+        author = ctx.message.author
+        channel = ctx.message.channel
+        serverID = ctx.message.server.id
+
+        # Get the permissions of the calling user
+        userPerms = getPermissions(channel, 'admin', author)
+        if type(userPerms) == str:
+            await self.sparcli.say(userPerms)
+            return
+
+        # Load current configuration
+        serverSettings = getServerJson(serverID)
+
+        # Make a lambda so I can easily check the author
+        messageAuthor = lambda x: x.author.id == author.id
+
+        # Tell the user to get off of mobile
+        startup = await self.sparcli.say('This command works with reactions. Thus, if you are on mobile, it will not work. If you wish to proceed, send a message saying `yes`. Otherwise, the command will abort.')
+        response = await self.sparcli.wait_for_message(author=author, channel=channel)
+        if response.content.lower() == 'yes':
+            await self.sparcli.delete_message(startup)
+            await self.sparcli.delete_message(response)
+        else:
+            await self.sparcli.say('This command is aborting.')
+            return
+
+        # Work on each type of toggle enable
+        toggleTypes = serverSettings['Toggles'].keys()
+        channelTypes = serverSettings['Channels'].keys()
+
+        for i in toggleTypes:
+            serverSettings = await updateFromEmoji(self.sparcli, ctx, serverSettings, i, serverSettings['Toggles'][i])
+
+            # See if you need to set it up with a channel
+            if i in channelTypes:
+                serverSettings = await updateFromMessage(self.sparcli, ctx, serverSettings, i)
+
+        # Tell the user that we're done
+        await self.sparcli.say('Alright, everything is updated!')
+
+        # Save it all to file
+        saveServerJson(serverID, serverSettings)
 
 
 def setup(bot):
