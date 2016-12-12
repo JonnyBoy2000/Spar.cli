@@ -109,12 +109,12 @@ async def on_message(message):
 
 @sparcli.event
 async def on_member_join(member):
-    await sendIfEnabled(sparcli, member.server, 'Joins')
+    await sendIfEnabled(sparcli, member.server, 'Joins', member=member)
 
 
 @sparcli.event
 async def on_member_remove(member):
-    await sendIfEnabled(sparcli, member.server, 'Leaves')
+    await sendIfEnabled(sparcli, member.server, 'Leaves', member=member)
 
 
 @sparcli.event

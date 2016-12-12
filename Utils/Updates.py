@@ -36,7 +36,7 @@ def serverEnables(serverID, typeOfEnable):
     return [ifEnabled, ifSendTo, sendMessage]
 
 
-async def sendIfEnabled(sparcli, serverOrChannel, typeOfEnable, *, embed=None, overrideMessage=None, overrideEnable=False, overrideChannel=None, edit=None):
+async def sendIfEnabled(sparcli, serverOrChannel, typeOfEnable, *, embed=None, overrideMessage=None, overrideEnable=False, overrideChannel=None, edit=None, member=None):
     '''Sends a message if the server wants it to happen'''
 
     # Set up some stuff
@@ -65,9 +65,12 @@ async def sendIfEnabled(sparcli, serverOrChannel, typeOfEnable, *, embed=None, o
         toSendTo = Object(ifShouldSend[1])
 
     # Reformat a send message, if it has one
-    if type(ifShouldSend[2]) == str:
-        ifShouldSend[2].replace('{mention}', member.mention).replace(
+    messageToSend = ifShouldSend[2]
+    try:
+        messageToSend = messageToSend.replace('{mention}', member.mention).replace(
             '{name}', str(member))
+    except AttributeError:
+        pass
 
     # Fill in the overrides
     toSendTo = overrideChannel if overrideChannel != None else toSendTo
