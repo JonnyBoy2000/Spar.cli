@@ -80,6 +80,9 @@ class Admin:
             await self.sparcli.say(permReturn)
             return
 
+        if amount > 500:
+            await self.sparcli.say('That number is too large. Please tone it down a notch.')
+
         # Use the API's purge feature
         amount += 1
         deleted = await self.sparcli.purge_from(ctx.message.channel, limit=amount)
