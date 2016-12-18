@@ -252,7 +252,7 @@ class Config:
             serverSettings = await updateFromEmoji(self.sparcli, ctx, serverSettings, i, serverSettings['Toggles'][i])
 
             # See if you need to set it up with a channel
-            if i in channelTypes:
+            if i in channelTypes and serverSettings['Toggles'][i] == True:
                 serverSettings = await updateFromMessage(self.sparcli, ctx, serverSettings, i)
 
         # Tell the user that we're done

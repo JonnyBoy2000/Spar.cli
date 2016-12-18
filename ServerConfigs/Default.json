@@ -15,7 +15,8 @@
         "Bans": "",
         "Leaves": "",
         "Joins": "",
-        "Starboard": ""
+        "Starboard": "",
+        "Serverupdates": ""
     },
     "Messages": {
         "Bans": "**{name}** has been banned!",

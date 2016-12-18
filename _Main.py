@@ -3,7 +3,7 @@ from discord.ext import commands
 from sys import argv
 from Utils.Configs import *
 from Utils.Updates import *
-from Utils.Discord import messageToStarboard
+from Utils.Discord import messageToStarboard, makeEmbed
 from Utils.Extentions import q as initialExtentions
 
 
@@ -111,6 +111,36 @@ async def on_member_join(member):
 @sparcli.event
 async def on_member_remove(member):
     await sendIfEnabled(sparcli, member.server, 'Leaves', member=member)
+
+
+@sparcli.event
+async def on_channel_update(before, after):
+    # Get the changes
+    updateChecks = ['topic', 'name', 'position', 'bitrate']
+    beforeChecksB = [getattr(before, i) for i in updateChecks]
+    afterChecksB = [getattr(after, i) for i in updateChecks]
+
+    # Fix up nonetypes
+    beforeChecks = []
+    afterChecks = []
+    for i in beforeChecksB:
+        if i == '': 
+            i = 'None'
+        beforeChecks.append(i)
+    for i in afterChecksB:
+        if i == '': 
+            i = 'None'
+        afterChecks.append(i)
+
+    # See exactly what's updated
+    changedThings = {}
+    for i in range(0, len(updateChecks)):
+        if beforeChecks[i] != afterChecks[i]:
+            changedThings[updateChecks[i].title()] = '`{}` changed into `{}`'.format(beforeChecks[i], afterChecks[i])
+
+    # Format everything into a nice embed
+    em = makeEmbed(name='Channel Update :: {}!'.format(after.name), values=changedThings, user=sparcli.user)
+    await sendIfEnabled(sparcli, after, 'Channelupdates', embed=em, overrideChannel=after)
 
 
 @sparcli.event

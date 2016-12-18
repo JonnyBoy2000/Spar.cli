@@ -77,6 +77,7 @@ async def sendIfEnabled(sparcli, serverOrChannel, typeOfEnable, *, embed=None, o
     messageToSend = overrideMessage if overrideMessage != None else messageToSend
 
     # Send the specified message
+    messageToSend = '' if messageToSend == None else messageToSend
     if edit == None:
         await sparcli.send_message(toSendTo, messageToSend, embed=embed)
     else:

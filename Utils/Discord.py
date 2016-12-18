@@ -99,13 +99,17 @@ def getNonTaggedMentions(server, toFind, tagType='user', *, caseSensitive=False)
     return retThings
 
 
-def makeEmbed(*, name='Spar.cli#1302', icon=None, colour=0xDEADBF, values={}):
+def makeEmbed(*, name=Embed.Empty, icon=Embed.Empty, colour=0xDEADBF, values={}, user=None):
     '''Creates an embed messasge with specified inputs'''
 
     # Create an embed object with the specified colour
     embedObj = Embed(colour=colour)
 
     # Set the author and URL
+    if user != None and name == Embed.Empty:
+        name = user.name
+    if user != None and icon == Embed.Empty:
+        icon_url = user.avatar_url if user.avatar_url != None else user.default_avatar_url
     embedObj.set_author(name=name, icon_url=icon)
 
     # Create all of the fields
