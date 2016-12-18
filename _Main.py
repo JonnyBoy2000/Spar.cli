@@ -14,10 +14,10 @@ def getCommandPrefix(bot, message):
         serverSettings = getServerJson(message.server.id)
         serverPrefix = serverSettings['CommandPrefix']
     except AttributeError:
-        return ';'
+        return [';', '<@252880131540910080> ']
 
     # Load the server prefix as defined
-    return serverPrefix
+    return [serverPrefix, '<@252880131540910080> ']
 
 
 sparcli = commands.Bot(
@@ -88,7 +88,12 @@ async def on_reaction_remove(reaction, member):
 @sparcli.event
 async def on_message(message):
     # Print out to console
-    print('{0.timestamp} :: {0.server.id} :: {0.author.id} :: {0.id}'.format(message))
+    try:
+        print(
+            '{0.timestamp} :: {0.server.id} :: {0.author.id} :: {0.id}'.format(message))
+    except AttributeError:
+        print(
+            '{0.timestamp} :: Private Message :: {0.author.id} :: {0.id}'.format(message))
 
     # Make the bot not respond to other bots
     if message.author.bot:
@@ -115,9 +120,6 @@ async def on_ready():
     print('ID :: {}'.format(sparcli.user.id))
     print('-----')
 
-    game = ';help'
-    await sparcli.change_presence(game=discord.Game(name=game))
-
     # Load the extentions
     for extension in initialExtentions:
         # This is necessary because I'm bad at code
@@ -138,6 +140,9 @@ async def on_ready():
     z = getServerJson('Globals')
     z = fixJson(z)
     saveServerJson('Globals', z)
+
+    game = '@Spar.cli help'
+    await sparcli.change_presence(game=discord.Game(name=game))
 
 
 sparcli.run(argv[1])

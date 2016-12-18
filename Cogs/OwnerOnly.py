@@ -2,7 +2,9 @@ from discord.ext import commands
 from discord import Game, Status
 from requests import get
 from random import choice
-from sys import path, exit
+from sys import exit
+from os import execl
+from sys import path, exit, executable, argv
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import getPermissions
 from Utils.Extentions import q as initialExtentions
@@ -152,6 +154,23 @@ class OwnerOnly:
         messageToAdd = await self.sparcli.get_message(ctx.message.channel, messageID)
         self.sparcli.messages.append(messageToAdd)
         await self.sparcli.say('This message has been added to the bot\'s cache.')
+
+    @commands.command(pass_context=True, hidden=True, aliases=['rs'])
+    async def restart(self, ctx):
+        '''Restarts the bot. Literally everything.
+        Usage :: restart'''
+
+        # Check if the owner is calling the command
+        permReturn = getPermissions(
+            ctx.message.channel, 'is_owner', ctx.message.author)
+        if type(permReturn) == str:
+            await self.sparcli.say(permReturn)
+            return
+
+        # If it is, tell the user the bot it dying
+        await self.sparcli.say('Now restarting.')
+        await self.sparcli.change_presence(status=Status.dnd, game=None)
+        execl(executable, *([executable] + argv))
 
 
 def setup(bot):
