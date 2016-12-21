@@ -99,7 +99,7 @@ class OwnerOnly:
         exit()
 
     @commands.command(pass_context=True, hidden=True)
-    async def rld(self, ctx, *, extention: str=None):
+    async def rld(self, ctx, extention: str=None, doFully:str=False):
         '''Reload an extention on the bot
         Usage :: rld <Extention>'''
 
@@ -115,11 +115,17 @@ class OwnerOnly:
             await self.sparcli.say("Currently loaded extentions :: \n```\n{}```".format("\n".join(self.sparcli.cogs)))
             return
 
-        # Load a nicer way of sorting out the extentions
-        # Plonk the initial extentions into a dictionary
-        eF = {i.split('.')[1].lower(): i for i in initialExtentions}
-        # Finish finish them off to be actual real extentions
-        extention = [eF[i] for i in eF.keys() if extention.lower() in i][0]
+        # Decides whether to be a smartbot
+        if doFully:
+            extention = 'Cogs.' + extention 
+
+        else:
+
+            # Load a nicer way of sorting out the extentions
+            # Plonk the initial extentions into a dictionary
+            eF = {i.split('.')[1].lower(): i for i in initialExtentions}
+            # Finish finish them off to be actual real extentions
+            extention = [eF[i] for i in eF.keys() if extention.lower() in i][0]
 
         # Unload the extention
         await self.sparcli.say("Reloading extension **{}**...".format(extention))
