@@ -230,6 +230,7 @@ class Config:
 
         # Load current configuration
         serverSettings = getServerJson(serverID)
+        defaultSettings = getServerJson('Default')
 
         # Make a lambda so I can easily check the author
         messageAuthor = lambda x: x.author.id == author.id
@@ -246,7 +247,7 @@ class Config:
 
         # Work on each type of toggle enable
         toggleTypes = serverSettings['Toggles'].keys()
-        channelTypes = serverSettings['Channels'].keys()
+        channelTypes = defaultSettings['Channels'].keys()
 
         for i in toggleTypes:
             serverSettings = await updateFromEmoji(self.sparcli, ctx, serverSettings, i, serverSettings['Toggles'][i])
