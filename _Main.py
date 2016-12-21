@@ -116,7 +116,7 @@ async def on_member_remove(member):
 @sparcli.event
 async def on_channel_update(before, after):
     # Get the changes
-    updateChecks = ['topic', 'name', 'position', 'bitrate']
+    updateChecks = ['topic', 'name', 'bitrate']
     beforeChecksB = [getattr(before, i) for i in updateChecks]
     afterChecksB = [getattr(after, i) for i in updateChecks]
 
@@ -131,6 +131,10 @@ async def on_channel_update(before, after):
         if i == '': 
             i = 'None'
         afterChecks.append(i)
+
+    # Return if it's all the same
+    if beforeChecks == afterChecks:
+        return
 
     # See exactly what's updated
     changedThings = {}
