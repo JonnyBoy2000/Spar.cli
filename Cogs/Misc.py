@@ -69,7 +69,7 @@ class Misc:
         # Send it out to the user
         await self.sparcli.say(userIcon, embed=embedMessage)
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, aliases=['clear'])
     async def clean(self, ctx, amount: int=50, user: str=None):
         '''Checks a given amount of messages, and removes ones from a certain user
         Defaults to 50, with the user being the bot
