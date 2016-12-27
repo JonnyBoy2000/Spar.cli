@@ -1,5 +1,6 @@
 from discord.ext import commands
 from requests import get
+from random import choice
 
 # Import translator
 try:
@@ -25,6 +26,7 @@ except ImportError:
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Configs import getTokens
+from Utils.Discord import getMentions
 
 
 class Internet:
@@ -34,6 +36,7 @@ class Internet:
         self.translator = None
         self.cb = None
         self.wolfClient = None
+        self.nounlist = []
 
         # Set up the translator, if you can
         if translatorImported != False:
@@ -57,6 +60,10 @@ class Internet:
                 self.wolfClient = Client(secret)
             except KeyError:
                 pass
+
+        # Set up noun list
+        nounstr = str(get('http://www.desiquintans.com/downloads/nounlist/nounlist.txt').content)[2:]
+        self.nounlist = nounstr.split('\\n')
 
     @commands.command(pass_context=True)
     async def cat(self, ctx):
@@ -196,6 +203,33 @@ class Internet:
 
         # Return to user
         await self.sparcli.say(' '.join(wolfList[0:6]))
+
+    @commands.command(pass_context=True)
+    async def throw(self, ctx, *, member: str=None):
+        '''Throws a random thing at a user
+        Usage :: throw
+              :: throw <@User>'''
+
+        # Get a tagged user, if there is one
+        # member will either me membertype or nonetype
+        if member != None:
+            member = getMentions(ctx.message, 1)
+        if type(member) == str:
+            member = None
+        elif member == None:
+            pass
+        else:
+            member = member[0]
+
+        # Get thrown object
+        toThrow = choice(self.nounlist)
+        aOrAn = 'an' if toThrow[0] in 'aeiou' else 'a'
+
+        # Throw the object
+        atUser = '.' if member == None else ' at {}.'.format(member.mention)
+        await self.sparcli.say('Thrown {} {}{}'.format(aOrAn, toThrow, atUser))
+
+
 
 
 def setup(bot):
