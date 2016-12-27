@@ -110,7 +110,7 @@ def makeEmbed(*, name=Embed.Empty, icon=Embed.Empty, colour=0xDEADBF, values={},
         name = user.name
     if user != None and icon == Embed.Empty:
         icon_url = user.avatar_url if user.avatar_url != None else user.default_avatar_url
-    embedObj.set_author(name=name, icon_url=icon)
+    embedObj.set_author(name=name, icon_url=icon_url)
 
     # Create all of the fields
     for i in values:

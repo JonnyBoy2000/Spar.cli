@@ -20,8 +20,8 @@ class Misc:
         clientID = '252880131540910080'
         permissionsID = '469888119'
         baseLink = 'https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions={}'
-        em = Embed()
-        em.set_author(name='Click here to invite me!', url=baseLink.format(clientID, permissionsID))
+        inviteLink = baseLink.format(clientID, permissionsID)
+        em = makeEmbed(user=self.sparcli.user, values={'Invite me!':'[Click here!]({})'.format(inviteLink)})
         await self.sparcli.say('', embed=em)
 
     @commands.command()
