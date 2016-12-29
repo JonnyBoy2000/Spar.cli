@@ -1,6 +1,7 @@
 from discord.ext import commands
-from discord import Embed
+from discord import Embed, Member
 from datetime import datetime
+from collections import OrderedDict
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import getMentions, makeEmbed
@@ -39,35 +40,38 @@ class Misc:
         await self.sparcli.say(content)
 
     @commands.command(pass_context=True)
-    async def info(self, ctx):
+    async def info(self, ctx, user:Member=None):
         '''Gives info on the mentioned user
-        Usage :: info <UserPing>'''
+        Usage :: info <UserPing>
+              :: info'''
 
         # Get the user who was pinged
-        pingedUsers = getMentions(ctx.message, 1)
-        if type(pingedUsers) == str:
-            await self.sparcli.say(pingedUsers)
-            return
-        userOne = pingedUsers[0]
+        u = user if user != None else ctx.message.author
 
         # Generate a dictionary of their information
-        userInfo = {'Username': userOne.name,
-                    'Discriminator': userOne.discriminator,
-                    'Display Name': userOne.display_name if userOne.display_name != None else userOne.name,
-                    'ID': userOne.id,
-                    'Bot': userOne.bot,
-                    'Created': str(userOne.joined_at)[:-10],
-                    'Age': str(datetime.now() - userOne.joined_at).split(",")[0],
-                    'Roles': ', '.join([g.name for g in userOne.roles][1:])
-                    }
+        userInfo = OrderedDict()
         userIcon = userOne.avatar_url if userOne.avatar_url != None else userOne.default_avatar_url
+        userInfo['Username'] = u.name 
+        userInfo['Discriminator'] = u.discriminator 
+        userInfo['Icon'] = '[Click here!]({})'.format(userIcon)
+        userInfo['Nickname'] = '{}'.format(u.display_name)
+        userInfo['ID'] = u.id
+        userInfo['Bot'] = u.bot 
+        userInfo['Join Date'] = str(u.joined_at)[:-10] + ' (' + str(datetime.now() - u.joined_at).split(',')[0] + ' ago)'
+        userInfo['Creation Date'] = str(u.created_at)[:-10] + ' (' + str(datetime.now() - u.created_at).split(',')[0] + ' ago)'
+        userInfo['Roles'] = ', '.join([g.name for g in userOne.roles][1:])
+
+        # Fix a possibly blank thing
+        userInfo['Roles'] = 'None' if userInfo['Roles'] == '' else userInfo['Roles']
+
+        # Get top role colour
+        topColour = u.colour.value
 
         # Create an embed out of it
-        embedMessage = makeEmbed(name='{}'.format(
-            userOne), icon=userIcon, values=userInfo)
+        embedMessage = makeEmbed(user=userOne, values=userInfo, image=userIcon, colour=topColour)
 
         # Send it out to the user
-        await self.sparcli.say(userIcon, embed=embedMessage)
+        await self.sparcli.say('', embed=embedMessage)
 
     @commands.command(pass_context=True, aliases=['clear'])
     async def clean(self, ctx, amount: int=50, user: str=None):
