@@ -99,7 +99,7 @@ def getNonTaggedMentions(server, toFind, tagType='user', *, caseSensitive=False)
     return retThings
 
 
-def makeEmbed(*, name=Embed.Empty, icon=Embed.Empty, colour=0xDEADBF, values={}, user=None):
+def makeEmbed(*, name=Embed.Empty, icon=Embed.Empty, colour=0xDEADBF, values={}, user=None, thumbnail=None, image=None, footer=[Embed.Empty, Embed.Empty]):
     '''Creates an embed messasge with specified inputs'''
 
     # Create an embed object with the specified colour
@@ -109,14 +109,29 @@ def makeEmbed(*, name=Embed.Empty, icon=Embed.Empty, colour=0xDEADBF, values={},
     if user != None and name == Embed.Empty:
         name = user.name
     if user != None and icon == Embed.Empty:
-        icon_url = user.avatar_url if user.avatar_url != None else user.default_avatar_url
-    embedObj.set_author(name=name, icon_url=icon_url)
+        icon = user.avatar_url if user.avatar_url != None else user.default_avatar_url
+    embedObj.set_author(name=name, icon_url=icon)
 
     # Create all of the fields
     for i in values:
         if values[i] == '':
             values[i] = 'None'
         embedObj.add_field(name=i, value='{}'.format(values[i]))
+
+    # Set thumbnail and image
+    if thumbnail != None:
+        embedObj.set_thumbnail(url=thumbnail)
+    if image != None:
+        embedObj.set_image(url=image)
+
+    # Set the footer
+    footerFixed = []
+    for i in footer:
+        if i == None:
+            i = Embed.Empty
+        footerFixed.append(i)
+    embedObj.set_footer(text=footerFixed[0], icon_url=footerFixed[1])
+
 
     # Return to user
     return embedObj
