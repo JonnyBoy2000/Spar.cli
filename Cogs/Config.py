@@ -153,6 +153,7 @@ class Config:
             roleToGive, {False: 'can now be', True: 'can no longer be'}[calledSubcommand]))
 
     @commands.command(pass_context=True, aliases=['setprefix', 'prefixset'])
+    @checkPerm(check='administrator')
     async def prefix(self, ctx, prefix: str):
         '''Changes the command prefix for the server
         Usage :: prefix <New Preifx>'''
