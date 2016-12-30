@@ -2,7 +2,7 @@ from discord.ext import commands
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Configs import getServerJson, saveServerJson
-from Utils.Discord import getPermissions
+from Utils.Discord import getPermissions, checkPerm
 
 
 class Tags:
@@ -19,17 +19,11 @@ class Tags:
         await self.runTag(ctx, subcom, False)
 
     @commands.command(pass_context=True, aliases=['et'], hidden=True)
+    @checkPerm(check='is_owner')
     async def etag(self, ctx, *, subcom: str=None):
         '''Defines server-specific tags for evaluating Python expressions
         Usage :: etag add
               :: etag del'''
-
-        # Check if the owner is calling the command
-        permReturn = getPermissions(
-            ctx.message.channel, 'is_owner', ctx.message.author)
-        if type(permReturn) == str:
-            await self.sparcli.say(permReturn)
-            return
 
         await self.runTag(ctx, subcom, True)
 

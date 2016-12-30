@@ -3,7 +3,7 @@ from discord import Colour
 from discord.errors import NotFound as Forbidden
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
-from Utils.Discord import getPermissions, getMentions, getNonTaggedMentions
+from Utils.Discord import getPermissions, getMentions, getNonTaggedMentions, checkPerm
 from Utils.Configs import getServerJson
 
 
@@ -13,18 +13,11 @@ class RoleManagement:
         self.sparcli = sparcli
 
     @commands.command(pass_context=True, aliases=['changecolour', 'changerolecolour', 'changerole', 'rolecolor', 'changecolor', 'changerolecolor'])
+    @checkPerm(check='manage_roles')
     async def rolecolour(self, ctx, rolecolour: str, *, rolename: str):
         '''Changes the colour of a specified role
         Usage :: rolecolour <HexValue> <RoleName>
               :: rolecolour <HexValue> <RolePing>'''
-
-        # Make sure that the calling user is allowed to manage roles
-        permReturn = getPermissions(
-            ctx.message.channel, 'manage_roles', ctx.message.author)
-
-        if type(permReturn) == str:
-            await self.sparcli.say(permReturn)
-            return
 
         # Get the role colour
         if len(rolecolour) == 7:

@@ -1,7 +1,7 @@
 from discord.ext import commands
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
-from Utils.Discord import getPermissions, getMentions, getNonTaggedMentions
+from Utils.Discord import getPermissions, getMentions, getNonTaggedMentions, checkPerm
 from Utils.Configs import getServerJson, saveServerJson
 from Utils.GuiConfig import addEmojiList, updateFromEmoji, updateFromMessage
 
@@ -12,20 +12,11 @@ class Config:
         self.sparcli = sparcli
 
     @commands.command(pass_context=True)
+    @checkPerm(check='administrator')
     async def enable(self, ctx, toChange: str):
         '''Enables a certain messagetype from the bot's server configuration
         Usage :: enable <MessageType>
         MessageTypes :: joins, leaves, bans, serverupdates, channelupdates'''
-
-        # Set up some variables to keep line length short
-        author = ctx.message.author
-        channel = ctx.message.channel
-
-        # Get the permissions of the calling user
-        userPerms = getPermissions(channel, 'admin', author)
-        if type(userPerms) == str:
-            await self.sparcli.say(userPerms)
-            return
 
         # If the user can use it, the serverconfig will be changed
         if toChange.title() not in getServerJson('Default')['Toggles']:
@@ -36,20 +27,11 @@ class Config:
         await self.toggleSetting(ctx, toChange.title(), True)
 
     @commands.command(pass_context=True)
+    @checkPerm(check='administrator')
     async def disable(self, ctx, toChange: str):
         '''Disables a certain messagetype from the bot's server configuration
         Usage :: disable <MessageType>
         MessageTypes :: joins, leaves, bans, serverupdates, channelupdates'''
-
-        # Set up some variables to keep line length short
-        author = ctx.message.author
-        channel = ctx.message.channel
-
-        # Get the permissions of the calling user
-        userPerms = getPermissions(channel, 'admin', author)
-        if type(userPerms) == str:
-            await self.sparcli.say(userPerms)
-            return
 
         # If the user can use it, the serverconfig will be changed
         if toChange.title() not in getServerJson('Default')['Toggles']:
@@ -75,20 +57,11 @@ class Config:
         await self.sparcli.say('The messagetype `{}` has been set to `{}`'.format(whatToSet, toSetTo))
 
     @commands.command(pass_context=True)
+    @checkPerm(check='administrator')
     async def set(self, ctx, toChange: str):
         '''Sets a messagetype's output to a certain channel
         Usage :: set <MessageType> <ChannelPing>
         MessageTypes :: joins, leaves, bans'''
-
-        # Set up some variables to keep line length short
-        author = ctx.message.author
-        channel = ctx.message.channel
-
-        # Get the permissions of the calling user
-        userPerms = getPermissions(channel, 'admin', author)
-        if type(userPerms) == str:
-            await self.sparcli.say(userPerms)
-            return
 
         # If the user can use it, the serverconfig will be changed
         if toChange.title() not in getServerJson('Default')['Channels']:
@@ -120,6 +93,7 @@ class Config:
         await self.sparcli.say('The messagetype `{0}` output has been set to {1.mention}, with ID `{1.id}`'.format(whatToSet, mentions))
 
     @commands.group(pass_context=True)
+    @checkPerm(check='administrator')
     async def youare(self, ctx, addRemove: str, *, whatToChange: str):
         '''Allows you to change which roles are self-assignable
         Usage :: youare not <RoleName>
@@ -127,16 +101,6 @@ class Config:
               :: youare del <RoleName>
               :: youare now <RoleName>
               :: youare add <RolePing>'''
-
-        # Set up some variables to keep line length short
-        author = ctx.message.author
-        channel = ctx.message.channel
-
-        # Get the permissions of the calling user
-        userPerms = getPermissions(channel, 'admin', author)
-        if type(userPerms) == str:
-            await self.sparcli.say(userPerms)
-            return
 
         # Try and see if the role was pinged
         roleToGive = getMentions(ctx.message, 1, 'role')
@@ -194,15 +158,7 @@ class Config:
         Usage :: prefix <New Preifx>'''
 
         # Set up some variables to keep line length short
-        author = ctx.message.author
-        channel = ctx.message.channel
         serverID = ctx.message.server.id
-
-        # Get the permissions of the calling user
-        userPerms = getPermissions(channel, 'admin', author)
-        if type(userPerms) == str:
-            await self.sparcli.say(userPerms)
-            return
 
         # Load and save the command prefix
         serverSettings = getServerJson(serverID)
@@ -213,6 +169,7 @@ class Config:
         await self.sparcli.say('The command prefix for this server has been set to `{}`'.format(prefix))
 
     @commands.command(pass_context=True)
+    @checkPerm(check='administrator')
     async def setup(self, ctx):
         '''Gives you a reaction-based configuration dialogue
         Usage :: setup'''
@@ -221,13 +178,7 @@ class Config:
         author = ctx.message.author
         channel = ctx.message.channel
         serverID = ctx.message.server.id
-
-        # Get the permissions of the calling user
-        userPerms = getPermissions(channel, 'admin', author)
-        if type(userPerms) == str:
-            await self.sparcli.say(userPerms)
-            return
-
+        
         # Load current configuration
         serverSettings = getServerJson(serverID)
         defaultSettings = getServerJson('Default')

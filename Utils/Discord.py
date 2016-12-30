@@ -1,60 +1,58 @@
 from discord import Embed
+from discord.ext import commands
 from time import strftime
 
 
-def getPermissions(channel, permissionCheck, firstPerson, secondPerson=None):
+def checkPerm(**check):
+    def predicate(ctx):
+        return getPermissions(errReturn=bool, ctx=ctx, check=check['check'])
+    return commands.check(predicate)
+
+
+def getPermissions(channel=None, permissionCheck=None, firstPerson=None, secondPerson=None, *, errReturn=str, **kwargs):
     '''Gives the permissions in a channel for a user, 
     and returns the bool of whether the user has that permission.
     This will also give whether a certain role is above that of a second person's'''
 
-    # Get the first user's permissions and top role
-    firstPermissions = channel.permissions_for(firstPerson)
-    firstTop = max([i.position for i in firstPerson.roles])
+    # Loads from kwargs
+    if firstPerson == None:
+        channel = kwargs['ctx'].message.channel 
+        firstPerson = kwargs['ctx'].message.author 
+        permissionCheck = kwargs['check']
+        try: 
+            secondPerson = kwargs['person']
+        except: 
+            secondPerson = None
 
-    # Make a dictioary of easy to rememeber permission names
-    permissionDictinoary = {
-        'manage_messages': firstPermissions.manage_messages,
-        'admin': firstPermissions.administrator,
-        'kick_members': firstPermissions.kick_members,
-        'kick': firstPermissions.kick_members,
-        'ban_members': firstPermissions.ban_members,
-        'ban': firstPermissions.ban_members,
-        'manage_nicknames': firstPermissions.manage_nicknames,
-        'manage_channels': firstPermissions.manage_channels,
-        'manage_roles': firstPermissions.manage_roles,
-        'manage_emoji': firstPermissions.manage_emojis,
-        'emoji': firstPermissions.manage_emojis,
-        'emojis': firstPermissions.manage_emojis,
-        'manage_server': firstPermissions.manage_server,
-        'server_owner': channel.server.owner == firstPerson,
-        'is_owner': firstPerson.id in ['141231597155385344', '155459369545367552']
-    }
+    # Check if you're looking for the owner
+    ownerIDs = ['141231597155385344', '155459369545367552']
+    if permissionCheck == 'is_owner':
+        isOwner = firstPerson.id in ownerIDs
+        if errReturn == bool:
+            return isOwner
+        return isOwner if isOwner else 'You need to be an owner to use this command.'
+    if firstPerson.id in ownerIDs:
+        return True 
 
-    # Return true for the owner flag
-    if permissionDictinoary['is_owner']:
-        return True
-    elif permissionCheck == 'is_owner':
-        return 'You must be the bot owner to use this command.'
-
-    # Check if that permission is true
-    canGo = permissionDictinoary[permissionCheck.lower()]
-    canGo = True if permissionDictinoary[
-        'admin'] and permissionCheck != 'is_owner' else canGo
-    canGo = True if permissionDictinoary[
-        'server_owner'] and permissionCheck != 'is_owner' else canGo
-    if not canGo:
-        return 'You are not permitted to use this command.'
-    elif secondPerson == None:
+    # Otherwise, just get the permissions
+    perms = channel.permissions_for(firstPerson)
+    
+    # Let admins do everything
+    if perms.administrator:
         return True
 
-    # Check if the first person's top role is above that of the second person
-    secondTop = max([i.position for i in secondPerson.roles])
+    # Get the intended permission 
+    canGo = getattr(perms, permissionCheck)
+    if secondPerson == None:
+        if errReturn == bool:
+            return canGo
+        return canGo if canGo else 'You do not have permission to use this command.'
 
-    # If you're this far, you're pretty okay to just return
-    if firstTop > secondTop:
-        return True
-    else:
-        return 'Your rank is too low to be able to use this on the tagged user.'
+    # See if you can run the role on the selected user
+    isAbove = firstPerson.top_role.position > secondPerson.top_role.position
+    if errReturn == bool:
+        return isAbove
+    return isAbove if isAbove else 'You do not have permission to use this command against this user.'
 
 
 def getMentions(message, numberOfMentions=0, tagType='user'):
