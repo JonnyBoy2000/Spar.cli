@@ -101,7 +101,7 @@ async def on_message(message):
             '{0.timestamp} :: {0.server.id} :: {0.author.id} :: {0.id}'.format(message))
     except AttributeError:
         print(
-            '{0.timestamp} :: Private Message :: {0.author.id} :: {0.id}'.format(message))
+            '{0.timestamp} :: Private Message    :: {0.author.id} :: {0.id}'.format(message))
 
     # Make the bot not respond to other bots
     if message.author.bot:

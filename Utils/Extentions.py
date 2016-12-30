@@ -6,4 +6,5 @@ q = ['Cogs.Admin',
      'Cogs.Random',
      'Cogs.Roles',
      'Cogs.Config',
-     'Cogs.Bible']
+     'Cogs.Bible',
+     'Cogs.Reddit']
