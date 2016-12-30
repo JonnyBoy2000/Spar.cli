@@ -1,10 +1,11 @@
 from discord.ext import commands
-from discord import Colour
+from discord import Colour, Member, Permissions
 from discord.errors import NotFound as Forbidden
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import getPermissions, getMentions, getNonTaggedMentions, checkPerm
 from Utils.Configs import getServerJson
+from Utils.Misc import colourFixer
 
 
 class RoleManagement:
@@ -20,11 +21,7 @@ class RoleManagement:
               :: rolecolour <HexValue> <RolePing>'''
 
         # Get the role colour
-        if len(rolecolour) == 7:
-            rolecolour = rolecolour.replace('#', '')
-        if len(rolecolour) != 6:
-            await self.sparcli.say('Give the colour of the role to change in the form of a hex code.')
-            return
+        rolecolour = colourFixer(rolecolour)
 
         # Get the role itself
         role = getMentions(ctx.message, 1, 'role')
@@ -107,6 +104,32 @@ class RoleManagement:
 
         # Print back out the user
         await self.sparcli.say('The following roles are self-assignable: ```\n* {}```'.format('\n* '.join(assignableRoles)))
+
+    @commands.command(pass_context=True, aliases=['makecolor'])
+    @checkPerm(check='manage_roles')
+    async def makecolour(self, ctx, colour:str, user:Member=None):
+        '''Creates a new role with a given colour, and assigns it to a user
+        Usage :: makecolour <HexValue> <Mention>
+              :: makecolour <HexValue>'''
+
+        # Fix up some variables
+        server = ctx.message.server
+        user = ctx.message.author if user == None else user
+
+        # Fix the colour string
+        colour = colourFixer(colour)
+
+        # Find the role
+        tempRoleFinder = [i for i in server.roles if i.name == user.id]
+        if len(tempRoleFinder) > 1:
+            role = tempRoleFinder[0]
+            await self.sparcli.edit_role(colour=int(colour, 16))
+        else:
+            role = await self.sparcli.create_role(server, name=user.id, colour=int(colour, 16), permissions=Permissions())
+            await self.sparcli.add_roles(user, role)
+
+        # Print out to user
+        await self.sparcli.say('This role has been successfully created. \nYou may need to move the positions of other roles to make it work properly.')
 
 
 def setup(bot):
