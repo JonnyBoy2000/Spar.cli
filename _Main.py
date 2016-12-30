@@ -17,11 +17,19 @@ def getCommandPrefix(bot, message):
         return [';', '<@252880131540910080> ']
 
     # Load the server prefix as defined
-    return [serverPrefix, '<@252880131540910080> ']
+    return [serverPrefix, serverPrefix + ' ', '<@252880131540910080> ']
 
 
 sparcli = commands.Bot(
     command_prefix=getCommandPrefix, description='ApplePy 2.0, pretty much.', pm_help=True)
+
+
+
+@sparcli.event 
+async def on_command_error(error, ctx):
+    # Check failure
+    if isinstance(error, commands.errors.CheckFailure):
+        await sparcli.send_message(ctx.message.channel, 'You are not permitted to use that command.')
 
 
 @sparcli.event
