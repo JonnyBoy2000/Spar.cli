@@ -48,7 +48,7 @@ class Reddit:
             if topComment != None and topLink != None:
                 break
 
-        redditData['Top Comment'] = '[Click here!]({0.link_url}{0.id}/&context=3)'.format(topComment)
+        redditData['Top Comment'] = '[Click here!]({0.link_url}{0.id}/?context=3)'.format(topComment)
         redditData['Top Post'] = '[Click here!](http://reddit.com{0.permalink})'.format(topLink)
 
         # Make an embed from it
