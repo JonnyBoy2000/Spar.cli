@@ -59,6 +59,7 @@ pun||Gives a random pun||
 wolfram|\<Query>|Sends a query to WolframAlpha, returns text||
 c|\<Query>|Sends a query to Cleverbot||
 trans|\<Language Shorthand> \<Content...>|Translates whatever you tell it to into a language of your choice. Language shorthand refers to things like `en` and `de`, etc||
+throw|\<User Mention>|Throws a random item at a user||
 
 ### Misc
 
@@ -71,6 +72,8 @@ info|\<User Mention>|Gives information about the mentioned user||
 invite||This will give you a link to invite the bot to your own server||
 echo|\<Content...>|Will repeat back whatever you pass as content||
 clean|\<Amount> \<User Mention>|Removes the last 50 (default) messages from the mentioned user|Manage Messages|
+colour|\<Hex Cde>|Displays the given hex code in an embed||color
+mycolour|\<Hex Code>|Displays the colour of your username in an embed|mycolor
 
 ### Random
 
@@ -80,6 +83,14 @@ Name|Argument(s)|Description|Requirements|Aliases
 ---|---|---|---|---
 coinflip||Returns "heads" or "tails"||
 
+### Reddit
+
+This is a set of commands that query reddit for an answer/response
+
+Name|Argument(s)|Description|Requirements|Aliases
+---|---|---|---|---
+reddituser|\<Reddit Username>|Gives a small overview of a given reddit account||
+
 ### RoleManagement
 
 The purpose of this category is to make the management of roles a lot easier, regarldess of whether you're at a PC or not
@@ -88,6 +99,14 @@ Name|Argument(s)|Description|Requirements|Aliases
 ---|---|---|---|---
 iam|\<Role Name/Mention>|If it's been set to do so, the bot will assign whatever role the user has specified to them||
 rolecolour|\<Hex Code> \<Role Name/Mention>|Changes a role's colour to whatever hex code is specified|Manage Roles|rolecolour, changecolour, changerolecolour, changerole, rolecolor, changecolor, changerolecolor
+
+### Scriptures
+
+Gives a bunch of quotes from a given holy text
+
+Name|Argument(s)|Description|Requirements|Aliases
+---|---|---|---|---
+christian|\<Passage>|Gives back whatever passage you requested||christianity, bible
 
 ### Tags
 
