@@ -158,9 +158,16 @@ def messageToStarboard(message):
     # Get timestamp
     date = message.timestamp
     formtattedDate = date.strftime('%c')
+    con = message.clean_content if message.clean_content != '' else 'None'
+
+    atch = message.attachments
+    if len(atch) > 0:
+        if atch[0]['url'][-4:] in ['.png','.jpg']:
+            embedObj.set_image(url=atch[0]['url'])
 
     # Add content
-    embedObj.add_field(name=message.clean_content, value=formtattedDate)
+    embedObj.add_field(name='Message :: ', value=con)
+    embedObj.set_footer(text=formtattedDate)
 
     # Return to user
     return starboardText, embedObj
