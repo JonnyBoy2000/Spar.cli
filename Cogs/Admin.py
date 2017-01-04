@@ -1,5 +1,6 @@
 from discord.ext import commands
 from discord import Member
+from requests import get
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import getPermissions, getMentions, checkPerm
@@ -75,6 +76,41 @@ class Admin:
         deleted = await self.sparcli.purge_from(ctx.message.channel, limit=amount)
         deletedAmount = len(deleted)
         await self.sparcli.say('Removed `{}` messages.'.format(deletedAmount))
+
+    @commands.command(pass_context=True)
+    @checkPerm(check='manage_nicknames')
+    async def rename(self, ctx, user:Member, *, name:str=None):
+        '''Changes the nickname of a member
+        Usage :: rename <UserMention> <Name>'''
+
+        try:
+            await self.sparcli.change_nickname(user, name)
+            await self.sparcli.say('Name updated successfully.')
+        except:
+            await self.sparcli.say('I was unable to change that person\'s nickname.')
+
+    @commands.command(pass_context=True, aliases=['servericon'])
+    @checkPerm(check='manage_server')
+    async def serverimage(self, ctx, *, icon:str=None):
+        '''Changes the icon of the server
+        Usage :: serverimage <ImageURL>
+              :: serverimage <ImageUpload>'''
+
+        # Sees if there's an image as an icon
+        if icon != None:
+            pass
+        # Gets it from the attachments
+        else:
+            try:
+                icon = ctx.message.attachments[0]['url']
+            except (KeyError, IndexError):
+                return
+
+        # Sets it as the server image
+        server = ctx.message.server
+        await self.sparcli.edit_server(server, icon=get(icon).content)
+        await self.sparcli.say('Server icon has been updated.')
+
 
 
 def setup(bot):
