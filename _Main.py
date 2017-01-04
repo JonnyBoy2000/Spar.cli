@@ -17,7 +17,7 @@ def getCommandPrefix(bot, message):
         return [';', '<@252880131540910080> ']
 
     # Load the server prefix as defined
-    return [serverPrefix, serverPrefix + ' ', '<@252880131540910080> ']
+    return [serverPrefix + ' ', serverPrefix, '<@252880131540910080> ']
 
 
 sparcli = commands.Bot(
@@ -30,6 +30,11 @@ async def on_command_error(error, ctx):
     # Check failure
     if isinstance(error, commands.errors.CheckFailure):
         await sparcli.send_message(ctx.message.channel, 'You are not permitted to use that command.')
+    else:
+        print('Error on message :: Server{0.server.id} Authour{0.author.id} Message{0.id} Content'.format(ctx.message), end='')
+        try: print(ctx.message.content + '\n')
+        except: print('Could not print.' + '\n')
+        raise(error)
 
 
 @sparcli.event
@@ -101,7 +106,7 @@ async def on_message(message):
             '{0.timestamp} :: {0.server.id} :: {0.author.id} :: {0.id}'.format(message))
     except AttributeError:
         print(
-            '{0.timestamp} :: Private Message    :: {0.author.id} :: {0.id}'.format(message))
+            '{0.timestamp} ::  Private Message   :: {0.author.id} :: {0.id}'.format(message))
 
     # Make the bot not respond to other bots
     if message.author.bot:
@@ -123,8 +128,16 @@ async def on_member_remove(member):
 
 @sparcli.event
 async def on_channel_update(before, after):
-    # Get the changes
-    updateChecks = ['topic', 'name', 'bitrate']
+    await updateSender(before, after, ['topic', 'name', 'bitrate'], 'Channel Update :: {}!', 'Channelupdates', True)
+
+
+@sparcli.event 
+async def on_server_update(before, after):
+    await updateSender(before, after, ['name', 'icon'], 'Server update!', 'Serverupdates')
+
+
+async def updateSender(before, after, updateChecks, embedName, sendEnable, override=False):
+    # Get the changes    
     beforeChecksB = [getattr(before, i) for i in updateChecks]
     afterChecksB = [getattr(after, i) for i in updateChecks]
 
@@ -151,8 +164,8 @@ async def on_channel_update(before, after):
             changedThings[updateChecks[i].title()] = '`{}` changed into `{}`'.format(beforeChecks[i], afterChecks[i])
 
     # Format everything into a nice embed
-    em = makeEmbed(name='Channel Update :: {}!'.format(after.name), values=changedThings, user=sparcli.user)
-    await sendIfEnabled(sparcli, after, 'Channelupdates', embed=em, overrideChannel=after)
+    em = makeEmbed(name=embedName.format(after.name), values=changedThings, user=sparcli.user)
+    await sendIfEnabled(sparcli, after, sendEnable, embed=em, overrideChannel={True:after,False:None}[override])
 
 
 @sparcli.event
