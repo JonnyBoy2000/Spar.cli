@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord import Member
 from requests import get
 from random import choice
 
@@ -205,25 +206,24 @@ class Internet:
         await self.sparcli.say(' '.join(wolfList[0:6]))
 
     @commands.command(pass_context=True)
-    async def throw(self, ctx, *, member: str=None):
+    async def throw(self, ctx, *, member: Member=None):
         '''Throws a random thing at a user
         Usage :: throw
               :: throw <@User>'''
 
         # Get a tagged user, if there is one
         # member will either me membertype or nonetype
-        if member != None:
-            member = getMentions(ctx.message, 1)
-        if type(member) == str:
-            member = None
-        elif member == None:
-            pass
-        else:
-            member = member[0]
 
         # Get thrown object
         toThrow = choice(self.nounlist)
         aOrAn = 'an' if toThrow[0] in 'aeiou' else 'a'
+
+        # See if the user is the bot
+        if member == None:
+            pass
+        elif member.id == self.sparcli.user.id:
+            await self.sparcli.say('Nice try.')
+            return
 
         # Throw the object
         atUser = '.' if member == None else ' at {}.'.format(member.mention)
