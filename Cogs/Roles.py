@@ -118,18 +118,22 @@ class RoleManagement:
 
         # Fix the colour string
         colour = colourFixer(colour)
+        colourObj = Colour(int(colour, 16))
+        # permissions=Permissions(permissions=0)
 
         # Find the role
-        tempRoleFinder = [i for i in server.roles if i.name == user.id]
-        if len(tempRoleFinder) > 1:
+        tempRoleFinder = [i for i in server.roles if user.id in i.name]
+        if len(tempRoleFinder) > 0:
             role = tempRoleFinder[0]
-            await self.sparcli.edit_role(colour=int(colour, 16))
+            await self.sparcli.edit_role(server, role, colour=colourObj)
+            created = False
         else:
-            role = await self.sparcli.create_role(server, name=user.id, colour=int(colour, 16), permissions=Permissions())
+            role = await self.sparcli.create_role(server, name=user.id, colour=colourObj)
             await self.sparcli.add_roles(user, role)
+            created = True
 
         # Print out to user
-        await self.sparcli.say('This role has been successfully created. \nYou may need to move the positions of other roles to make it work properly.')
+        await self.sparcli.say('This role has been successfully {}. \nYou may need to move the positions of other roles to make it work properly.'.format({True:'created',False:'edited'}))
 
 
 def setup(bot):
