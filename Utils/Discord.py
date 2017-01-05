@@ -166,7 +166,8 @@ def messageToStarboard(message):
             embedObj.set_image(url=atch[0]['url'])
 
     # Add content
-    embedObj.add_field(name='Message :: ', value=con)
+    if con != 'None':
+        embedObj.add_field(name='Message :: ', value=con)
     embedObj.set_footer(text=formtattedDate)
 
     # Return to user
