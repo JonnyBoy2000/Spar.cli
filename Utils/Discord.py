@@ -111,10 +111,15 @@ def makeEmbed(*, name=Embed.Empty, icon=Embed.Empty, colour=0xDEADBF, values={},
     embedObj.set_author(name=name, icon_url=icon)
 
     # Create all of the fields
-    for i in values:
-        if values[i] == '':
-            values[i] = 'None'
-        embedObj.add_field(name=i, value='{}'.format(values[i]))
+    for i, o in values.items():
+        q = o
+        w = True
+        if type(o) == tuple:
+            q = o[0]
+            w = o[1]
+        if q == '':
+            q = 'None'
+        embedObj.add_field(name=i, value='{}'.format(q), inline=w)
 
     # Set thumbnail and image
     if thumbnail != None:
