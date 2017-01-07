@@ -24,7 +24,7 @@ class Misc:
         baseLink = 'https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions={}'
         inviteLink = baseLink.format(clientID, permissionsID)
         em = makeEmbed(user=self.sparcli.user, values={'Invite me!':'[Click here!]({})'.format(inviteLink)})
-        await self.sparcli.say('', embed=em)
+        await self.sparcli.say(inviteLink, embed=em)
 
     @commands.command()
     async def git(self):
@@ -124,7 +124,6 @@ class Misc:
 
         # Actually print it out
         await self.sparcli.say('', embed=makeEmbed(colour=colour, name='#'+hexColour))
-
 
 
 def setup(bot):
