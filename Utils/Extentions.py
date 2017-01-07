@@ -7,4 +7,5 @@ q = ['Cogs.Admin',
      'Cogs.Roles',
      'Cogs.Config',
      'Cogs.Bible',
-     'Cogs.Reddit']
+     'Cogs.Reddit',
+     'Cogs.Steam']
