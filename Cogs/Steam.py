@@ -6,6 +6,13 @@ from sys import path
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import makeEmbed
 
+# Used so I can fix Steam game descriptions
+def descFixer(description:str):
+    fixes = [('<strong>', '**'), ('</strong>', '**'), ('<u>', '__'), ('</u>', '__'), ('<i>', '*'), ('</i>', '*'), ('<br>', '\n')]
+    for i in fixes:
+        description = description.replace(i[0], i[1])
+    return description
+
 
 class Steam:
 
@@ -13,7 +20,6 @@ class Steam:
         self.sparcli = sparcli
         self.gameInfo = 'http://store.steampowered.com/api/appdetails?appids={}&format=json'
         self.steamIcon = 'https://image.freepik.com/free-icon/steam-logo-games-website_318-40350.jpg'
-        self.steamColour = 0x000001
 
     @commands.command(pass_context=True)
     async def steamgame(self, ctx, *, gameURL:str):
@@ -49,7 +55,7 @@ class Steam:
         gameData = steamData[gameID]['data']
         retData['Name'] = gameData['name']
         desc = gameData['short_description']
-        for i in [('<b>', '**'), ('</b>', '**'), ('<u>', '__'), ('</u>', '__'), ('<i>', '*'), ('</i>', '*')]: desc = desc.replace(i[0], i[1])
+        desc = descFixer(desc)
         retData['Description'] = (desc, False)
         retData['Game ID'] = gameID
         retData['Categories'] = ', '.join([i['description'] for i in gameData['categories']])
@@ -61,13 +67,13 @@ class Steam:
             retData['Price'] = '~~{}~~ {}'.format(priceFormatter(priceTemp['initial']), priceFormatter(priceTemp['final']))
         else:
             retData['Price'] = priceFormatter(priceTemp['initial'])
-        retData['Link'] = '[Click here!](http://store.steampowered.com/app/{}/)'.format(gameID)
-        retData['Steam Link'] = '[Click here!](steam://store/{}/)'.format(gameID)
+        retData['Store Link'] = '[Open in Steam](steam://store/{0}/), [open in your browser](http://store.steampowered.com/app/{0}/)'.format(gameID)
+        # retData['Steam Link'] = '[Click here!](steam://store/{}/)'.format(gameID)
 
         gameImage = choice(gameData['screenshots'])['path_full']
 
         # Make it into an embed
-        e = makeEmbed(name=retData['Name'], icon=self.steamIcon, colour=self.steamColour, values=retData, image=gameImage)
+        e = makeEmbed(name=retData['Name'], icon=self.steamIcon, colour=1, values=retData, image=gameImage)
 
         # Return to user
         await self.sparcli.say('', embed=e)
