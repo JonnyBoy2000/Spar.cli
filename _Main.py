@@ -5,6 +5,7 @@ from Utils.Configs import *
 from Utils.Updates import *
 from Utils.Discord import messageToStarboard, makeEmbed
 from Utils.Extentions import q as initialExtentions
+from Utils.Exceptions import *
 
 
 def getCommandPrefix(bot, message):
@@ -27,10 +28,32 @@ sparcli = commands.Bot(
 
 @sparcli.event 
 async def on_command_error(error, ctx):
-    # Check failure
-    if isinstance(error, commands.errors.CheckFailure):
-        await sparcli.send_message(ctx.message.channel, 'You are not permitted to use that command.')
+    channel = ctx.message.channel
+    server = ctx.message.server
+
+    if isinstance(error, BotPermissionsTooLow):
+        # This should run if the bot doesn't have permissions to do a thing to a user
+        await sparcli.send_message(channel, 'The bot does is not able to do that to the given user.')
+        
+    elif isinstance(error, MemberPermissionsTooLow):
+        # This should run if the member calling a command doens't have permission to call it
+        await sparcli.send_message(channel, 'You are not permitted to use that command on that user.')
+        
+    elif isinstance(error, MemberMissingPermissions):
+        # This should be run should the member calling the command not be able to run it
+        await sparcli.send_message(channel, 'You are not permitted to use this command.')
+
+    elif isinstance(error, BotMissingPermissions):
+        # This should be run if the bot can't run what it needs to
+        await sparcli.send_message(channel, 'The bot is missing permissions to run this command.')
+        
+    elif isinstance(error, commands.errors.CheckFailure):
+        # This should never really occur
+        # This is if the command check fails
+        await sparcli.send_message(channel, 'You are not permitted to use that command.')
+        
     else:
+        # Who knows what happened? Not me. Raise the error again, and print to console
         print('Error on message :: Server{0.server.id} Authour{0.author.id} Message{0.id} Content'.format(ctx.message), end='')
         try: print(ctx.message.content + '\n')
         except: print('Could not print.' + '\n')
@@ -201,3 +224,4 @@ async def on_ready():
 
 
 sparcli.run(argv[1])
+

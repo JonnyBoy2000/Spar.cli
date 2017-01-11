@@ -1,8 +1,3 @@
-from sys import path
-path.append('../')  # Move path so you can get the Utils folder
-from Utils.Discord import getMentions
-
-
 async def addEmojiList(sparcli, message, emojiList):
     '''Adds a list of emoji to a given message'''
 
@@ -55,8 +50,8 @@ async def updateFromMessage(sparcli, ctx, serverSettings, thingToSet):
         ret = await sparcli.wait_for_message(author=author, channel=channel)
 
         # Check if there's a tagged channel
-        mentioned = getMentions(ret, 1, 'channel')
-        if type(mentioned) == str:
+        mentioned = ret.channel_mentions
+        if mentioned == []:
             z = await sparcli.say('You need to tag a channel in your message.')
             mes.append(z)
             mes.append(ret)

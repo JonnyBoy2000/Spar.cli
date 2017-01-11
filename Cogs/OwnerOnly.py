@@ -6,7 +6,7 @@ from sys import exit
 from os import execl
 from sys import path, exit, executable, argv
 path.append('../')  # Move path so you can get the Utils folder
-from Utils.Discord import getPermissions, checkPerm
+from Utils.Permissions import permissionChecker
 from Utils.Extentions import q as initialExtentions
 
 
@@ -16,7 +16,7 @@ class OwnerOnly:
         self.sparcli = bot
 
     @commands.command(pass_context=True, hidden=True, aliases=['playing'])
-    @checkPerm(check='is_owner')
+    @permissionChecker(check='is_owner')
     async def game(self, ctx, *, game: str=None):
         '''Change what the bot is playing
         Usage :: game <Content>'''
@@ -26,7 +26,7 @@ class OwnerOnly:
         await self.sparcli.say('Game changed to **{}**.'.format(game))
 
     @commands.command(pass_context=True, hidden=True)
-    @checkPerm(check='is_owner')
+    @permissionChecker(check='is_owner')
     async def ev(self, ctx, *, content: str):
         '''Evaluates a given Python expression
         Usage :: ev <Python>'''
@@ -35,7 +35,7 @@ class OwnerOnly:
         await self.sparcli.say(eval(content))
 
     @commands.command(pass_context=True, hidden=True)
-    @checkPerm(check='is_owner')
+    @permissionChecker(check='is_owner')
     async def av(self, ctx, *, avatarUrl: str=None):
         '''Changes the bot's avatar to a set URL
         Usage :: av <ImageLink>
@@ -58,7 +58,7 @@ class OwnerOnly:
         await self.sparcli.say("Profile picture successfully changed.")
 
     @commands.command(pass_context=True, hidden=True)
-    @checkPerm(check='is_owner')
+    @permissionChecker(check='is_owner')
     async def kill(self, ctx):
         '''Kills the bot. Makes it deaded.
         Usage :: kill'''
@@ -78,7 +78,7 @@ class OwnerOnly:
         exit()
 
     @commands.command(pass_context=True, hidden=True)
-    @checkPerm(check='is_owner')
+    @permissionChecker(check='is_owner')
     async def rld(self, ctx, extention: str=None, doFully:str=False):
         '''Reload an extention on the bot
         Usage :: rld <Extention>'''
@@ -118,7 +118,7 @@ class OwnerOnly:
         await self.sparcli.say("Done!")
 
     @commands.command(pass_context=True, hidden=True)
-    @checkPerm(check='is_owner')
+    @permissionChecker(check='is_owner')
     async def loadmessage(self, ctx, messageID: str):
         '''Loads a message into the bot chache
         Usage :: loadmessage <MessageID>'''
@@ -129,7 +129,7 @@ class OwnerOnly:
         await self.sparcli.say('This message has been added to the bot\'s cache.')
 
     @commands.command(pass_context=True, hidden=True, aliases=['rs'])
-    @checkPerm(check='is_owner')
+    @permissionChecker(check='is_owner')
     async def restart(self, ctx):
         '''Restarts the bot. Literally everything.
         Usage :: restart'''

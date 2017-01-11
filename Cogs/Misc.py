@@ -2,9 +2,10 @@ from discord.ext import commands
 from discord import Embed, Member
 from datetime import datetime
 from collections import OrderedDict
+from asyncio import sleep
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
-from Utils.Discord import getMentions, makeEmbed
+from Utils.Discord import makeEmbed
 from Utils.Misc import colourFixer
 
 
@@ -75,19 +76,16 @@ class Misc:
         await self.sparcli.say('', embed=embedMessage)
 
     @commands.command(pass_context=True, aliases=['clear'])
-    async def clean(self, ctx, amount: int=50, user: str=None):
+    async def clean(self, ctx, amount: int=50, user: Member=None):
         '''Checks a given amount of messages, and removes ones from a certain user
         Defaults to 50, with the user being the bot
         Usage :: clean
               :: clean <Number>
               :: clean <Number> <UserMention>'''
 
-        # Check if the user has mentioned anyone
-        messagePings = getMentions(ctx.message, 1)
-        if type(messagePings) == str:
-            user = self.sparcli.user
-        else:
-            user = messagePings[0]
+        # Default to itself
+        if user == None:
+            user = self.sparcli.user 
 
         # Set up the check
         cleanCheck = lambda m: m.author.id == user.id

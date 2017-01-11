@@ -1,9 +1,11 @@
 from discord.ext import commands
+from discord import Channel
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
-from Utils.Discord import getPermissions, getMentions, getNonTaggedMentions, checkPerm
+from Utils.Discord import getTextRoles
 from Utils.Configs import getServerJson, saveServerJson
 from Utils.GuiConfig import addEmojiList, updateFromEmoji, updateFromMessage
+from Utils.Permissions import permissionChecker
 
 
 class Config:
@@ -12,7 +14,7 @@ class Config:
         self.sparcli = sparcli
 
     @commands.command(pass_context=True)
-    @checkPerm(check='administrator')
+    @permissionChecker(check='administrator')
     async def enable(self, ctx, toChange: str):
         '''Enables a certain messagetype from the bot's server configuration
         Usage :: enable <MessageType>
@@ -27,7 +29,7 @@ class Config:
         await self.toggleSetting(ctx, toChange.title(), True)
 
     @commands.command(pass_context=True)
-    @checkPerm(check='administrator')
+    @permissionChecker(check='administrator')
     async def disable(self, ctx, toChange: str):
         '''Disables a certain messagetype from the bot's server configuration
         Usage :: disable <MessageType>
@@ -57,43 +59,32 @@ class Config:
         await self.sparcli.say('The messagetype `{}` has been set to `{}`'.format(whatToSet, toSetTo))
 
     @commands.command(pass_context=True)
-    @checkPerm(check='administrator')
-    async def set(self, ctx, toChange: str):
+    @permissionChecker(check='administrator')
+    async def set(self, ctx, toChange: str, channel: Channel):
         '''Sets a messagetype's output to a certain channel
         Usage :: set <MessageType> <ChannelPing>
-        MessageTypes :: joins, leaves, bans'''
+        MessageTypes :: joins, leaves, bans, etc'''
 
         # If the user can use it, the serverconfig will be changed
-        if toChange.title() not in getServerJson('Default')['Channels']:
+        settableChannels = getServerJson('Default')['Channels']
+        if toChange.title() not in settableChannels:
             await self.sparcli.say('That isn\'t a messagetype you can set. Try something from `{}`'.format(
-                ', '.join(getServerJson('Default')['Channels'].keys())))
-
-        # Change the thingy
-        await self.setSettings(ctx, toChange.title())
-
-    async def setSettings(self, ctx, whatToSet):
-        '''Sets a certain server config to a string'''
-
-        # Get any tagged channels
-        mentions = getMentions(ctx.message, 1, 'channel')
-        if type(mentions) == str:
-            await self.sparcli.say(mentions)
+                ', '.join(settableChannels.keys())))
             return
-        mentions = mentions[0]
 
-        # Make line length shorter
         serverID = ctx.message.server.id
+        toChange = toChange.title()
 
         # Changes the server settings
         serverSettings = getServerJson(serverID)
-        serverSettings['Channels'][whatToSet] = mentions.id
+        serverSettings['Channels'][whatToSet] = channel.id
         saveServerJson(serverID, serverSettings)
 
         # Print out to user
-        await self.sparcli.say('The messagetype `{0}` output has been set to {1.mention}, with ID `{1.id}`'.format(whatToSet, mentions))
+        await self.sparcli.say('The messagetype `{0}` output has been set to {1.mention}, with ID `{1.id}`'.format(whatToSet, channel))
 
-    @commands.group(pass_context=True)
-    @checkPerm(check='administrator')
+    @commands.command(pass_context=True)
+    @permissionChecker(check='administrator')
     async def youare(self, ctx, addRemove: str, *, whatToChange: str):
         '''Allows you to change which roles are self-assignable
         Usage :: youare not <RoleName>
@@ -102,21 +93,9 @@ class Config:
               :: youare now <RoleName>
               :: youare add <RolePing>'''
 
-        # Try and see if the role was pinged
-        roleToGive = getMentions(ctx.message, 1, 'role')
-        if type(roleToGive) == str:
-
-            # If wasn't pinged - see if it exists
-            roleToGive = getNonTaggedMentions(
-                ctx.message.server, whatToChange, 'role')
-            if type(roleToGive) == str:
-
-                # The user hates us
-                await self.sparcli.say(roleToGive)
-                return
-
-        # Turn the role list into a role
-        roleToGive = roleToGive[0]
+        roleToGive = await getTextRoles(ctx)
+        if roleToGive is 0:
+            return
 
         # Set up where the subcommand will redirect to
         subcommands = {'not': True,
@@ -147,13 +126,14 @@ class Config:
         # Plonk the settings back into the file storage
         serverSettings['SelfAssignableRoles'] = allowableIDs
         saveServerJson(ctx.message.server.id, serverSettings)
+        canItBeAssigned = {False: 'can now be', True: 'can no longer be'}[calledSubcommand]
 
         # Print out to the user
         await self.sparcli.say('The role `{0.name}` with ID `{0.id}` {1} self-assigned.'.format(
-            roleToGive, {False: 'can now be', True: 'can no longer be'}[calledSubcommand]))
+            roleToGive, canItBeAssigned))
 
     @commands.command(pass_context=True, aliases=['setprefix', 'prefixset'])
-    @checkPerm(check='administrator')
+    @permissionChecker(check='administrator')
     async def prefix(self, ctx, prefix: str):
         '''Changes the command prefix for the server
         Usage :: prefix <New Preifx>'''
@@ -170,7 +150,7 @@ class Config:
         await self.sparcli.say('The command prefix for this server has been set to `{}`'.format(prefix))
 
     @commands.command(pass_context=True)
-    @checkPerm(check='administrator')
+    @permissionChecker(check='administrator')
     async def setup(self, ctx):
         '''Gives you a reaction-based configuration dialogue
         Usage :: setup'''

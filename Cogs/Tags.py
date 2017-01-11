@@ -2,7 +2,14 @@ from discord.ext import commands
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Configs import getServerJson, saveServerJson
-from Utils.Discord import getPermissions, checkPerm
+from Utils.Discord import getPermissions
+from Utils.Permissions import permissionChecker
+
+
+'''
+Todo: Rewrite this entire class
+On completion: I can remove the getPermissions function
+'''
 
 
 class Tags:
@@ -19,7 +26,7 @@ class Tags:
         await self.runTag(ctx, subcom, False)
 
     @commands.command(pass_context=True, aliases=['et'], hidden=True)
-    @checkPerm(check='is_owner')
+    @permissionChecker(check='is_owner')
     async def etag(self, ctx, *, subcom: str=None):
         '''Defines server-specific tags for evaluating Python expressions
         Usage :: etag add
@@ -173,16 +180,14 @@ class Tags:
         # Tell them thhat you're making tag and being nice
         await self.sparcli.say('Creating tag with name `{}`. What is the indended content?'.format(tagName))
         contentMessage = await self.sparcli.wait_for_message(author=ctx.message.author)
-        content = contentMessage.content if contentMessage.content != '' else contentMessage.attachments[
-            0]['url']
+        content = contentMessage.content if contentMessage.content != '' else contentMessage.attachments[0]['url']
 
         # Get the serverID
         serverID = ctx.message.server.id if serverID == None else serverID
 
         # Save it into the server configs
         settings = getServerJson(serverID)
-        settings[{False: 'Tags', True: 'Etags'}
-                 [runWithExec]][tagName] = content
+        settings[{False: 'Tags', True: 'Etags'}[runWithExec]][tagName] = content
         saveServerJson(serverID, settings)
 
         # Respond to the user

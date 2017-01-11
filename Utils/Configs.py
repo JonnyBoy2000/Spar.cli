@@ -7,9 +7,12 @@ workingDirectory = dirname(realpath(__file__))
 def getServerJson(serverID):
     '''Returns the JSON config for a server'''
 
+    # Try and open a specified file
     try:
         with open(workingDirectory + '/../ServerConfigs/{}.json'.format(serverID)) as a:
             jsonData = loads(a.read())
+
+    # The file doesn't exist, load and return the default file data
     except FileNotFoundError:
         with open(workingDirectory + '/../ServerConfigs/Default.json') as a:
             jsonData = loads(a.read())

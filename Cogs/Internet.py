@@ -27,7 +27,6 @@ except ImportError:
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Configs import getTokens
-from Utils.Discord import getMentions
 
 
 class Internet:

@@ -26,6 +26,12 @@ def getPermissions(channel=None, permissionCheck=None, firstPerson=None, secondP
 
     # Check if you're looking for the owner
     ownerIDs = ['141231597155385344', '155459369545367552']
+    try:
+        ownerIDs = ownerIDs + kwargs['owners']
+    except KeyError:
+        pass
+
+    # Run the actual owner checks
     if permissionCheck == 'is_owner':
         isOwner = firstPerson.id in ownerIDs
         if errReturn == bool:
@@ -55,46 +61,34 @@ def getPermissions(channel=None, permissionCheck=None, firstPerson=None, secondP
     return isAbove if isAbove else 'You do not have permission to use this command against this user.'
 
 
-def getMentions(message, numberOfMentions=0, tagType='user'):
-    '''Filters out the mentions from the input message'''
+async def getTextRoles(ctx):
+    '''Gets non-tagged and tagged roles from a message's ctx'''
 
-    # Pick the type of mention to return
-    tags = {'user': message.mentions,
-            'channel': message.channel_mentions,
-            'role': message.role_mentions}[tagType]
+    # Try and see if the role was pinged
+    roleToGive = ctx.message.role_mentions
+    if roleToGive == []:
 
-    # Make sure that it's the right length
-    if len(tags) == 0:
-        return 'You need to tag a {} in your message.'.format(tagType)
-    if len(tags) > numberOfMentions:
-        return 'You have tagged too many {}s.'.format(tagType)
-    if len(tags) < numberOfMentions:
-        return 'You have tagged too few {}s.'.format(tagType)
-    return tags
+        # Find it from the names of the roles on the server
+        serverRoleObjects = ctx.message.server.roles
+        serverRoleNames = [i.name for i in serverRoleObjects]
+        results = []
 
+        for i, n in enumerate(serverRoleNames):
+            # i is index, n is name
+            if whatToChange.lower() in n.lower():
+                results.append(i)
 
-def getNonTaggedMentions(server, toFind, tagType='user', *, caseSensitive=False):
-    '''Filters through the server to the name of a thing that was tagged'''
+        # Check if there was more than one relevant result
+        if len(results) == 0:
+            await self.sparcli.say('There were no results for roles with that name on this server.')
+            return 0
+        elif len(results) > 1:
+            await self.sparcli.say('There were too many results for roles with that name on this server.')
+            return 0
+        else:
+            roleToGive = [serverRoleObjects[results[0]]]
 
-    # Set what to iterate through
-    tags = {'user': server.members,
-            'channel': server.channels,
-            'role': server.roles}[tagType]
-
-    # Alter the toFind string if caseSensitive
-    if caseSensitive:
-
-        # Iterate through each tag to see if it applies
-        retThings = [i for i in tags if toFind in i.name]
-
-    else:
-        retThings = [i for i in tags if toFind.lower() in i.name.lower()]
-
-    if len(retThings) > 1:
-        return 'There are too many possibilities for this search term - try narrowing your search or tagging your {}.'.format(tagType)
-    elif len(retThings) == 0:
-        return 'There are no {}s with the name `{}`.'.format(tagType, toFind)
-    return retThings
+    return roleToGive[0]
 
 
 def makeEmbed(*, name=Embed.Empty, icon=Embed.Empty, colour=0xDEADBF, values={}, user=None, thumbnail=None, image=None, footer=[Embed.Empty, Embed.Empty]):

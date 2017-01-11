@@ -3,7 +3,8 @@ from discord import Member
 from requests import get
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
-from Utils.Discord import getPermissions, getMentions, checkPerm
+from Utils.Discord import getPermissions, checkPerm
+from Utils.Permissions import permissionChecker, botPermission
 
 
 class Admin:
@@ -12,62 +13,36 @@ class Admin:
         self.sparcli = bot
 
     @commands.command(pass_context=True)
-    @checkPerm(check='ban_members')
-    async def ban(self, ctx, user:Member=None, *, reason: str=None):
+    @permissionChecker(check='ban_members', compare=True)
+    @botPermission(check='ban_members', compare=True)
+    async def ban(self, ctx, user:Member=None, *, reason: str='Unspecified'):
         '''Bans a user from the server.
         Usage :: ban <Mention> <Reason...>'''
 
-        # Get the tagged users from the message
-        if user == None:
-            await self.sparcli.say('You need to tag a member in your message')
-            return
-
-        # See if the user is allowed to run the command on the given user
-        permReturn = getPermissions(ctx=ctx, person=user, check='ban_members')
-        if type(permReturn) == str:
-            await self.sparcli.say(permReturn)
-            return
-
-        # Try and ban the user
-        try:
-            await self.sparcli.ban(user)
-        except:
-            await self.sparcli.say('I was unable to ban that user.')
-            return
-
+        await self.sparcli.ban(user)
         # Todo :: make this print out in a config-determined channel
-        await self.sparcli.say('**{0}** `({0.id})` has been banned.'.format(user))
+        await self.sparcli.say('**{0}** `({0.id})` has been banned for reason `{1}`.'.format(user, reason))
 
     @commands.command(pass_context=True)
-    @checkPerm(check='kick_members')
+    @permissionChecker(check='kick_members', compare=True)
+    @botPermission(check='kick_members', compare=True)
     async def kick(self, ctx, user: Member, *, reason: str=None):
         '''Kicks a user from the server.
         Usage :: kick <Mention> <Reason...>'''
 
-        # See if the user is allowed to run the command
-        permReturn = getPermissions(ctx=ctx, person=user, check='kick_members')
-        if type(permReturn) == str:
-            await self.sparcli.say(permReturn)
-            return
-
-        # Try and kick the user
-        try:
-            await self.sparcli.kick(user)
-        except:
-            await self.sparcli.say('I was unable to kick that user.')
-            return
-
+        await self.sparcli.kick(user)
         # Todo :: make this print out in a config-determined channel
-        await self.sparcli.say('**{0}** `({0.id})` has been kicked.'.format(taggedUser[0]))
+        await self.sparcli.say('**{0}** `({0.id})` has been kicked for reason `{1}`.'.format(user, reason))
 
     @commands.command(pass_context=True)
-    @checkPerm(check='manage_messages')
+    @permissionChecker(check='manage_messages')
+    @botPermission(check='manage_messages')
     async def purge(self, ctx, amount: int):
         '''Deletes a number of messages from a channel
         Usage :: purge <Number>'''
 
         # Make sure the calling member isn't an idiot
-        if amount > 500:
+        if amount >= 500:
             await self.sparcli.say('That number is too large. Please tone it down a notch.')
             return
 
@@ -78,19 +53,18 @@ class Admin:
         await self.sparcli.say('Removed `{}` messages.'.format(deletedAmount))
 
     @commands.command(pass_context=True)
-    @checkPerm(check='manage_nicknames')
+    @permissionChecker(check='manage_nicknames')
+    @botPermission(check='manage_nicknames')
     async def rename(self, ctx, user:Member, *, name:str=None):
         '''Changes the nickname of a member
         Usage :: rename <UserMention> <Name>'''
 
-        try:
-            await self.sparcli.change_nickname(user, name)
-            await self.sparcli.say('Name updated successfully.')
-        except:
-            await self.sparcli.say('I was unable to change that person\'s nickname.')
+        await self.sparcli.change_nickname(user, name)
+        await self.sparcli.say('Name updated successfully.')
 
     @commands.command(pass_context=True, aliases=['servericon'])
-    @checkPerm(check='manage_server')
+    @permissionChecker(check='manage_server')
+    @botPermission(check='manage_server')
     async def serverimage(self, ctx, *, icon:str=None):
         '''Changes the icon of the server
         Usage :: serverimage <ImageURL>
