@@ -94,7 +94,7 @@ class Reddit:
             makeThumb = False
             if post.selftext != '':
                 postValues['Body Text'] = post.selftext
-        elif True in [post.url.endswith(i) for i in['.jpg', '.jpeg', '.png']]:
+        elif True in [post.url.endswith(i) for i in['.jpg', '.jpeg', '.png', '.gif']]:
             makeThumb = True
         else:
             makeThumb = True
