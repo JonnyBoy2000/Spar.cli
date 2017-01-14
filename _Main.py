@@ -33,7 +33,7 @@ async def on_command_error(error, ctx):
 
     if isinstance(error, BotPermissionsTooLow):
         # This should run if the bot doesn't have permissions to do a thing to a user
-        await sparcli.send_message(channel, 'The bot does is not able to do that to the given user.')
+        await sparcli.send_message(channel, 'The bot is not able to do that to the given user.')
         
     elif isinstance(error, MemberPermissionsTooLow):
         # This should run if the member calling a command doens't have permission to call it
@@ -54,7 +54,7 @@ async def on_command_error(error, ctx):
         
     else:
         # Who knows what happened? Not me. Raise the error again, and print to console
-        print('Error on message :: Server{0.server.id} Authour{0.author.id} Message{0.id} Content'.format(ctx.message), end='')
+        print('Error on message :: Server{0.server.id} Author{0.author.id} Message{0.id} Content'.format(ctx.message), end='')
         try: print(ctx.message.content + '\n')
         except: print('Could not print.' + '\n')
         raise(error)
@@ -123,13 +123,15 @@ async def on_reaction_remove(reaction, member):
 
 @sparcli.event
 async def on_message(message):
+    
+    # See if it's a PM
+    if message.server != None:
+        f = '{0.timestamp} :: {0.server.id} :: {0.author.id} :: {0.id}'
+    else:
+        f = '{0.timestamp} ::  Private Message   :: {0.author.id} :: {0.id}'
+
     # Print out to console
-    try:
-        print(
-            '{0.timestamp} :: {0.server.id} :: {0.author.id} :: {0.id}'.format(message))
-    except AttributeError:
-        print(
-            '{0.timestamp} ::  Private Message   :: {0.author.id} :: {0.id}'.format(message))
+    print(f.format(message))
 
     # Make the bot not respond to other bots
     if message.author.bot:
@@ -200,7 +202,7 @@ async def on_ready():
 
     # Load the extentions
     for extension in initialExtentions:
-        # This is necessary because I'm bad at code
+        # This is necessary because I'm bad at code lol
         try:
             sparcli.load_extension(extension)
 
