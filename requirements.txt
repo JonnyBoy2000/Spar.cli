@@ -4,3 +4,4 @@ microsofttranslator
 requests
 cleverbot
 wolframalpha==2.4
+youtube_dl

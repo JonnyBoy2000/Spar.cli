@@ -8,4 +8,6 @@ q = ['Cogs.Admin',
      'Cogs.Config',
      'Cogs.Bible',
      'Cogs.Reddit',
-     'Cogs.Steam']
+     'Cogs.Steam',
+     'Cogs.Music']
+
