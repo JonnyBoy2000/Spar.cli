@@ -20,6 +20,37 @@ class Steam:
         self.sparcli = sparcli
         self.gameInfo = 'http://store.steampowered.com/api/appdetails?appids={}&format=json'
         self.steamIcon = 'https://image.freepik.com/free-icon/steam-logo-games-website_318-40350.jpg'
+        self.steamGames = []
+
+        everyGame = 'http://api.steampowered.com/ISteamApps/GetAppList/v0001/'
+        gameResp = get(everyGame)
+        gameDict = gameResp.json()
+        self.steamGames = gameDict['applist']['apps']['app']
+
+    def gameFinder(self, gameName:str):
+        '''Returns a game ID as found from its name on the game list'''
+
+        for i in self.steamGames:
+            if gameName.lower() in i['name'].lower():
+                return str(i['appid'])
+        return None
+
+    @commands.command(pass_context=True)
+    async def steamsearch(self, ctx, *, gameName:str):
+        '''Gets the information of a game from Steam
+        Usage :: steamsearch watch_dogs
+              :: steamsearch papers, please'''
+
+        await self.sparcli.send_typing(ctx.message.server)
+
+        # Try and get the game from the game list
+        gameID = self.gameFinder(gameName)
+        if gameID == None:
+            await self.sparcli.say('I was unable to find the ID of that game on the Steam API.')
+            return
+
+        # Send it to the information formatter
+        await self.getSteamGameInfo(gameID)
 
     @commands.command(pass_context=True)
     async def steamgame(self, ctx, *, gameURL:str):
@@ -43,9 +74,14 @@ class Steam:
             await self.sparcli.say('I was unable to find the ID of that game on the Steam API.')
             return
 
+        await self.getSteamGameInfo(gameID)
+
+    async def getSteamGameInfo(self, gameID:str=None):
+        '''Gets the data of a game on Steam. Can only be done through ID'''
+
         # Get the data from Steam
         steamData = get(self.gameInfo.format(gameID)).json()
-        if steamData[gameID]['success'] == False:
+        if steamData[str(gameID)]['success'] == False:
             await self.sparcli.say('I was unable to find the ID of that game on the Steam API.')
             return
 
