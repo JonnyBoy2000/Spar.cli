@@ -87,7 +87,7 @@ class Steam:
 
         # Get the embed information
         retData = OrderedDict()
-        priceFormatter = lambda x: '£{}.{}'.format(str(x)[:-2], str(x)[-2:]) if len(str(x)) > 2 else '£0.' + str(x)
+        priceFormatter = lambda x: 'GPB{}.{}'.format(str(x)[:-2], str(x)[-2:]) if len(str(x)) > 2 else 'GPB0.' + str(x)
         gameData = steamData[gameID]['data']
         retData['Name'] = gameData['name']
         desc = gameData['short_description']
@@ -98,15 +98,24 @@ class Steam:
         retData['Platforms'] = ', '.join([i.title() for i in list(gameData['platforms'].keys())])
         retData['Developer'] = ', '.join(gameData['developers'])
         retData['Publisher'] = ', '.join(gameData['publishers'])
-        priceTemp = gameData['price_overview']
-        if priceTemp['initial'] != priceTemp['final']:
-            retData['Price'] = '~~{}~~ {}'.format(priceFormatter(priceTemp['initial']), priceFormatter(priceTemp['final']))
-        else:
-            retData['Price'] = priceFormatter(priceTemp['initial'])
+        try:
+            priceTemp = gameData['price_overview']
+            if priceTemp['initial'] != priceTemp['final']:
+                retData['Price'] = '~~{}~~ {}'.format(priceFormatter(priceTemp['initial']), priceFormatter(priceTemp['final']))
+            else:
+                retData['Price'] = priceFormatter(priceTemp['initial'])
+        except KeyError:
+            # The game is not released/does not have a price
+            pass
+
         retData['Store Link'] = '[Open in Steam](steam://store/{0}/), [open in your browser](http://store.steampowered.com/app/{0}/)'.format(gameID)
-        # retData['Steam Link'] = '[Click here!](steam://store/{}/)'.format(gameID)
 
         gameImage = choice(gameData['screenshots'])['path_full']
+
+        # Delete stuff that doesn't exist
+        for i, o in retData.items():
+            if o == '':
+                del retData[i]
 
         # Make it into an embed
         e = makeEmbed(name=retData['Name'], icon=self.steamIcon, colour=1, values=retData, image=gameImage)
