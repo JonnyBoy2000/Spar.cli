@@ -6,6 +6,19 @@ from sys import path
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import makeEmbed
 
+
+'''
+Todo :: Add Steam game comparisons
+
+* http://steamcommunity.com/id/USERID/games?tab=all&xml=1
+* http://steamcommunity.com/profiles/USERID64/games?tab=all&xml=1
+-- Both of those return XML of all games
+
+* http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=XXXXXXXXXXXXXXXXX&steamid=76561197960434622&format=json
+-- Returns owned games of a player from an ID64 and API key
+'''
+
+
 # Used so I can fix Steam game descriptions
 def descFixer(description:str):
     fixes = [('<strong>', '**'), ('</strong>', '**'), ('<u>', '__'), ('</u>', '__'), ('<i>', '*'), ('</i>', '*'), ('<br>', '\n')]
@@ -94,6 +107,11 @@ class Steam:
         desc = descFixer(desc)
         retData['Description'] = (desc, False)
         retData['Game ID'] = gameID
+        try:
+            m = gameData['metacritic']
+            retData['Metacritic'] = '**{}**, [click here]({})'.format(m['score'], m['url'])
+        except KeyError:
+            pass
         retData['Categories'] = ', '.join([i['description'] for i in gameData['categories']])
         retData['Platforms'] = ', '.join([i.title() for i in list(gameData['platforms'].keys())])
         retData['Developer'] = ', '.join(gameData['developers'])
