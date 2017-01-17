@@ -62,7 +62,7 @@ class Music:
         '''Plays a song through a voice client via YTDL'''
 
         # Make sure it filters through ytdl properly
-        if 'http://' in songName:
+        if 'http://' in songName.lower() or 'https://' in songName.lower():
             searchTerm = songName
         else:
             searchTerm = 'ytsearch:' + songName
