@@ -179,6 +179,34 @@ class Music:
         # Go play the stuff
         await self.youtubeBridge(server, nameOfSong)
 
+    @commands.command(pass_context=True, aliases=['disconnect', 'dc'])
+    async def leave(self, ctx):
+        '''Makes a bot on the server leave the joined voice channel
+        Usage :: leave'''
+
+        server = ctx.message.server
+
+        voiceClient = self.voice[server]['VoiceClient']
+        streamClient = self.voice[server]['StreamClient']
+
+        # Stop any playing media
+        try:
+            streamClient.stop()
+        except AttributeError:
+            pass
+
+        # Leave the voice channel
+        try:
+            await voiceClient.disconnect()
+        except AttributeError:
+            await self.sparcli.say('I\'m not currently in a voice channel.')
+            return
+
+        await self.sparcli.say('Disconnected from the VC.')
+        self.voice[server]['VoiceClient'] = None
+        self.voice[server]['StreamClient'] = None
+
+
 def setup(bot):
     bot.add_cog(Music(bot))
 
