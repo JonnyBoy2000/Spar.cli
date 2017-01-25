@@ -3,6 +3,10 @@ from discord import opus, ClientException
 from time import time as currentTime
 from datetime import timedelta
 from ctypes.util import find_library
+from sys import path
+from collections import OrderedDict
+path.append('../')  # Move path so you can get the Utils folder
+from Utils.Discord import makeEmbed
 
 
 class Music:
@@ -26,6 +30,7 @@ class Music:
                 'Volume': 0.2,
                 'LastCalled': 0
             }
+
 
     async def joinVC(self, *, member=None, channel=None):
         '''Joins a given voice channel.
@@ -99,9 +104,40 @@ class Music:
         self.voice[server]['StreamClient'] = streamClient
 
         # Print out to user
-        duration = timedelta(seconds=streamClient.duration)
+        # duration = timedelta(seconds=streamClient.duration)
+        # title = streamClient.title
+        # await self.sparcli.say('Now playing `{0}` :: `[{1}]`'.format(title, duration))
+        await self.playEmbed(streamClient)
+
+    async def playEmbed(self, streamClient):
+        '''Creates and sends an embed based on the steamclient'''
+
         title = streamClient.title
-        await self.sparcli.say('Now playing `{0}` :: `[{1}]`'.format(title, duration))
+        duration = timedelta(seconds=streamClient.duration)
+        description = streamClient.description
+        likes = streamClient.likes
+        dislikes = streamClient.dislikes
+        views = streamClient.views
+        uploader = streamClient.uploader
+        date = streamClient.upload_date
+
+        if len(description) > 100:
+            fdesc = description[:100] + '...'
+        else:
+            fdesc = description
+
+        o = OrderedDict()
+        o['Title'] = title 
+        o['Views'] = views 
+        o['Duration'] = duration 
+        o['Uploader'] = uploader 
+        o['Upload Date'] = date
+        o['Likes'] = likes 
+        o['Dislikes'] = dislikes 
+        o['Description'] = (fdesc, False)
+
+        e = makeEmbed(name='Now Playing!', values=o, user=self.sparcli.user)
+        await self.sparcli.say('', embed=e)
 
     def handleBlacklist(self, streamClient):
         '''Sets a blacklist for certain terms - earrape, etc'''
