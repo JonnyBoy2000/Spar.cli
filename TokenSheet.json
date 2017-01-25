@@ -8,8 +8,12 @@
 	},
 	"Reddit": {
 		"ID": "",
-		"Secret": ""
+		"Secret": "",
+		"User Agent": "",
+		"Username": "",
+		"Password": "",
+		"Refresh Token": ""
 	},
 	"OwnerIDs": [],
-	"BotID": "252880131540910080"
+	"BotID": ""
 }

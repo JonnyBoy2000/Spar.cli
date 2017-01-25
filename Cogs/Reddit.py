@@ -19,11 +19,16 @@ class Reddit:
 
         tokens = getTokens()['Reddit']
         self.reddit = praw.Reddit(client_id=tokens['ID'],
-                                  client_secret=tokens['Secret'],
-                                  user_agent='Spar.cli Discord bot reddit bridge - /u/SatanistSnowflake')
+            client_secret=tokens['Secret'],
+            user_agent=tokens['User Agent'],
+            username=tokens['Username'],
+            password=tokens['Password'],
+            refresh_token=tokens['Refresh Token']
+        )
 
         self.getRedditor = lambda name: self.reddit.redditor(name)
         self.getSubreddit = lambda name: self.reddit.subreddit(name)
+        self.discordSays = self.reddit.subreddit('DiscordSays')
         self.redditIcon = 'http://rawapk.com/wp-content/uploads/2016/04/Reddit-The-Official-App-Icon.png'
 
     @commands.command(pass_context=True)
@@ -107,6 +112,36 @@ class Reddit:
 
         # Return to user
         await self.sparcli.say('', embed=e)
+
+    @commands.command(pass_context=True, hidden=True)
+    async def discordsays(self, ctx, *, title:str=None):
+        '''Posts an image to /r/DiscordSays under the /u/SparCli user
+        Usage :: discordsays <Title> (image upload)'''
+
+        # Make sure that they're trying to give an image
+        message = ctx.message
+        try:
+            image = message.attachments[0]['url']
+            if True not in [image.lower().endswith(i) for i in ['.png', '.jpg', '.jpeg', '.gif', '.gifv']]:
+                raise IndexError
+        except IndexError:
+            await self.sparcli.say('You need to upload an image for this command to work.')
+            return
+
+        # See if there's a title
+        if title == None:
+            await self.sparcli.say('What do you want the title of this post to be?')
+            titleMessage = await self.sparcli.wait_for_message(author=message.author)
+            if titleMessage.content == '':
+                await self.sparcli.say('You have not given a valid title. Aborting upload.')
+            elif len(titleMessage.content) > 300:
+                await self.sparcli.say('The title you have given is too long. Aborting upload.')
+            else:
+                title = titleMessage.content
+
+        # Upload to reddit
+        postedImage = self.discordSays.submit(title, url=image)
+        await self.sparcli.say('Uploaded :: <{}>'.format(postedImage.shortlink))
 
 
 def setup(bot):
