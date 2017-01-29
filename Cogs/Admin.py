@@ -53,8 +53,8 @@ class Admin:
         await self.sparcli.say('Removed `{}` messages.'.format(deletedAmount))
 
     @commands.command(pass_context=True)
-    @permissionChecker(check='manage_nicknames')
-    @botPermission(check='manage_nicknames')
+    @permissionChecker(check='manage_nicknames', compare=True)
+    @botPermission(check='manage_nicknames', compare=True)
     async def rename(self, ctx, user:Member, *, name:str=None):
         '''Changes the nickname of a member
         Usage :: rename <UserMention> <Name>'''
