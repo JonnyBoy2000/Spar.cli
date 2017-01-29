@@ -1,4 +1,7 @@
-class BotPermissionsTooLow(Exception):
+from discord.ext import commands
+CE = commands.errors.CommandError
+
+class BotPermissionsTooLow(CE):
     '''
     This is the exception to be thrown when the bot's permissions are too low
     to perform the given action
@@ -7,7 +10,7 @@ class BotPermissionsTooLow(Exception):
     pass
 
 
-class MemberPermissionsTooLow(Exception):
+class MemberPermissionsTooLow(CE):
     '''
     This will be thrown when a given member is trying to perform an action
     on another member but doens't have a high enough top role
@@ -16,7 +19,7 @@ class MemberPermissionsTooLow(Exception):
     pass
 
 
-class MemberMisingPermissions(Exception):
+class MemberMissingPermissions(CE):
     '''
     This will be thrown when a member is missing permissions to perform an action
     that they are trying to do a command with
@@ -25,10 +28,28 @@ class MemberMisingPermissions(Exception):
     pass
 
 
-class BotMissingPermissions(Exception):
+class BotMissingPermissions(CE):
     '''
     This will be thrown when the bot is missing permissions for an action
     that a cog has specified
+    '''
+
+    pass
+
+
+class DoesntWorkInPrivate(CE):
+    '''
+    This is to be thrown when a message is send in a private message
+    that can't be handled
+    '''
+
+    pass
+
+
+class ThisNeedsAToken(CE):
+    '''
+    The command run needs a token to work, which wasn't input by the host
+    of the bot
     '''
 
     pass

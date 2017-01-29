@@ -1,5 +1,25 @@
 from discord.ext import commands
 from .Configs import getTokens
+from .Exceptions import *
+
+
+def needsToken(**kwargs):
+    '''Checks to see if a certain token type's secret exists
+
+    Parameters :: 
+        token : str
+            The type of token whose secret needs to exist
+    '''
+
+    def predicate(ctx):
+        token = kwargs.get('token', None)
+
+        if getTokens()[token]['Secret'] == '':
+            raise ThisNeedsAToken
+        return True
+        
+    return commands.check(predicate)
+
 
 def permissionChecker(**kwargs):
     '''Checks permissions based on ctx and some kwargs
@@ -27,11 +47,13 @@ def permissionChecker(**kwargs):
         if author.id in tokens['OwnerIDs'] + owners:
             return True
         elif check == 'is_owner':
+            raise MemberMissingPermissions
             return False
 
         # Checks if it's a PM
         if server == None:
             # Handle PM'd messages better later, for now just say you can't do them
+            raise DoesntWorkInPrivate
             return False
 
         # Sees if the author is the server owner
@@ -45,10 +67,14 @@ def permissionChecker(**kwargs):
             mentions = [i for i in ctx.message.mentions if i.id != tokens['BotID']]
 
             # Check that it's not empty
-            if mentions == []: return False
+            if mentions == []: 
+                raise MemberPermissionsTooLow
+                return False
 
             # Pretty much just return false if they have a higher top role, otherwise continue
-            if author.top_role.position <= mentions[1].top_role.position: return False
+            if author.top_role.position <= mentions[1].top_role.position: 
+                raise MemberPermissionsTooLow
+                return False
 
         # Check that the user has permission to actually do what they want to
         permissionsInChannel = channel.permissions_for(author)
@@ -81,7 +107,10 @@ def botPermission(**kwargs):
         # Check the bot's permissions
         if compare == False:
             # No comparison, just say whether the bot can do it
-            return getattr(perms, check)
+            x = getattr(perms, check)
+            if x == True:
+                return x
+            raise BotMissingPermissions
         elif getattr(perms, check) == False:
             # Compare, but the bot can't run the command
             return False 
@@ -91,9 +120,14 @@ def botPermission(**kwargs):
             pass
 
         # Makes sure that there actually are mentions
-        if mentions == []: return False 
+        if mentions == []:
+            raise BotPermissionsTooLow 
+            return False 
         user = mentions[0]
 
-        return botMember.top_role.position > user.top_role.position
+        x = botMember.top_role.position > user.top_role.position
+        if x == True:
+            return True
+        raise BotPermissionsTooLow
 
     return commands.check(predicate)
