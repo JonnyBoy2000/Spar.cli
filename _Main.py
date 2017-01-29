@@ -33,24 +33,28 @@ async def on_command_error(error, ctx):
 
     if isinstance(error, BotPermissionsTooLow):
         # This should run if the bot doesn't have permissions to do a thing to a user
-        await sparcli.send_message(channel, 'The bot is not able to do that to the given user.')
+        await sparcli.send_message(channel, 'That user is too high ranked for me to perform that action on them.')
         
     elif isinstance(error, MemberPermissionsTooLow):
         # This should run if the member calling a command doens't have permission to call it
-        await sparcli.send_message(channel, 'You are not permitted to use that command on that user.')
+        await sparcli.send_message(channel, 'That user is too high ranked for you to run that command on them.')
         
     elif isinstance(error, MemberMissingPermissions):
         # This should be run should the member calling the command not be able to run it
-        await sparcli.send_message(channel, 'You are not permitted to use this command.')
+        await sparcli.send_message(channel, 'You are missing the permissions required to run that command.')
 
     elif isinstance(error, BotMissingPermissions):
         # This should be run if the bot can't run what it needs to
-        await sparcli.send_message(channel, 'The bot is missing permissions to run this command.')
+        await sparcli.send_message(channel, 'I\'m missing the permissions required to run this command.')
+
+    elif isinstance(error, DoesntWorkInPrivate):
+        # This is to be run if the command is sent in PM
+        await sparcli.send_message(channel, 'This command does not work in PMs.')
         
-    elif isinstance(error, commands.errors.CheckFailure):
+    if isinstance(error, commands.errors.CheckFailure):
         # This should never really occur
         # This is if the command check fails
-        await sparcli.send_message(channel, 'You are not permitted to use that command.')
+        await sparcli.send_message(channel, 'Command check failed. Unknown error; please mention `Caleb#2831`.')
         
     else:
         # Who knows what happened? Not me. Raise the error again, and print to console
