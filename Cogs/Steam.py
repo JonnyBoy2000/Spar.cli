@@ -21,7 +21,8 @@ Todo :: Add Steam game comparisons
 
 # Used so I can fix Steam game descriptions
 def descFixer(description:str):
-    fixes = [('<strong>', '**'), ('</strong>', '**'), ('<u>', '__'), ('</u>', '__'), ('<i>', '*'), ('</i>', '*'), ('<br>', '\n')]
+    fixes = [('<strong>', '**'), ('</strong>', '**'), ('<u>', '__'), ('</u>', '__'), 
+             ('<i>', '*'), ('</i>', '*'), ('<br>', '\n'), ('<br />', '\n'), ('&quot;', '"')]
     for i in fixes:
         description = description.replace(i[0], i[1])
     return description
