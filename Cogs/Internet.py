@@ -10,13 +10,6 @@ try:
 except ImportError:
     translatorImported = True
 
-# Import Cleverbot
-try:
-    from cleverbot import Cleverbot
-    cleverbotImported = True
-except ImportError:
-    cleverbotImported = False
-
 # Import WolframAlpha
 try:
     from wolframalpha import Client
@@ -34,7 +27,6 @@ class Internet:
     def __init__(self, sparcli):
         self.sparcli = sparcli
         self.translator = None
-        self.cb = None
         self.wolfClient = None
         self.nounlist = []
 
@@ -47,10 +39,6 @@ class Internet:
                 self.translator = Translator(transid, secret)
             except KeyError:
                 pass
-
-        # Set up Cleverbot
-        if cleverbotImported == True:
-            self.cb = Cleverbot()
 
         # Set up Wolfram
         if wolframalphaImported == True:
@@ -134,25 +122,6 @@ class Internet:
         translatedText = self.translator.translate(toChange, langTo.lower())
         await self.sparcli.say(translatedText)
 
-    @commands.command(pass_context=True, name='c')
-    async def clevertalk(self, ctx, *, message: str):
-        '''Sends a query to Cleverbot.
-        Usage :: c <Query>'''
-
-        # Return if Cleverbot isn't imported
-        if cleverbotImported == False:
-            await self.sparcli.say('Cleverbot has not been set up for this bot.')
-            return
-
-        # Send typing, so you can see it's being processed
-        await self.sparcli.send_typing(ctx.message.server)
-
-        # Get the response from Cleverbot
-        response = self.cb.ask(message)
-
-        # Respond nicely
-        await self.sparcli.say(response)
-
     @commands.command(pass_context=True)
     async def wolfram(self, ctx, *, toDo: str):
         '''Searches WolframAlpha for the given term. Returns text
@@ -227,8 +196,6 @@ class Internet:
         # Throw the object
         atUser = '.' if member == None else ' at {}.'.format(member.mention)
         await self.sparcli.say('Thrown {} {}{}'.format(aOrAn, toThrow, atUser))
-
-
 
 
 def setup(bot):
