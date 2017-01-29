@@ -9,5 +9,6 @@ q = ['Cogs.Admin',
      'Cogs.Bible',
      'Cogs.Reddit',
      'Cogs.Steam',
-     'Cogs.Music']
+     'Cogs.Music',
+     'Cogs.LEGO']
 
