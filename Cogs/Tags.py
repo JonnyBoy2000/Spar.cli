@@ -167,6 +167,13 @@ class Tags:
         await self.sparcli.say('This tag has been deleted.')
 
     async def tagAdd(self, ctx, tagName, serverID=None, runWithExec=False):
+
+        settings = getServerJson(serverID)
+        zz = settings[{False: 'Tags', True: 'Etags'}[runWithExec]]
+        if len(zz) > 30:
+            await self.sparcli.say('There are already 30 tags on this server. You can\'t add any more.')
+            return
+
         # Deal with idiots - trying to make tag without name
         if tagName == None:
             await self.sparcli.say('What is the tag name you want to add?')
