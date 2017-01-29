@@ -127,7 +127,7 @@ class Music:
             fdesc = description
 
         o = OrderedDict()
-        o['Title'] = title 
+        o['Title'] = (title, False)
         o['Views'] = views 
         o['Duration'] = duration 
         o['Uploader'] = uploader 
@@ -161,7 +161,7 @@ class Music:
         # It *should* be fine I think
         return True
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, aliases=['p'])
     async def play(self, ctx, *, nameOfSong:str):
         '''Gets a song from YouTube and plays it through the bot
         Usage :: play <SongName>
@@ -205,6 +205,24 @@ class Music:
         await self.sparcli.say('Disconnected from the VC.')
         self.voice[server]['VoiceClient'] = None
         self.voice[server]['StreamClient'] = None
+
+    @commands.command(pass_context=True, aliases=['v'])
+    async def volume(self, ctx, volume:int=20):
+        '''Changes the volume of the currently playing music stream
+        Usage :: volume 63'''
+
+        server = ctx.message.server
+
+        streamClient = self.voice[server]['StreamClient']
+        if volume < 0:
+            volume = 0
+        elif volume > 100:
+            volume = 100
+
+        streamClient.volume = volume / 100
+        self.voice[server]['Volume'] = volume / 100
+
+        await self.sparcli.say('The volume has been set to {}%.'.format(volume))
 
 
 def setup(bot):
