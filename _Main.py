@@ -22,7 +22,7 @@ def getCommandPrefix(bot, message):
 
 
 sparcli = commands.Bot(
-    command_prefix=getCommandPrefix, description='ApplePy 2.0, pretty much.', pm_help=True)
+    command_prefix=getCommandPrefix, description='ApplePy 2.0, pretty much.', pm_help=True, formatter=commands.formatter.HelpFormatter(show_check_failure=True))
 
 
 
@@ -73,7 +73,7 @@ async def on_server_join(server):
     saveServerJson(server.id, z)
 
     # Say hi
-    await sparcli.send_message(server, 'Hey! I\'ve just been added to this server. I\'m Spar.cli, and i\'ll try and do a good job c;')
+    await sparcli.send_message(server, 'Hey! I\'ve just been added to this server. I\'m Spar.cli, and I\'ll try and do a good job c;')
 
 
 @sparcli.event
