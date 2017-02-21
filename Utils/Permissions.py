@@ -72,7 +72,7 @@ def permissionChecker(**kwargs):
                 return False
 
             # Pretty much just return false if they have a higher top role, otherwise continue
-            if author.top_role.position <= mentions[1].top_role.position: 
+            if author.top_role.position <= mentions[-1].top_role.position: 
                 raise MemberPermissionsTooLow
                 return False
 
