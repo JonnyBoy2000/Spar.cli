@@ -161,6 +161,22 @@ class Music:
         # It *should* be fine I think
         return True
 
+    @commands.command(pass_context=True)
+    async def bestsong(self, ctx):
+        '''Plays the best song.'''
+
+        nameOfSong='https://www.youtube.com/watch?v=miomuSGoPzI'
+        member = ctx.message.author
+        server = member.server
+
+        # Join voice channel
+        voiceClient = await self.joinVC(member=member)
+        if voiceClient == False: return
+        self.voice[server]['VoiceClient'] = voiceClient
+
+        # Go play the stuff
+        await self.youtubeBridge(server, nameOfSong)
+
     @commands.command(pass_context=True, aliases=['p'])
     async def play(self, ctx, *, nameOfSong:str):
         '''Gets a song from YouTube and plays it through the bot
