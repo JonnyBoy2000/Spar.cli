@@ -3,6 +3,7 @@ from discord import Embed, Member
 from datetime import datetime
 from collections import OrderedDict
 from asyncio import sleep
+from random import randint
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import makeEmbed
@@ -122,6 +123,26 @@ class Misc:
 
         # Actually print it out
         await self.sparcli.say('', embed=makeEmbed(colour=colour, name='#'+hexColour))
+
+    @commands.command(pass_context=True)
+    async def help2(self, ctx):
+        '''Shows this message'''
+
+        usr = ctx.message.author 
+        c = self.sparcli.commands
+        o = OrderedDict()
+        cogList = list(self.sparcli.cogs.keys())
+        cogList.sort()
+        for i in cogList:
+            o[i] = OrderedDict()
+        o[None] = OrderedDict()
+        for u, i in c.items():
+            o[i.cog_name][u] = (i.help.split('\n')[0], False)
+
+        e = [makeEmbed(name=u, values=i, user=self.sparcli.user, colour=randint(0, 0xFFFFFF)) for u, i in o.items()]
+        for i in e:
+            await self.sparcli.send_message(usr, '', embed=i)
+
 
 
 def setup(bot):
