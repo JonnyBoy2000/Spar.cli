@@ -1,14 +1,12 @@
 from discord.ext import commands 
+from random import choice
 try:
     import praw
 except ImportError:
     raise Exception('You need to install Praw for this class to work.')
 from collections import OrderedDict
-from sys import path
-path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import makeEmbed
 from Utils.Configs import getTokens
-from random import choice
 
 
 

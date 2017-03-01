@@ -1,6 +1,4 @@
 from discord.ext import commands
-from sys import path
-path.append('../')  # Move path so you can get the Utils folder
 from Utils.Configs import getServerJson, saveServerJson
 from Utils.Discord import getPermissions
 from Utils.Permissions import permissionChecker

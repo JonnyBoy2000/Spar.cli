@@ -3,9 +3,7 @@ from discord import opus, ClientException
 from time import time as currentTime
 from datetime import timedelta
 from ctypes.util import find_library
-from sys import path
 from collections import OrderedDict
-path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import makeEmbed
 
 

@@ -2,8 +2,6 @@ from discord.ext import commands
 from requests import get
 from collections import OrderedDict
 from random import choice
-from sys import path
-path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import makeEmbed
 
 

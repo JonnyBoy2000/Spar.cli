@@ -1,8 +1,6 @@
 from discord.ext import commands
 from discord import Colour, Member, Permissions
 from discord.errors import NotFound as Forbidden
-from sys import path
-path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import getTextRoles
 from Utils.Configs import getServerJson
 from Utils.Misc import colourFixer

@@ -1,11 +1,11 @@
 import discord
 from discord.ext import commands
 from sys import argv
-from Utils.Configs import *
-from Utils.Updates import *
-from Utils.Discord import messageToStarboard, makeEmbed
-from Utils.Extentions import q as initialExtentions
-from Utils.Exceptions import *
+from Cogs.Utils.Configs import *
+from Cogs.Utils.Updates import *
+from Cogs.Utils.Discord import messageToStarboard, makeEmbed
+from Cogs.Utils.Extentions import q as initialExtentions
+from Cogs.Utils.Exceptions import *
 
 
 def getCommandPrefix(bot, message):

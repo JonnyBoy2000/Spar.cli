@@ -1,7 +1,5 @@
 from discord import Object, Server, Channel
-from sys import path
-path.append('../')  # Set the path properly
-from Utils.Configs import getServerJson
+from .Configs import getServerJson
 
 
 def serverEnables(serverID, typeOfEnable):

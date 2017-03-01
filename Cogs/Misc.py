@@ -4,8 +4,6 @@ from datetime import datetime
 from collections import OrderedDict
 from asyncio import sleep
 from random import randint
-from sys import path
-path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import makeEmbed
 from Utils.Misc import colourFixer
 

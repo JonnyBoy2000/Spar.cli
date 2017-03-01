@@ -4,8 +4,7 @@ from requests import get
 from random import choice
 from sys import exit
 from os import execl
-from sys import path, exit, executable, argv
-path.append('../')  # Move path so you can get the Utils folder
+from sys import exit, executable, argv
 from Utils.Permissions import permissionChecker
 from Utils.Extentions import q as initialExtentions
 

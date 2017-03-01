@@ -1,9 +1,7 @@
 from discord.ext import commands 
 from requests import get 
 from json import loads 
-from sys import path
 from collections import OrderedDict
-path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import makeEmbed
 
 

@@ -1,8 +1,6 @@
 from discord.ext import commands
 from discord import Member
 from requests import get
-from sys import path
-path.append('../')  # Move path so you can get the Utils folder
 from Utils.Discord import getPermissions, checkPerm
 from Utils.Permissions import permissionChecker, botPermission
 
