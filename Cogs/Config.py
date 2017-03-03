@@ -2,10 +2,10 @@ from discord.ext import commands
 from discord import Channel
 from sys import path
 path.append('../')  # Move path so you can get the Utils folder
-from Utils.Discord import getTextRoles
-from Utils.Configs import getServerJson, saveServerJson
-from Utils.GuiConfig import addEmojiList, updateFromEmoji, updateFromMessage
-from Utils.Permissions import permissionChecker
+from Cogs.Utils.Discord import getTextRoles
+from Cogs.Utils.Configs import getServerJson, saveServerJson
+from Cogs.Utils.GuiConfig import addEmojiList, updateFromEmoji, updateFromMessage
+from Cogs.Utils.Permissions import permissionChecker
 
 
 class Config:

@@ -5,8 +5,8 @@ from random import choice
 from sys import exit
 from os import execl
 from sys import exit, executable, argv
-from Utils.Permissions import permissionChecker
-from Utils.Extentions import q as initialExtentions
+from Cogs.Utils.Permissions import permissionChecker
+from Cogs.Utils.Extentions import q as initialExtentions
 
 
 class OwnerOnly:

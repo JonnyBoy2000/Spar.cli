@@ -4,8 +4,8 @@ from datetime import datetime
 from collections import OrderedDict
 from asyncio import sleep
 from random import randint
-from Utils.Discord import makeEmbed
-from Utils.Misc import colourFixer
+from Cogs.Utils.Discord import makeEmbed
+from Cogs.Utils.Misc import colourFixer
 
 
 class Misc:

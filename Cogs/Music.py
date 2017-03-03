@@ -4,7 +4,7 @@ from time import time as currentTime
 from datetime import timedelta
 from ctypes.util import find_library
 from collections import OrderedDict
-from Utils.Discord import makeEmbed
+from Cogs.Utils.Discord import makeEmbed
 
 
 class Music:

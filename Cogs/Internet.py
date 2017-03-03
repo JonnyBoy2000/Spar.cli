@@ -18,8 +18,7 @@ except ImportError:
     wolframalphaImported = False
 
 from sys import path
-path.append('../')  # Move path so you can get the Utils folder
-from Utils.Configs import getTokens
+from Cogs.Utils.Configs import getTokens
 
 
 class Internet:

@@ -2,7 +2,7 @@ from discord.ext import commands
 from requests import get
 from collections import OrderedDict
 from random import choice
-from Utils.Discord import makeEmbed
+from Cogs.Utils.Discord import makeEmbed
 
 
 '''

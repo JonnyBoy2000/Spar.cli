@@ -5,8 +5,8 @@ try:
 except ImportError:
     raise Exception('You need to install Praw for this class to work.')
 from collections import OrderedDict
-from Utils.Discord import makeEmbed
-from Utils.Configs import getTokens
+from Cogs.Utils.Discord import makeEmbed
+from Cogs.Utils.Configs import getTokens
 
 
 

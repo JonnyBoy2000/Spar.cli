@@ -1,7 +1,7 @@
 from discord.ext import commands
-from Utils.Configs import getServerJson, saveServerJson
-from Utils.Discord import getPermissions
-from Utils.Permissions import permissionChecker
+from Cogs.Utils.Configs import getServerJson, saveServerJson
+from Cogs.Utils.Discord import getPermissions
+from Cogs.Utils.Permissions import permissionChecker
 
 
 '''
