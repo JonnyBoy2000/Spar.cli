@@ -4,8 +4,10 @@ from datetime import datetime
 from collections import OrderedDict
 from asyncio import sleep
 from random import randint
+from requests import get
 from Cogs.Utils.Discord import makeEmbed
 from Cogs.Utils.Misc import colourFixer
+from Cogs.Utils.Permissions import botPermission
 
 
 class Misc:
@@ -141,6 +143,54 @@ class Misc:
         for i in e:
             await self.sparcli.send_message(usr, '', embed=i)
 
+    @commands.command(pass_context=True)
+    @botPermission(check='attach_files')
+    async def meme(self, ctx, topText:str=None, bottomText:str=None, imageLink:str=None):
+        '''
+        Creates a meme from a top and bottom text with a given image
+        '''
+
+        # Create some shorthand
+        author = ctx.message.author
+        sentMessages = []
+        userMessages = []
+
+        # Fill any blank spots
+        if None in [topText, bottomText, imageLink]:
+            z = await self.sparcli.say('What is the top text for your image?')
+            sentMessages.append(z)
+            z = await self.sparcli.wait_for_message(author=author)
+            topText = z.content
+            userMessages.append(z)
+
+            z = await self.sparcli.say('What is the bottom text for your image?')
+            sentMessages.append(z)
+            z = await self.sparcli.wait_for_message(author=author)
+            bottomText = z.content
+            userMessages.append(z)
+
+            z = await self.sparcli.say('What is the image URL to add the text to?')
+            sentMessages.append(z)
+            z = await self.sparcli.wait_for_message(author=author)
+            imageLink = z.content
+            userMessages.append(z)
+
+        # Delete the user/bot messages that were prompted for
+        if sentMessages:
+            await self.sparcli.delete_messages(sentMessages)
+            if ctx.message.server.me.permissions_in(ctx.message.channel).manage_messages:
+                await self.sparcli.delete_messages(userMessages)
+
+        if '' in [topText, bottomText, imageLink]:
+            await self.sparcli.say('You can\'t have empty content fields. Aborting command.')
+            return
+
+        # Get the meme image from the site
+        siteURL = 'https://memegen.link/custom/{}/{}.jpg?alt={}'.format(topText, bottomText, imageLink)
+        site = get(siteURL)
+        image = site.content
+        with open('SPARCLI_RAW_IMAGE_DOWNLOAD.png', 'wb') as a: a.write(image)
+        await self.sparcli.send_file(ctx.message.channel, 'SPARCLI_RAW_IMAGE_DOWNLOAD.png', content=author.mention)
 
 
 def setup(bot):
