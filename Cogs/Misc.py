@@ -192,6 +192,49 @@ class Misc:
         with open('SPARCLI_RAW_IMAGE_DOWNLOAD.png', 'wb') as a: a.write(image)
         await self.sparcli.send_file(ctx.message.channel, 'SPARCLI_RAW_IMAGE_DOWNLOAD.png', content=author.mention)
 
+    @commands.command(pass_context=True)
+    async def permissions(self, ctx, member:Member=None):
+        '''
+        Checks what permissions a given user has in the mentioned channel
+        '''
+
+        # Checks for a tagged member
+        if member == None:
+            member = ctx.message.author 
+
+        # ✅ TICK
+        # ❎ CROSS
+        # 💚 ❤
+
+        w = {True:'💚', False:'❤'}
+
+        # Store the channel
+        channel = ctx.message.channel
+        p = channel.permissions_for(member)
+        o = OrderedDict()
+        o['Read Messages'] = w[p.read_messages]
+        o['Send Messages'] = w[p.send_messages]
+        o['TTS'] = w[p.send_tts_messages]
+        o['Manage Messages'] = w[p.manage_messages]
+        o['Embed Links'] = w[p.embed_links]
+        o['Attach Files'] = w[p.attach_files]
+        o['Read Message History'] = w[p.read_message_history]
+        o['Mention Everyone'] = w[p.mention_everyone]
+        o['Mute Members'] = w[p.mute_members]
+        o['Deafen Members'] = w[p.deafen_members]
+        o['Move Members'] = w[p.move_members]
+        o['Change Nickanme'] = w[p.change_nickname]
+        o['Manage Nicknames'] = w[p.manage_nicknames]
+        o['Manage Roles'] = w[p.manage_roles]
+        o['Manage Emoji'] = w[p.manage_emojis]
+        o['Manage Channels'] = w[p.manage_channels]
+        o['Kick Members'] = w[p.kick_members]
+        o['Ban Members'] = w[p.ban_members]
+        o['Administrator'] = w[p.administrator]
+
+        e = makeEmbed(name='Your permissions in this channel', values=o)
+        await self.sparcli.say('', embed=e)
+
 
 def setup(bot):
     bot.add_cog(Misc(bot))
