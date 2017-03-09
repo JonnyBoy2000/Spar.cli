@@ -1,8 +1,9 @@
-from discord import Channel
+from discord import Channel, ClientException
 from string import punctuation as AllPunctuation
 from asyncio import sleep
 from datetime import timedelta
 from collections import OrderedDict
+from .Discord import makeEmbed
 
 
 class ServerVoice(object):
@@ -16,11 +17,12 @@ class ServerVoice(object):
         self.sparcli = bot
         self.lastChannel = kwargs.get('lastChannel', kwargs['server'])
         self.queue = kwargs.get('queue', [])
-        self.skipCount = kwargs.get('skipCount', 0)
+        self.forceNext = False
         self.voiceClient = kwargs.get('voiceClient', None)
         self.streamClient = kwargs.get('streamClient', None)
         self.volume = kwargs.get('volume', 0.2)
         self.looping = False
+        self.songInfoMessage = None
 
     async def joinVC(self, toJoin, channel=None):
         '''
@@ -127,16 +129,37 @@ class ServerVoice(object):
         Starts a player and sets it to the streamClient attribute.
         '''
 
-        # Start the new one
+        # Stop current stream
         try: self.streamClient.stop()
         except AttributeError: pass
+
+        # Start next one
         player.volume = self.volume
         player.start()
-        self.skipCount = 0
         self.streamClient = player
 
         # Print out to user
         await self.playEmbed(player)
+
+    async def skipChecker(self, message, force=False, channel=None):
+        '''
+        Adds one to the skip counter.
+        '''
+
+        if channel == None:
+            channel = self.lastChannel
+
+        emoji = [[str(i.emoji), i.count] for i in message.reactions]
+        if ['⏭', 4] in emoji:
+            await self.sparcli.send_message(channel, 'This song has received enough vote skips to go to the next song. Skipping...')
+            
+            try:
+                self.songInfoMessage = None
+                await self.startPlayer(self.queue[0])
+                del self.queue[0]
+            except IndexError:
+                self.songInfoMessage = None
+                self.streamClient.stop()
 
     async def playEmbed(self, player, channel=None):
         '''
@@ -180,7 +203,9 @@ class ServerVoice(object):
         o['Description'] = (fdesc, False)
 
         e = makeEmbed(name='Now Playing!', values=o, user=self.sparcli.user)
-        await self.sparcli.send_message(channel, '', embed=e)
+        q = await self.sparcli.send_message(channel, 'React with ⏭ to vote skip.', embed=e)
+        await self.sparcli.add_reaction(q, '⏭')
+        self.songInfoMessage = q.id
 
     async def addToQueue(self, whatToAdd, channel=None):
         '''
@@ -255,7 +280,7 @@ class ServerVoice(object):
 
                 # No current client
                 except Exception:
-                    doPlayNext = True 
+                    doPlayNext = True
 
             # Play the next thing in the queue
             if doPlayNext and len(self.queue) > 0:

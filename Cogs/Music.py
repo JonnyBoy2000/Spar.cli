@@ -2,6 +2,7 @@ from discord.ext import commands
 from discord import opus, ClientException
 from ctypes.util import find_library
 from Cogs.Utils.Discord import makeEmbed
+from Cogs.Utils.Permissions import permissionChecker
 from Cogs.Utils.VoiceHandler import ServerVoice
 
 
@@ -63,10 +64,9 @@ class Music:
         serverHandler.lastChannel = ctx.message.channel
         if serverHandler.voiceClient == None:
             await self.sparcli.say('I\'m not currently in a voice channel.')
-            return
-
-        await serverHandler.disconnect()
-        await self.sparcli.say('Disconnected from the VC.')
+        else:
+            await serverHandler.disconnect()
+            await self.sparcli.say('Disconnected from the VC.')
         if serverHandler.looping == False: await serverHandler.loop()
 
     @commands.command(pass_context=True, aliases=['v'])
@@ -101,14 +101,33 @@ class Music:
 
         if serverHandler.looping == False: await serverHandler.loop()
 
+    @commands.command(pass_context=True)
+    @permissionChecker(check='administrator')
+    async def forceskip(self, ctx):
+        '''
+        Forces the bot to skip to the next song.
+        '''
 
-    # async def EXAMPLETHINGY(self):
-    #     serverHandler = self.voice[ctx.message.server]
-    #     serverHandler.lastChannel = ctx.message.channel
+        serverHandler = self.voice[ctx.message.server]
+        serverHandler.lastChannel = ctx.message.channel
 
-    #     # CODE GOES HERE
+        if serverHandler.voiceClient == None:
+            await self.sparcli.say('I\'m not currently in a voice channel.')
+        else:
+            await serverHandler.skipIncrement(ctx.message.author, force=True)
 
-    #     if serverHandler.looping == False: await serverHandler.loop()
+        if serverHandler.looping == False: await serverHandler.loop()
+
+    async def on_reaction_add(self, reaction, user):
+        '''
+        Checks reactions and etc
+        '''
+
+        serverHandler = self.voice[reaction.message.server]
+        if serverHandler.songInfoMessage == reaction.message.id:
+            await serverHandler.skipChecker(reaction.message)
+
+        if serverHandler.looping == False: await serverHandler.loop()
 
 
 def setup(bot):
