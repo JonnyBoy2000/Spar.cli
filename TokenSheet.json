@@ -10,9 +10,7 @@
 		"ID": "",
 		"Secret": "",
 		"User Agent": "",
-		"Username": "",
-		"Password": "",
-		"Refresh Token": ""
+		"Redirect URI": ""
 	},
 	"Brickset": {
 		"Secret": ""
