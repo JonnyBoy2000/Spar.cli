@@ -7,3 +7,4 @@ Tokens.json
 *.pem
 *.py~
 *.un~
+redditInstances.json

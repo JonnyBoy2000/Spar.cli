@@ -71,3 +71,20 @@ def getTokens():
 
     # Return it to user
     return tokenReading
+
+def getRedditInstances():
+    '''
+    Gets all the stored Discord user IDs which are tied to refresh tokens for reddit
+    '''
+
+    with open(workingDirectory + '/../../redditInstances.json') as a:
+        tokenReading = loads(a.read())
+
+    return tokenReading
+
+def saveRedditInstances(data):
+    '''
+    Stores some saved reddit instances
+    '''
+    with open(workingDirectory + '/../../redditInstances.json', 'w') as a:
+        a.write(dumps(data, indent=4))
