@@ -5,29 +5,66 @@ workingDirectory = dirname(realpath(__file__))
 
 
 def getServerJson(serverID):
-    '''Returns the JSON config for a server'''
+    '''
+    Returns the JSON config for a server
+    '''
+
+    return getWorkingJson('ServerConfigs', serverID)
+
+
+def saveServerJson(serverID, jsonData):
+    '''
+    Writes a JSON file into savedata
+    '''
+
+    saveWorkingJson('ServerConfigs', serverID, jsonData)
+
+
+def getMoneyJson(serverID):
+    '''
+    Returns the JSON config for a server
+    '''
+
+    return getWorkingJson('ServerMoney', serverID)
+
+
+def saveMoneyJson(serverID, jsonData):
+    '''
+    Writes a JSON file into savedata
+    '''
+
+    saveWorkingJson('ServerMoney', serverID, jsonData)
+
+
+def getWorkingJson(folder, serverID):
+    '''
+    Returns the JSON config for a server
+    '''
 
     # Try and open a specified file
     try:
-        with open(workingDirectory + '/../../ServerConfigs/{}.json'.format(serverID)) as a:
+        with open(workingDirectory + '/../../{}/{}.json'.format(folder, serverID)) as a:
             jsonData = loads(a.read())
 
     # The file doesn't exist, load and return the default file data
     except FileNotFoundError:
-        with open(workingDirectory + '/../../ServerConfigs/Default.json') as a:
+        with open(workingDirectory + '/../../{}/Default.json'.format(folder)) as a:
             jsonData = loads(a.read())
     return jsonData
 
+def saveWorkingJson(folder, serverID, jsonData):
+    '''
+    Writes a JSON file into savedata
+    '''
 
-def saveServerJson(serverID, jsonData):
-    '''Writes a JSON file into savedata'''
-
-    with open(workingDirectory + '/../../ServerConfigs/{}.json'.format(serverID), 'w') as a:
+    with open(workingDirectory + '/../../{}/{}.json'.format(folder, serverID), 'w') as a:
         a.write(dumps(jsonData, indent=4))
 
 
 def fixJson(inputDictionary, referenceDictionary=getServerJson('Default')):
-    '''Fixes an input dictionary with a reference'''
+    '''
+    Fixes an input dictionary with a reference
+    '''
 
     # Go through the reference dictionary
     for i in referenceDictionary:
@@ -50,7 +87,9 @@ def fixJson(inputDictionary, referenceDictionary=getServerJson('Default')):
 
 
 def getTokens():
-    '''Gives the arguments passed to the bot through CLI'''
+    '''
+    Gives the arguments passed to the bot through CLI
+    '''
 
     # Get the filename of the tokensheet
     tokenJson = argv[-1]
