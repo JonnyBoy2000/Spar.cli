@@ -54,7 +54,7 @@ async def on_command_error(error, ctx):
     if isinstance(error, commands.errors.CheckFailure):
         # This should never really occur
         # This is if the command check fails
-        await sparcli.send_message(channel, 'Check failed.')
+        await sparcli.send_message(channel, 'Command check failed. Unknown error; please mention `Caleb#2831`.')
         
     else:
         # Who knows what happened? Not me. Raise the error again, and print to console

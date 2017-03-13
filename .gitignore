@@ -1,10 +1,16 @@
 __pycache__
 *.bat
+*.sh
 ServerConfigs/*
+ServerMoney/*
 !ServerConfigs/Default.json
+!ServerMoney/Default.json
 Tokens.json
 *.ppk
 *.pem
 *.py~
 *.un~
+redditInstances.json
+Template.py
+WEBSITE/*
 redditInstances.json
