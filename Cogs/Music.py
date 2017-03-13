@@ -114,7 +114,7 @@ class Music:
         if serverHandler.voiceClient == None:
             await self.sparcli.say('I\'m not currently in a voice channel.')
         else:
-            await serverHandler.skipIncrement(ctx.message.author, force=True)
+            await serverHandler.skipChecker(ctx.message, force=True)
 
         if serverHandler.looping == False: await serverHandler.loop()
 
