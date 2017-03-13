@@ -10,5 +10,7 @@ q = ['Cogs.Admin',
      'Cogs.Reddit',
      'Cogs.Steam',
      'Cogs.Music',
-     'Cogs.LEGO']
+     'Cogs.LEGO',
+     'Cogs.Levels'
+]
 
