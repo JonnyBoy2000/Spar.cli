@@ -1,6 +1,7 @@
 from discord.ext import commands
 from discord import Member
 from requests import get
+from Cogs.Utils.Discord import getPermissions, checkPerm
 from Cogs.Utils.Permissions import permissionChecker, botPermission
 
 
