@@ -77,12 +77,15 @@ class ServerVoice(object):
             'earrape',
             'rip headphone',
             'ripheadphone',
-            'thomas the pain'
+            'thomas the pain train',
+            'thomas the pain',
+            'pain train'
         ]
 
         # Make check if it can filter through
-        if True in [i.lower() in title.lower() for i in blacklistedTerms]:
-            return False
+        c = [i.lower() in title.lower() for i in blacklistedTerms]
+        if True in c:
+            return blacklistedTerms[c.index(True)]
 
         # It *should* be fine I think
         return True
@@ -118,8 +121,9 @@ class ServerVoice(object):
            return None
 
         # Check the blacklist for the thinamawhatsit
-        if self.handleBlacklist(streamClient) == False:
-            await self.sparcli.send_message(channel, 'Your search term\'s first result returns a video with a blacklisted title (`{.title}`).'.format(streamClient))
+        c = self.handleBlacklist(streamClient)
+        if c is not True:
+            await self.sparcli.send_message(channel, 'Your search term\'s first result returns a video with a blacklisted title (`{.title}`, matching `{}`).'.format(streamClient, c))
             return None
 
         return streamClient
@@ -150,7 +154,7 @@ class ServerVoice(object):
             channel = self.lastChannel
 
         emoji = [[str(i.emoji), i.count] for i in message.reactions]
-        if ['⏭', 4] in emoji:
+        if ['⏭', 4] in emoji or force:
             await self.sparcli.send_message(channel, 'This song has received enough vote skips to go to the next song. Skipping...')
             
             try:
@@ -203,7 +207,7 @@ class ServerVoice(object):
         o['Description'] = (fdesc, False)
 
         e = makeEmbed(name='Now Playing!', values=o, user=self.sparcli.user)
-        q = await self.sparcli.send_message(channel, 'React with ⏭ to vote skip.', embed=e)
+        q = await self.sparcli.send_message(channel, 'React with ⏭ to vote skip. 3 votes (4 reactions) are required.', embed=e)
         await self.sparcli.add_reaction(q, '⏭')
         self.songInfoMessage = q.id
 
@@ -218,7 +222,8 @@ class ServerVoice(object):
         q = await self.createPlayer(whatToAdd)
         if q == None: return
         self.queue.append(q)
-        await self.sparcli.send_message(channel, 'The video `{.title}` has been added to the queue.'.format(q))
+        if self.queue != [q]:
+            await self.sparcli.send_message(channel, 'The video `{.title}` has been added to the queue.'.format(q))
 
     async def disconnect(self):
         '''
