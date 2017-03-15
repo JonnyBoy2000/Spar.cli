@@ -3,7 +3,7 @@ q = [
      'Cogs.Misc',
      'Cogs.OwnerOnly',
      'Cogs.Internet',
-     'Cogs.Tags',
+     # 'Cogs.Tags',
      'Cogs.Random',
      'Cogs.Roles',
      'Cogs.Config',
