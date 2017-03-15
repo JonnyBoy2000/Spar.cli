@@ -5,6 +5,7 @@ from collections import OrderedDict
 from asyncio import sleep
 from random import randint
 from requests import get
+from os import remove
 from Cogs.Utils.Discord import makeEmbed
 from Cogs.Utils.Misc import colourFixer
 from Cogs.Utils.Permissions import botPermission
@@ -71,7 +72,7 @@ class Misc:
         topColour = u.colour.value
 
         # Create an embed out of it
-        embedMessage = makeEmbed(user=u, values=userInfo, image=userIcon, colour=topColour)
+        embedMessage = makeEmbed(user=u, values=userInfo, image=userIcon)
 
         # Send it out to the user
         await ctx.send('', embed=embedMessage)
@@ -108,7 +109,8 @@ class Misc:
         intColour = int(fixColour, 16)
 
         # Actually print it out
-        await ctx.send('', embed=makeEmbed(colour=intColour, name='#'+fixColour.upper()))
+        em = makeEmbed(colour=intColour, author='#'+fixColour.upper())
+        await ctx.send('', embed=em)
 
     @commands.command(aliases=['mycolor'])
     async def mycolour(self, ctx):
@@ -122,26 +124,8 @@ class Misc:
         hexColour = hex(colour)[2:].upper()
 
         # Actually print it out
-        await ctx.send('', embed=makeEmbed(colour=colour, name='#'+hexColour))
-
-    @commands.command()
-    async def help2(self, ctx):
-        '''Shows this message'''
-
-        usr = ctx.message.author 
-        c = self.sparcli.commands
-        o = OrderedDict()
-        cogList = list(self.sparcli.cogs.keys())
-        cogList.sort()
-        for i in cogList:
-            o[i] = OrderedDict()
-        o[None] = OrderedDict()
-        for u, i in c.items():
-            o[i.cog_name][u] = (i.help.split('\n')[0], False)
-
-        e = [makeEmbed(name=u, values=i, user=self.sparcli.user, colour=randint(0, 0xFFFFFF)) for u, i in o.items()]
-        for i in e:
-            await ctx.send('', embed=i)
+        em = makeEmbed(colour=colour, name='#'+hexColour)
+        await ctx.send('', embed=em)
 
     @commands.command()
     @botPermission(check='attach_files')
@@ -177,9 +161,10 @@ class Misc:
 
         # Delete the user/bot messages that were prompted for
         if sentMessages:
-            await self.sparcli.delete_messages(sentMessages)
             if ctx.message.server.me.permissions_in(ctx.message.channel).manage_messages:
-                await self.sparcli.delete_messages(userMessages)
+                await self.sparcli.delete_messages(userMessages + sentMessages)
+            else:
+                await self.sparcli.delete_messages(sentMessages)
 
         if '' in [topText, bottomText, imageLink]:
             await self.sparcli.say('You can\'t have empty content fields. Aborting command.')
@@ -191,6 +176,7 @@ class Misc:
         image = site.content
         with open('SPARCLI_RAW_IMAGE_DOWNLOAD.png', 'wb') as a: a.write(image)
         await ctx.send(author.mention, file='SPARCLI_RAW_IMAGE_DOWNLOAD.png')
+        os.remove('SPARCLI_RAW_IMAGE_DOWNLOAD.png')
 
     @commands.command(pass_context=True)
     async def permissions(self, ctx, member:Member=None):
@@ -202,8 +188,6 @@ class Misc:
         if member == None:
             member = ctx.message.author 
 
-        # ✅ TICK
-        # ❎ CROSS
         # 💚 ❤
 
         w = {True:'💚', False:'❤'}
@@ -220,9 +204,6 @@ class Misc:
         o['Attach Files'] = w[p.attach_files]
         o['Read Message History'] = w[p.read_message_history]
         o['Mention Everyone'] = w[p.mention_everyone]
-        o['Mute Members'] = w[p.mute_members]
-        o['Deafen Members'] = w[p.deafen_members]
-        o['Move Members'] = w[p.move_members]
         o['Change Nickanme'] = w[p.change_nickname]
         o['Manage Nicknames'] = w[p.manage_nicknames]
         o['Manage Roles'] = w[p.manage_roles]
@@ -232,7 +213,7 @@ class Misc:
         o['Ban Members'] = w[p.ban_members]
         o['Administrator'] = w[p.administrator]
 
-        e = makeEmbed(name='Your permissions in this channel', values=o)
+        e = makeEmbed(user=member, values=o)
         await ctx.send('', embed=e)
 
 

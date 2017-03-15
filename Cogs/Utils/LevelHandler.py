@@ -17,7 +17,7 @@ class LevelHandler(object):
         Used to increment a user's exp globally
         '''
 
-        userID = message.author.id
+        userID = str(message.author.id)
         if userID not in self.users:
             self.users[userID] = LevelUser(userID)
         self.users[userID].increment(message.guild)

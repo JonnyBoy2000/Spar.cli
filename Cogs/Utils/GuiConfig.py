@@ -68,7 +68,7 @@ async def updateFromMessage(sparcli, ctx, serverSettings, thingToSet):
             mes.append(z)
         else:
             await ctx.channel.delete_messages(mes)
-            serverSettings['Channels'][thingToSet] = mentioned[0].id
+            serverSettings['Channels'][thingToSet] = str(mentioned[0].id)
             break
 
     return serverSettings

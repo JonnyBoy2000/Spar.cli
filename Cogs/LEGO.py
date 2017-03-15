@@ -43,7 +43,7 @@ class LEGO:
         else:
             z = 'None available.'
         o['Price'] = z
-        e = makeEmbed(name=name, image=image, values=o)
+        e = makeEmbed(author=name, image=image, values=o)
         await ctx.send('', embed=e)
 
 

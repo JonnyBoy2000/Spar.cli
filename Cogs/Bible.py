@@ -67,7 +67,7 @@ class Scriptures:
         for i in sortedVerses:
             embeddableDict[i[0]] = i[1]
 
-        em = makeEmbed(name=bookName, icon=self.biblePicture, values=embeddableDict)
+        em = makeEmbed(author=bookName, author_icon=self.biblePicture, values=embeddableDict, inline=False)
 
 
         # Boop it to the user

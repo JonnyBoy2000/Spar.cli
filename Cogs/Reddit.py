@@ -95,7 +95,7 @@ class Reddit:
         redditData['Top Post'] = '[Click here!](http://reddit.com{0.permalink})'.format(topLink)
 
         # Make an embed from it
-        e = makeEmbed(name=redditor.name, icon=self.redditIcon, colour=0xff4006, values=redditData)
+        e = makeEmbed(author=redditor.name, icon=self.redditIcon, colour=0xff4006, values=redditData)
 
         # Print to user
         await ctx.send('', embed=e)
@@ -139,9 +139,9 @@ class Reddit:
 
         # Make the embed
         if makeThumb:
-            e = makeEmbed(name=title, icon=self.redditIcon, colour=0xff4006, image=post.url, values=postValues)
+            e = makeEmbed(author=title, icon=self.redditIcon, colour=0xff4006, image=post.url, values=postValues)
         else:
-            e = makeEmbed(name=title, icon=self.redditIcon, colour=0xff4006, values=postValues)
+            e = makeEmbed(author=title, icon=self.redditIcon, colour=0xff4006, values=postValues)
 
         # Return to user
         await ctx.send('', embed=e)

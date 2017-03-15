@@ -76,13 +76,10 @@ class Steam:
         # Try and get the game ID
         gameID = None 
         gameSplit = gameURL.split('/')
-        for i in gameSplit:
-            try:
-                int(i)
-                gameID = i
-            except ValueError:
-                pass
-        if gameID == None:
+        gameSplit = [i for i in gameSplit if i.isdigit()]
+        try:
+            gameID = gameSplit[0]
+        except IndexError:
             await ctx.send('I was unable to find the ID of that game on the Steam API.')
             return
 
@@ -135,7 +132,7 @@ class Steam:
                 del retData[i]
 
         # Make it into an embed
-        e = makeEmbed(name=retData['Name'], icon=self.steamIcon, colour=1, values=retData, image=gameImage)
+        e = makeEmbed(author=retData['Name'], icon=self.steamIcon, colour=1, values=retData, image=gameImage)
 
         # Return to user
         await ctx.send('', embed=e)
