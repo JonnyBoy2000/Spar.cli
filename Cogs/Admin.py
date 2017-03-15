@@ -13,23 +13,37 @@ class Admin:
     @permissionChecker(check='ban_members', compare=True)
     @botPermission(check='ban_members', compare=True)
     async def ban(self, ctx, user:Member=None, *, reason: str='Unspecified'):
-        '''Bans a user from the server.
-        Usage :: ban <Mention> <Reason...>'''
+        '''
+        Bans a user from the server.
+        '''
+
+        serverData = getServerJson(ctx.guild.id)
+        enabled = serverData['Toggles']['Bans']
+        channel = serverData['Channels']['Bans']
+        channelSend = ctx.message.guild.get_channel(int(channel))
 
         await ctx.guild.ban(user)
-        # Todo :: make this print out in a config-determined channel
-        await ctx.send('**{0}** `({0.id})` has been banned for reason `{1}`.'.format(user, reason))
+        if enabled:
+            await channelSend.send('**{0}** `({0.id})` has been banned for reason `{1}`.'.format(user, reason))
+        await ctx.send('👌')
 
     @commands.command()
     @permissionChecker(check='kick_members', compare=True)
     @botPermission(check='kick_members', compare=True)
     async def kick(self, ctx, user: Member, *, reason: str=None):
-        '''Kicks a user from the server.
-        Usage :: kick <Mention> <Reason...>'''
+        '''
+        Kicks a user from the server.
+        '''
+
+        serverData = getServerJson(ctx.guild.id)
+        enabled = serverData['Toggles']['Kicks']
+        channel = serverData['Channels']['Kicks']
+        channelSend = ctx.message.guild.get_channel(int(channel))
 
         await ctx.guild.kick(user)
-        # Todo :: make this print out in a config-determined channel
-        await ctx.send('**{0}** `({0.id})` has been kicked for reason `{1}`.'.format(user, reason))
+        if enabled:
+            await channelSend.send('**{0}** `({0.id})` has been kicked for reason `{1}`.'.format(user, reason))
+        await ctx.send('👌')
 
     @commands.command(pass_context=True)
     @permissionChecker(check='manage_messages')
@@ -62,21 +76,10 @@ class Admin:
     @commands.command(aliases=['servericon'])
     @permissionChecker(check='manage_guild')
     @botPermission(check='manage_guild')
-    async def serverimage(self, ctx, *, icon:str=None):
-        '''Changes the icon of the server
-        Usage :: serverimage <ImageURL>
-              :: serverimage <ImageUpload>'''
-
-        # Sees if there's an image as an icon
-        if icon != None:
-            pass
-        # Gets it from the attachments
-        else:
-            try:
-                icon = ctx.message.attachments[0]['url']
-            except (KeyError, IndexError):
-                await ctx.send('You haven\'t provided a valid image to set as the sever icon.')
-                return
+    async def serverimage(self, ctx, *, icon:str):
+        '''
+        Changes the icon of the server.
+        '''
 
         # Sets it as the guild image
         guild = ctx.message.guild
