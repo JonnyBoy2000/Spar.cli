@@ -1,4 +1,4 @@
-from discord import Object, Server, Channel
+from discord import Object, Guild, TextChannel
 from .Configs import getServerJson
 
 
@@ -34,15 +34,15 @@ def serverEnables(serverID, typeOfEnable):
     return [ifEnabled, ifSendTo, sendMessage]
 
 
-async def sendIfEnabled(sparcli, serverOrChannel, typeOfEnable, *, embed=None, overrideMessage=None, overrideEnable=False, overrideChannel=None, edit=None, member=None):
+async def sendIfEnabled(serverOrChannel, typeOfEnable, *, embed=None, overrideMessage=None, overrideEnable=False, overrideChannel=None, edit=None, member=None):
     '''Sends a message if the server wants it to happen'''
 
     # Set up some stuff
     argType = type(serverOrChannel)
-    if argType == Server:
+    if argType == Guild:
         serverID = serverOrChannel.id
         channel = serverOrChannel
-    elif argType == Channel:
+    elif argType == TextChannel:
         serverID = serverOrChannel.server.id
         channel = serverOrChannel
     else:
@@ -77,6 +77,6 @@ async def sendIfEnabled(sparcli, serverOrChannel, typeOfEnable, *, embed=None, o
     # Send the specified message
     messageToSend = '' if messageToSend == None else messageToSend
     if edit == None:
-        await sparcli.send_message(toSendTo, messageToSend, embed=embed)
+        await toSendTo.send(messageToSend, embed=embed)
     else:
-        await sparcli.edit_message(edit, messageToSend, embed=embed)
+        await edit.edit(messageToSend, embed=embed)

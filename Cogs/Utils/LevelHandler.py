@@ -20,7 +20,7 @@ class LevelHandler(object):
         userID = message.author.id
         if userID not in self.users:
             self.users[userID] = LevelUser(userID)
-        self.users[userID].increment(message.server)
+        self.users[userID].increment(message.guild)
 
 
 class LevelUser(object):

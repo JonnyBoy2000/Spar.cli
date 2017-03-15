@@ -39,32 +39,32 @@ def permissionChecker(**kwargs):
         compare = kwargs.get('compare', False)
         owners = kwargs.get('owners', [])
         channel = ctx.message.channel
-        server = ctx.message.server 
+        guild = ctx.message.guild 
         author = ctx.message.author
         tokens = getTokens()
 
         # Checks if it's an owner
-        if author.id in tokens['OwnerIDs'] + owners:
+        if str(author.id) in tokens['OwnerIDs'] + owners:
             return True
         elif check == 'is_owner':
             raise MemberMissingPermissions
             return False
 
         # Checks if it's a PM
-        if server == None:
+        if guild == None:
             # Handle PM'd messages better later, for now just say you can't do them
             raise DoesntWorkInPrivate
             return False
 
-        # Sees if the author is the server owner
-        if server.owner.id == author.id:
+        # Sees if the author is the guild owner
+        if guild.owner.id == author.id:
             return True
 
         # Looks at the person to compare against
         if compare == True:
 
             # Get the member mentions in the message (excluding the bot)
-            mentions = [i for i in ctx.message.mentions if i.id != tokens['BotID']]
+            mentions = [i for i in ctx.message.mentions if str(i.id) != tokens['BotID']]
 
             # Check that it's not empty
             if mentions == []: 
@@ -85,7 +85,7 @@ def permissionChecker(**kwargs):
 
 def botPermission(**kwargs):
     '''Checks that the bot actually has permission to do what it's trying to do
-    It makes sure its own highest role (on the message's server) is higher than
+    It makes sure its own highest role (on the message's guild) is higher than
     the tagged member that's in the message
 
     Parameters ::
@@ -99,7 +99,7 @@ def botPermission(**kwargs):
     def predicate(ctx):
         check = kwargs.get('check', 'send_messages')
         compare = kwargs.get('compare', False)
-        botMember = ctx.message.server.me 
+        botMember = ctx.message.guild.me 
         tokens = getTokens()
         mentions = [i for i in ctx.message.mentions if i.id != tokens['BotID']]
         perms = ctx.message.channel.permissions_for(botMember)
@@ -113,6 +113,7 @@ def botPermission(**kwargs):
             raise BotMissingPermissions
         elif getattr(perms, check) == False:
             # Compare, but the bot can't run the command
+            raise BotPermissionsTooLow 
             return False 
         else:
             # The bot has permission to run the command, now checking if can be run on the

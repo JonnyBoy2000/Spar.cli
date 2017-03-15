@@ -12,7 +12,7 @@ class RoleManagement:
     def __init__(self, sparcli):
         self.sparcli = sparcli
 
-    @commands.command(pass_context=True, aliases=['changecolour', 'changerolecolour', 'changerole', 'rolecolor', 'changecolor', 'changerolecolor'])
+    @commands.command(aliases=['changecolour', 'changerolecolour', 'changerole', 'rolecolor', 'changecolor', 'changerolecolor'])
     @permissionChecker(check='manage_roles')
     @botPermission(check='manage_roles')
     async def rolecolour(self, ctx, rolecolour: str, *, rolename: str):
@@ -31,15 +31,15 @@ class RoleManagement:
         # Change the role colour
         colour = Colour(int(rolecolour, 16))
         try:
-            await self.sparcli.edit_role(ctx.message.server, role, colour=colour)
+            await role.edit(colour=colour)
         except Forbidden:
-            await self.sparcli.say('I was unable to edit the role.')
+            await ctx.send('I was unable to edit the role.')
             return
 
         # Print to user
-        await self.sparcli.say('The colour of the role `{0.name}` has been changed to value `{1.value}`.'.format(role, colour))
+        await ctx.send('The colour of the role `{0.name}` has been changed to value `{1.value}`.'.format(role, colour))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @botPermission(check='manage_roles')
     async def iam(self, ctx, *, whatRoleToAdd: str):
         '''If allowed, the bot will give you a mentioned role
@@ -57,7 +57,7 @@ class RoleManagement:
             return
 
         # See what you're allowed to self-assign
-        serverSettings = getServerJson(ctx.message.server.id)
+        serverSettings = getServerJson(ctx.message.guild.id)
         allowableIDs = serverSettings['SelfAssignableRoles']
 
         # See if you can add that
@@ -67,28 +67,29 @@ class RoleManagement:
 
         # See if the user already has the role
         if roleToGive.id in [i.id for i in ctx.message.author.roles]:
-            await self.sparcli.say('You already have that role.')
+            await ctx.send('You already have that role.')
             return
 
         # You can - add it to the user
         try:
-            await self.sparcli.add_roles(ctx.message.author, roleToGive)
-            await self.sparcli.say('The role `{0.name}` with ID `{0.id}` has been sucessfully added to you.'.format(roleToGive))
+            userRoles = ctx.message.author.roles + [roleToGive]
+            await ctx.message.author.edit(roles=userRoles)
+            await ctx.send('The role `{0.name}` with ID `{0.id}` has been sucessfully added to you.'.format(roleToGive))
         except Forbidden:
-            await self.sparcli.say('I was unable to add that role to you.')
+            await ctx.send('I was unable to add that role to you.')
 
     async def iamlist(self, ctx):
         '''Gives a list of roles that you can self-assign'''
 
         # Get all the stuff on the server that you can give to yourself
-        serverSettings = getServerJson(ctx.message.server.id)
+        serverSettings = getServerJson(ctx.message.guild.id)
         allowableIDs = serverSettings['SelfAssignableRoles']
 
         # Get their role names
-        assignableRoles = [i.name for i in ctx.message.server.roles if i.id in allowableIDs]
+        assignableRoles = [i.name for i in ctx.message.guild.roles if i.id in allowableIDs]
 
         # Print back out the user
-        await self.sparcli.say('The following roles are self-assignable: ```\n* {}```'.format('\n* '.join(assignableRoles)))
+        await ctx.send('The following roles are self-assignable: ```\n* {}```'.format('\n* '.join(assignableRoles)))
 
     @commands.command(pass_context=True, aliases=['makecolor'])
     @permissionChecker(check='manage_roles')
@@ -99,7 +100,7 @@ class RoleManagement:
               :: makecolour <HexValue>'''
 
         # Fix up some variables
-        server = ctx.message.server
+        server = ctx.message.guild
         user = ctx.message.author if user == None else user
 
         # Fix the colour string
@@ -108,18 +109,19 @@ class RoleManagement:
         # permissions=Permissions(permissions=0)
 
         # Find the role
-        tempRoleFinder = [i for i in server.roles if user.id in i.name]
+        tempRoleFinder = [i for i in server.roles if 'SPARCLI {}'.format(user.id) in i.name]
         if len(tempRoleFinder) > 0:
             role = tempRoleFinder[0]
-            await self.sparcli.edit_role(server, role, colour=colourObj)
+            await role.edit(colour=colourObj)
             created = False
         else:
-            role = await self.sparcli.create_role(server, name=user.id, colour=colourObj)
-            await self.sparcli.add_roles(user, role)
+            role = await server.create_role(name='SPARCLI {}'.format(user.id), colour=colourObj)
+            userRoles = [i for i in user.roles] + [role]
+            await user.edit(roles=userRoles)
             created = True
 
         # Print out to user
-        await self.sparcli.say('This role has been successfully {}. \nYou may need to move the positions of other roles to make it work properly.'.format({True:'created',False:'edited'}))
+        await ctx.send('This role has been successfully {}. \nYou may need to move the positions of other roles to make it work properly.'.format({True:'created',False:'edited'}))
 
 
 def setup(bot):

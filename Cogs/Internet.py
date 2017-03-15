@@ -52,13 +52,13 @@ class Internet:
         nounstr = str(get('http://www.desiquintans.com/downloads/nounlist/nounlist.txt').content)[2:]
         self.nounlist = nounstr.split('\\n')
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def cat(self, ctx):
         '''Gives a random picture of a cat
         Usage :: cat'''
 
         # Send typing, so you can see it's being processed
-        await self.sparcli.send_typing(ctx.message.server)
+        await ctx.channel.trigger_typing()
 
         # Loop to keep track of rate limiting
         while True:
@@ -71,7 +71,7 @@ class Internet:
 
         # Give the url of the loaded page
         returnUrl = page.url
-        await self.sparcli.say(returnUrl)
+        await ctx.send(returnUrl)
 
     @commands.command(pass_context=True)
     async def pun(self, ctx):
@@ -79,7 +79,7 @@ class Internet:
         Usage :: pun'''
 
         # Send typing, so you can see it's being processed
-        await self.sparcli.send_typing(ctx.message.server)
+        await ctx.channel.trigger_typing()
 
         # Read from page
         page = get('http://www.punoftheday.com/cgi-bin/randompun.pl')
@@ -88,7 +88,7 @@ class Internet:
         rawPun = page.text.split('dropshadow1')[1][6:].split('<')[0]
 
         # Boop it out
-        await self.sparcli.say(rawPun)
+        await ctx.send(rawPun)
 
     @commands.command(pass_context=True)
     async def trans(self, ctx, langTo: str, *, toChange: str):
@@ -106,20 +106,20 @@ class Internet:
                 transid = tokens['Microsoft Translate']['ID']
                 self.translator = Translator(transid, secret)
             except KeyError:
-                await self.sparcli.say('Translation has not been set up for this bot.')
+                await ctx.send('Translation has not been set up for this bot.')
                 return
 
         # Send typing, so you can see it's being processed
-        await self.sparcli.send_typing(ctx.message.server)
+        await ctx.channel.trigger_typing()
 
         # Make sure that the language is supported
         if langTo not in self.translator.get_languages():
-            await self.sparcli.say("The language provided is not supported.")
+            await ctx.send("The language provided is not supported.")
             return
 
         # If so, translate it
         translatedText = self.translator.translate(toChange, langTo.lower())
-        await self.sparcli.say(translatedText)
+        await ctx.send(translatedText)
 
     @commands.command(pass_context=True)
     async def wolfram(self, ctx, *, toDo: str):
@@ -149,11 +149,11 @@ class Internet:
                 secret = tokens['WolframAlpha']['Secret']
                 self.wolfClient = Client(secret)
             except KeyError:
-                await self.sparcli.say('WolframAlpha has not been set up for this bot.')
+                await ctx.send('WolframAlpha has not been set up for this bot.')
                 return
 
         # Send typing, so you can see it's being processed
-        await self.sparcli.send_typing(ctx.message.server)
+        await ctx.channel.trigger_typing()
 
         # Sends query to Wolfram
         wolfResults = self.wolfClient.query(whatToSearch)
@@ -170,9 +170,9 @@ class Internet:
             wolfList = [i.img for i in wolfResults.pods]
 
         # Return to user
-        await self.sparcli.say(' '.join(wolfList[0:6]))
+        await ctx.send(' '.join(wolfList[0:6]))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def throw(self, ctx, *, member: Member=None):
         '''Throws a random thing at a user
         Usage :: throw
@@ -189,12 +189,12 @@ class Internet:
         if member == None:
             pass
         elif member.id == self.sparcli.user.id:
-            await self.sparcli.say('Nice try.')
+            await ctx.send('Nice try.')
             return
 
         # Throw the object
         atUser = '.' if member == None else ' at {}.'.format(member.mention)
-        await self.sparcli.say('Thrown {} {}{}'.format(aOrAn, toThrow, atUser))
+        await ctx.send('Thrown {} {}{}'.format(aOrAn, toThrow, atUser))
 
 
 def setup(bot):

@@ -8,7 +8,7 @@ class Random:
         self.sparcli = sparcli
 
     @commands.command()
-    async def coinflip(self):
+    async def coinflip(self, ctx):
         '''Gives a random result of heads or tails
         Usage :: coinflip'''
 
@@ -24,7 +24,7 @@ class Random:
             result = 'You flipped the coin so hard, it got stuck in the roof .-.'
 
         # Print out to user
-        await self.sparcli.say(result)
+        await ctx.send(result)
 
 
 def setup(bot):

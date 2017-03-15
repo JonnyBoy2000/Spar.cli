@@ -1,4 +1,4 @@
-async def addEmojiList(sparcli, message, emojiList):
+async def addEmojiList(message, emojiList):
     '''Adds a list of emoji to a given message'''
 
     # Split emoji into a list if it is a string
@@ -7,7 +7,7 @@ async def addEmojiList(sparcli, message, emojiList):
 
     # Add the reactions
     for i in emojiList:
-        await sparcli.add_reaction(message, i)
+        await message.add_reaction(i)
 
 
 async def updateFromEmoji(sparcli, ctx, serverSettings, thingToEnable, whatPresentlyIs):
@@ -18,19 +18,26 @@ async def updateFromEmoji(sparcli, ctx, serverSettings, thingToEnable, whatPrese
     thumbs = ['👍', '👎']
 
     # Print out message to user
-    mes = await sparcli.say('Enable {0}? (Presently `{1}`)'.format(thingToEnable, whatPresentlyIs))
+    mes = await ctx.send('Enable {0}? (Presently `{1}`)'.format(thingToEnable, whatPresentlyIs))
 
     # Add emoji to it
-    await addEmojiList(sparcli, mes, thumbs)
+    await addEmojiList(mes, thumbs)
 
     # See what the user gives back
-    ret, usr = await sparcli.wait_for_reaction(thumbs, user=author, message=mes)
+    def check(reaction, user):
+        c = []
+        c.append(reaction.message.id == mes.id)
+        c.append(user.id == author.id)
+        c.append(reaction.emoji in thumbs)
+        return c == [True, True, True]
+
+    ret, usr = await sparcli.wait_for('reaction_add', check=check)
 
     # Set it up to save
     serverSettings['Toggles'][thingToEnable] = {'👍': True, '👎': False}[ret.emoji]
 
     # Delete the message
-    await sparcli.delete_message(mes)
+    await mes.delete()
 
     return serverSettings
 
@@ -42,23 +49,25 @@ async def updateFromMessage(sparcli, ctx, serverSettings, thingToSet):
     author = ctx.message.author
     channel = ctx.message.channel
 
+    def check(mes):
+        return mes.author == author and mes.channel == channel
+
     # Say out to user
-    mes = [await sparcli.say('What channel should {0} be set to?'.format(thingToSet))]
+    mes = [await ctx.send('What channel should {0} be set to?'.format(thingToSet))]
 
     # Wait for response from user
     while True:
-        ret = await sparcli.wait_for_message(author=author, channel=channel)
+
+        ret = await sparcli.wait_for('message', check=check)
+        mes.append(ret)
 
         # Check if there's a tagged channel
         mentioned = ret.channel_mentions
         if mentioned == []:
-            z = await sparcli.say('You need to tag a channel in your message.')
+            z = await ctx.send('You need to tag a channel in your message.')
             mes.append(z)
-            mes.append(ret)
         else:
-            for q in mes:
-                await sparcli.delete_message(q)
-            await sparcli.delete_message(ret)
+            await ctx.channel.delete_messages(mes)
             serverSettings['Channels'][thingToSet] = mentioned[0].id
             break
 

@@ -171,3 +171,10 @@ def messageToStarboard(message):
 
     # Return to user
     return starboardText, embedObj
+
+def getServerDefaultChannel(server):
+    '''
+    Gets the default channel of a server in order to use `.send()` etc on
+    '''
+
+    return [i for i in server.channels if i.id == server.id][0]

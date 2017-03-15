@@ -14,7 +14,7 @@ class OwnerOnly:
     def __init__(self, bot):
         self.sparcli = bot
 
-    @commands.command(pass_context=True, hidden=True, aliases=['playing'])
+    @commands.command(hidden=True, aliases=['playing'])
     @permissionChecker(check='is_owner')
     async def game(self, ctx, *, game: str=None):
         '''Change what the bot is playing
@@ -22,18 +22,18 @@ class OwnerOnly:
 
         # Change the game
         await self.sparcli.change_presence(game=Game(name=game))
-        await self.sparcli.say('Game changed to **{}**.'.format(game))
+        await ctx.send('Game changed to **{}**.'.format(game))
 
-    @commands.command(pass_context=True, hidden=True)
+    @commands.command(hidden=True)
     @permissionChecker(check='is_owner')
     async def ev(self, ctx, *, content: str):
         '''Evaluates a given Python expression
         Usage :: ev <Python>'''
 
         # Eval and print the answer
-        await self.sparcli.say(eval(content))
+        await ctx.send(eval(content))
 
-    @commands.command(pass_context=True, hidden=True)
+    @commands.command(hidden=True)
     @permissionChecker(check='is_owner')
     async def av(self, ctx, *, avatarUrl: str=None):
         '''Changes the bot's avatar to a set URL
@@ -46,17 +46,17 @@ class OwnerOnly:
                 avatarUrl = ctx.message.attachments[0]['url']
         except IndexError:
             # If you get to this point, there's no image
-            await self.sparcli.say('You need to pass an image or url to set the avatar to.')
+            await ctx.send('You need to pass an image or url to set the avatar to.')
             return
 
         # Load up the image
         imageData = get(avatarUrl).content
 
         # Set profile picture
-        await self.sparcli.edit_profile(avatar=imageData)
-        await self.sparcli.say("Profile picture successfully changed.")
+        await self.sparcli.user.edit(avatar=imageData)
+        await ctx.send("Profile picture successfully changed.")
 
-    @commands.command(pass_context=True, hidden=True)
+    @commands.command(hidden=True)
     @permissionChecker(check='is_owner')
     async def kill(self, ctx):
         '''Kills the bot. Makes it deaded.
@@ -72,11 +72,11 @@ class OwnerOnly:
                         'Dead or not, I\'m still more loved than BlackBox.',
                         'In my culture, this is called "delayed abortion".']
         toSay = choice(killMessages)
-        await self.sparcli.say(toSay)
+        await ctx.send(toSay)
         await self.sparcli.change_presence(status=Status.invisible, game=None)
         exit()
 
-    @commands.command(pass_context=True, hidden=True)
+    @commands.command(hidden=True)
     @permissionChecker(check='is_owner')
     async def rld(self, ctx, extention: str=None, doFully:str=False):
         '''Reload an extention on the bot
@@ -84,7 +84,7 @@ class OwnerOnly:
 
         # Get list of loaded extentions
         if extention == None:
-            await self.sparcli.say("Currently loaded extentions :: \n```\n{}```".format("\n".join(self.sparcli.cogs)))
+            await ctx.send("Currently loaded extentions :: \n```\n{}```".format("\n".join(self.sparcli.cogs)))
             return
 
         # Decides whether to be a smartbot
@@ -100,7 +100,7 @@ class OwnerOnly:
             extention = [eF[i] for i in eF.keys() if extention.lower() in i][0]
 
         # Unload the extention
-        await self.sparcli.say("Reloading extension **{}**...".format(extention))
+        await ctx.send("Reloading extension **{}**...".format(extention))
         try:
             self.sparcli.unload_extension(extention)
         except:
@@ -110,31 +110,34 @@ class OwnerOnly:
         try:
             self.sparcli.load_extension(extention)
         except ImportError:
-            await self.sparcli.say("That extention does not exist.")
+            await ctx.send("That extention does not exist.")
             return
 
         # Boop the user
-        await self.sparcli.say("Done!")
+        await ctx.send("Done!")
 
-    @commands.command(pass_context=True, hidden=True)
+    @commands.command(hidden=True)
     @permissionChecker(check='is_owner')
-    async def loadmessage(self, ctx, messageID: str):
+    async def loadmessage(self, ctx, messageID: int):
         '''Loads a message into the bot chache
         Usage :: loadmessage <MessageID>'''
 
         # Find and add the message
-        messageToAdd = await self.sparcli.get_message(ctx.message.channel, messageID)
-        self.sparcli.messages.append(messageToAdd)
-        await self.sparcli.say('This message has been added to the bot\'s cache.')
+        try:
+            messageToAdd = await self.sparcli.user.get_message(messageID)
+            self.sparcli.messages.append(messageToAdd)
+            await ctx.send('This message has been added to the bot\'s cache.')
+        except Exception:
+            await ctx.send('I was unable to find that message.')
 
-    @commands.command(pass_context=True, hidden=True, aliases=['rs'])
+    @commands.command(hidden=True, aliases=['rs'])
     @permissionChecker(check='is_owner')
     async def restart(self, ctx):
         '''Restarts the bot. Literally everything.
         Usage :: restart'''
 
         # If it is, tell the user the bot it dying
-        await self.sparcli.say('Now restarting.')
+        await ctx.send('Now restarting.')
         await self.sparcli.change_presence(status=Status.dnd, game=None)
         execl(executable, *([executable] + argv))
 

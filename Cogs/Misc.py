@@ -16,7 +16,7 @@ class Misc:
         self.sparcli = bot
 
     @commands.command()
-    async def invite(self):
+    async def invite(self, ctx):
         '''Gives the bot's invite link
         Usage :: invite'''
 
@@ -26,23 +26,23 @@ class Misc:
         baseLink = 'https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions={}'
         inviteLink = baseLink.format(clientID, permissionsID)
         em = makeEmbed(user=self.sparcli.user, values={'Invite me!':'[Click here!]({})'.format(inviteLink)})
-        await self.sparcli.say(inviteLink, embed=em)
+        await ctx.send(inviteLink, embed=em)
 
     @commands.command()
-    async def git(self):
+    async def git(self, ctx):
         '''Gives the link to the bot's GitHub page/code
         Usage :: git'''
 
-        await self.sparcli.say('https://github.com/4Kaylum/Spar.cli/')
+        await ctx.send('https://github.com/4Kaylum/Spar.cli/')
 
     @commands.command()
-    async def echo(self, *, content: str):
+    async def echo(self, ctx, *, content: str):
         '''Makes the bot print back what the user said
         Usage :: echo <Content>'''
 
-        await self.sparcli.say(content)
+        await ctx.send(content)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def info(self, ctx, user:Member=None):
         '''Gives info on the mentioned user
         Usage :: info <UserPing>
@@ -74,9 +74,9 @@ class Misc:
         embedMessage = makeEmbed(user=u, values=userInfo, image=userIcon, colour=topColour)
 
         # Send it out to the user
-        await self.sparcli.say('', embed=embedMessage)
+        await ctx.send('', embed=embedMessage)
 
-    @commands.command(pass_context=True, aliases=['clear'])
+    @commands.command(aliases=['clear'])
     async def clean(self, ctx, amount: int=50, user: Member=None):
         '''Checks a given amount of messages, and removes ones from a certain user
         Defaults to 50, with the user being the bot
@@ -92,11 +92,11 @@ class Misc:
         cleanCheck = lambda m: m.author.id == user.id
 
         # Purge accurately
-        deleted = await self.sparcli.purge_from(ctx.message.channel, limit=amount, check=cleanCheck)
-        await self.sparcli.say('Cleaned `{}` messages from the channel.'.format(len(deleted)))
+        deleted = await ctx.channel.purge(limit=amount, check=cleanCheck)
+        await ctx.send('Cleaned `{}` messages from the channel.'.format(len(deleted)))
 
     @commands.command(aliases=['color'])
-    async def colour(self, colour:str):
+    async def colour(self, ctx, colour:str):
         '''Gives the colour of a hex code in an embed
         Usage :: colour <Hex>
               :: color <Hex>'''
@@ -108,9 +108,9 @@ class Misc:
         intColour = int(fixColour, 16)
 
         # Actually print it out
-        await self.sparcli.say('', embed=makeEmbed(colour=intColour, name='#'+fixColour.upper()))
+        await ctx.send('', embed=makeEmbed(colour=intColour, name='#'+fixColour.upper()))
 
-    @commands.command(pass_context=True, aliases=['mycolor'])
+    @commands.command(aliases=['mycolor'])
     async def mycolour(self, ctx):
         '''Gives you the hex colour that your user is displayed as
         Usage :: mycolour'''
@@ -122,9 +122,9 @@ class Misc:
         hexColour = hex(colour)[2:].upper()
 
         # Actually print it out
-        await self.sparcli.say('', embed=makeEmbed(colour=colour, name='#'+hexColour))
+        await ctx.send('', embed=makeEmbed(colour=colour, name='#'+hexColour))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def help2(self, ctx):
         '''Shows this message'''
 
@@ -141,9 +141,9 @@ class Misc:
 
         e = [makeEmbed(name=u, values=i, user=self.sparcli.user, colour=randint(0, 0xFFFFFF)) for u, i in o.items()]
         for i in e:
-            await self.sparcli.send_message(usr, '', embed=i)
+            await ctx.send('', embed=i)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @botPermission(check='attach_files')
     async def meme(self, ctx, topText:str=None, bottomText:str=None, imageLink:str=None):
         '''
@@ -157,21 +157,21 @@ class Misc:
 
         # Fill any blank spots
         if None in [topText, bottomText, imageLink]:
-            z = await self.sparcli.say('What is the top text for your image?')
+            z = await ctx.send('What is the top text for your image?')
             sentMessages.append(z)
-            z = await self.sparcli.wait_for_message(author=author)
+            z = await self.sparcli.wait_for('message', author=author)
             topText = z.content
             userMessages.append(z)
 
-            z = await self.sparcli.say('What is the bottom text for your image?')
+            z = await ctx.send('What is the bottom text for your image?')
             sentMessages.append(z)
-            z = await self.sparcli.wait_for_message(author=author)
+            z = await self.sparcli.wait_for('message', author=author)
             bottomText = z.content
             userMessages.append(z)
 
-            z = await self.sparcli.say('What is the image URL to add the text to?')
+            z = await ctx.send('What is the image URL to add the text to?')
             sentMessages.append(z)
-            z = await self.sparcli.wait_for_message(author=author)
+            z = await self.sparcli.wait_for('message', author=author)
             imageLink = z.content
             userMessages.append(z)
 
@@ -190,7 +190,7 @@ class Misc:
         site = get(siteURL)
         image = site.content
         with open('SPARCLI_RAW_IMAGE_DOWNLOAD.png', 'wb') as a: a.write(image)
-        await self.sparcli.send_file(ctx.message.channel, 'SPARCLI_RAW_IMAGE_DOWNLOAD.png', content=author.mention)
+        await ctx.send(author.mention, file='SPARCLI_RAW_IMAGE_DOWNLOAD.png')
 
     @commands.command(pass_context=True)
     async def permissions(self, ctx, member:Member=None):
@@ -233,7 +233,7 @@ class Misc:
         o['Administrator'] = w[p.administrator]
 
         e = makeEmbed(name='Your permissions in this channel', values=o)
-        await self.sparcli.say('', embed=e)
+        await ctx.send('', embed=e)
 
 
 def setup(bot):

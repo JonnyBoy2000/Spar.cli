@@ -1,7 +1,5 @@
 from discord.ext import commands
-from discord import Channel
-from sys import path
-path.append('../')  # Move path so you can get the Utils folder
+from discord import TextChannel
 from Cogs.Utils.Discord import getTextRoles
 from Cogs.Utils.Configs import getServerJson, saveServerJson
 from Cogs.Utils.GuiConfig import addEmojiList, updateFromEmoji, updateFromMessage
@@ -13,7 +11,7 @@ class Config:
     def __init__(self, sparcli):
         self.sparcli = sparcli
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @permissionChecker(check='administrator')
     async def enable(self, ctx, toChange: str):
         '''Enables a certain messagetype from the bot's server configuration
@@ -22,13 +20,13 @@ class Config:
 
         # If the user can use it, the serverconfig will be changed
         if toChange.title() not in getServerJson('Default')['Toggles']:
-            await self.sparcli.say('That isn\'t something you can configure. Try something from `{}`'.format(
+            await ctx.send('That isn\'t something you can configure. Try something from `{}`'.format(
                 ', '.join(getServerJson('Default')['Toggles'].keys())))
 
         # Change the thingy
         await self.toggleSetting(ctx, toChange.title(), True)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @permissionChecker(check='administrator')
     async def disable(self, ctx, toChange: str):
         '''Disables a certain messagetype from the bot's server configuration
@@ -37,7 +35,7 @@ class Config:
 
         # If the user can use it, the serverconfig will be changed
         if toChange.title() not in getServerJson('Default')['Toggles']:
-            await self.sparcli.say('That isn\'t something you can configure. Try something from `{}`'.format(
+            await ctx.send('That isn\'t something you can configure. Try something from `{}`'.format(
                 ', '.join(getServerJson('Default')['Toggles'].keys())))
 
         # Change the thingy
@@ -48,7 +46,7 @@ class Config:
         command that called it'''
 
         # Make line length shorter
-        serverID = ctx.message.server.id
+        serverID = ctx.message.guild.id
 
         # Changes the server settings
         serverSettings = getServerJson(serverID)
@@ -56,11 +54,11 @@ class Config:
         saveServerJson(serverID, serverSettings)
 
         # Print out to user
-        await self.sparcli.say('The messagetype `{}` has been set to `{}`'.format(whatToSet, toSetTo))
+        await ctx.send('The messagetype `{}` has been set to `{}`'.format(whatToSet, toSetTo))
 
     @commands.command(pass_context=True)
     @permissionChecker(check='administrator')
-    async def set(self, ctx, toChange: str, channel: Channel):
+    async def set(self, ctx, toChange: str, channel: TextChannel):
         '''Sets a messagetype's output to a certain channel
         Usage :: set <MessageType> <ChannelPing>
         MessageTypes :: joins, leaves, bans, etc'''
@@ -68,11 +66,11 @@ class Config:
         # If the user can use it, the serverconfig will be changed
         settableChannels = getServerJson('Default')['Channels']
         if toChange.title() not in settableChannels:
-            await self.sparcli.say('That isn\'t a messagetype you can set. Try something from `{}`'.format(
+            await ctx.send('That isn\'t a messagetype you can set. Try something from `{}`'.format(
                 ', '.join(settableChannels.keys())))
             return
 
-        serverID = ctx.message.server.id
+        serverID = ctx.message.guild.id
         toChange = toChange.title()
 
         # Changes the server settings
@@ -83,7 +81,7 @@ class Config:
         # Print out to user
         await self.sparcli.say('The messagetype `{0}` output has been set to {1.mention}, with ID `{1.id}`'.format(whatToSet, channel))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @permissionChecker(check='administrator')
     async def youare(self, ctx, addRemove: str, *, whatToChange: str):
         '''Allows you to change which roles are self-assignable
@@ -106,7 +104,7 @@ class Config:
         calledSubcommand = subcommands[addRemove.lower()]
 
         # Read from the server configs
-        serverSettings = getServerJson(ctx.message.server.id)
+        serverSettings = getServerJson(ctx.message.guild.id)
         allowableIDs = serverSettings['SelfAssignableRoles']
 
         # Fliter if add or remove
@@ -114,32 +112,32 @@ class Config:
             try:
                 allowableIDs.remove(roleToGive.id)
             except ValueError:
-                await self.sparcli.say('This role isn\'t self-assignable.')
+                await ctx.send('This role isn\'t self-assignable.')
                 return
         else:
             if roleToGive.id not in allowableIDs:
                 allowableIDs.append(roleToGive.id)
             else:
-                await self.sparcli.say('This role can already be self-assigned.')
+                await ctx.send('This role can already be self-assigned.')
                 return
 
         # Plonk the settings back into the file storage
         serverSettings['SelfAssignableRoles'] = allowableIDs
-        saveServerJson(ctx.message.server.id, serverSettings)
+        saveServerJson(ctx.message.guild.id, serverSettings)
         canItBeAssigned = {False: 'can now be', True: 'can no longer be'}[calledSubcommand]
 
         # Print out to the user
-        await self.sparcli.say('The role `{0.name}` with ID `{0.id}` {1} self-assigned.'.format(
+        await ctx.send('The role `{0.name}` with ID `{0.id}` {1} self-assigned.'.format(
             roleToGive, canItBeAssigned))
 
-    @commands.command(pass_context=True, aliases=['setprefix', 'prefixset'])
+    @commands.command(aliases=['setprefix', 'prefixset'])
     @permissionChecker(check='administrator')
     async def prefix(self, ctx, prefix: str):
         '''Changes the command prefix for the server
         Usage :: prefix <New Preifx>'''
 
         # Set up some variables to keep line length short
-        serverID = ctx.message.server.id
+        serverID = ctx.message.guild.id
 
         # Load and save the command prefix
         serverSettings = getServerJson(serverID)
@@ -147,9 +145,9 @@ class Config:
         saveServerJson(serverID, serverSettings)
 
         # Print out to the user
-        await self.sparcli.say('The command prefix for this server has been set to `{}`'.format(prefix))
+        await ctx.send('The command prefix for this server has been set to `{}`'.format(prefix))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @permissionChecker(check='administrator')
     async def setup(self, ctx):
         '''Gives you a reaction-based configuration dialogue
@@ -158,7 +156,7 @@ class Config:
         # Set up some variables to keep line length short
         author = ctx.message.author
         channel = ctx.message.channel
-        serverID = ctx.message.server.id
+        serverID = ctx.message.guild.id
         
         # Load current configuration
         serverSettings = getServerJson(serverID)
@@ -166,16 +164,6 @@ class Config:
 
         # Make a lambda so I can easily check the author
         messageAuthor = lambda x: x.author.id == author.id
-
-        # Tell the user to get off of mobile
-        startup = await self.sparcli.say('This command works with reactions. Thus, if you are on mobile, it will not work. If you wish to proceed, send a message saying `yes`. Otherwise, the command will abort.')
-        response = await self.sparcli.wait_for_message(author=author, channel=channel)
-        if response.content.lower() == 'yes':
-            await self.sparcli.delete_message(startup)
-            await self.sparcli.delete_message(response)
-        else:
-            await self.sparcli.say('This command is aborting.')
-            return
 
         # Work on each type of toggle enable
         toggleTypes = serverSettings['Toggles'].keys()
@@ -189,7 +177,7 @@ class Config:
                 serverSettings = await updateFromMessage(self.sparcli, ctx, serverSettings, i)
 
         # Tell the user that we're done
-        await self.sparcli.say('Alright, everything is updated!')
+        await ctx.send('Alright, everything is updated!')
 
         # Save it all to file
         saveServerJson(serverID, serverSettings)

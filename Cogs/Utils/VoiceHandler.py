@@ -1,4 +1,4 @@
-from discord import Channel, ClientException
+from discord import VoiceChannel, ClientException
 from string import punctuation as AllPunctuation
 from asyncio import sleep
 from datetime import timedelta
@@ -34,27 +34,27 @@ class ServerVoice(object):
             channel = self.lastChannel
 
         # Join a channel if specified
-        if type(toJoin) == Channel:
-            loadedVC = self.sparcli.join_voice_channel(toJoin)
+        if type(toJoin) == VoiceChannel:
+            loadedVC = await channel.guild.me.voice(toJoin)
             self.voiceClient = loadedVC
             return loadedVC
 
         # No channel specified, join the user's VC
-        memberVC = toJoin.voice.voice_channel
+        memberVC = toJoin.voice.channel
         if memberVC == None:
-            await self.sparcli.send_message(channel, 'You aren\'t currently in a voice channel.')
+            await channel.send('You aren\'t currently in a voice channel.')
             return False
 
         # Join the member's VC
         try:
             # Try to join
-            loadedVC = await self.sparcli.join_voice_channel(memberVC)
+            loadedVC = await channel.guild.me.voice(toJoin)
             self.voiceClient = loadedVC
             return loadedVC
 
         except ClientException:
             # You're already in it
-            loadedVC = self.sparcli.voice_client_in(toJoin.server)
+            loadedVC = channel.guild.me.voice.channel
             self.voiceClient = loadedVC
             return loadedVC
 

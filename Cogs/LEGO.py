@@ -18,7 +18,7 @@ class LEGO:
         self.brickClient = Client(getTokens()['Brickset']['Secret'])
 
     @commands.command()
-    async def legoset(self, *, query: str):
+    async def legoset(self, ctx, *, query: str):
         '''Searches for a LEGO set'''
 
         sets = self.brickClient.getSets(query=query, pageSize=200)
@@ -44,7 +44,7 @@ class LEGO:
             z = 'None available.'
         o['Price'] = z
         e = makeEmbed(name=name, image=image, values=o)
-        await self.sparcli.say('', embed=e)
+        await ctx.send('', embed=e)
 
 
 def setup(bot):

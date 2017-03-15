@@ -58,11 +58,11 @@ class Tags:
                 content = None
 
             # Call the function that actually does stuff.
-            await functionDict[subcom.split(' ', 1)[0]](ctx, content, ctx.message.server.id, runWithExec)
+            await functionDict[subcom.split(' ', 1)[0]](ctx, content, ctx.message.guild.id, runWithExec)
             return
 
         # This is run to actually print a tag
-        server = ctx.message.server
+        server = ctx.message.guild
 
         # Get both the global and local tags
         globalTags = getServerJson(
@@ -92,14 +92,14 @@ class Tags:
 
         # Output to user
         if tagOutput != None:
-            await self.sparcli.say(tagOutput)
+            await ctx.send(tagOutput)
         else:
-            await self.sparcli.say('That tag does not exist.')
+            await ctx.send('That tag does not exist.')
 
     async def tagInfo(self, ctx, tagName, completelyUnused, runWithExec):
         # Tagname isn't used, but it's kinda necessary because of how I'm calling it
         # Get the local and global tags
-        server = ctx.message.server
+        server = ctx.message.guild
         globalTags = getServerJson(
             'Globals')[{False: 'Tags', True: 'Etags'}[runWithExec]]
         localTags = getServerJson(
@@ -122,8 +122,8 @@ class Tags:
         formatted = '{}\n{}'.format(formatLocal, formatGlobal)
 
         # PM it to the user
-        await self.sparcli.say('You have been private messaged a list of all of the commands.')
-        await self.sparcli.send_message(ctx.message.author, formatted)
+        await ctx.send('You have been private messaged a list of all of the commands.')
+        await ctx.author.send(formatted)
 
     async def tagGlobalAdd(self, ctx, tagName, unusedServerID, runWithExec):
         permThing = getPermissions(
@@ -137,45 +137,47 @@ class Tags:
         permThing = getPermissions(
             ctx.message.channel, 'is_owner', ctx.message.author)
         if type(permThing) == str:
-            await self.sparcli.say(permThing)
+            await ctx.send(permThing)
             return
         await self.tagDelete(ctx, tagName, 'Globals', runWithExec)
 
     async def tagDelete(self, ctx, tagName, serverID=None, runWithExec=False):
         # Deal with idiots - trying to make tag without name
         if tagName == None:
-            await self.sparcli.say('What is the tag name you want to delete?')
-            nameMessage = await self.sparcli.wait_for_message(author=ctx.message.author)
+            await ctx.send('What is the tag name you want to delete?')
+            check = lambda mes: mes.author == ctx.message.author
+            nameMessage = await self.sparcli.wait_for('message', check=check)
             tagName = nameMessage.content
 
         # Get the serverID
-        serverID = ctx.message.server.id if serverID == None else serverID
+        serverID = ctx.message.guild.id if serverID == None else serverID
 
         # Save it into the server configs
         settings = getServerJson(serverID)
         try:
             del settings[{False: 'Tags', True: 'Etags'}[runWithExec]][tagName]
         except KeyError:
-            await self.sparcli.say('This tag does not exist.')
+            await ctx.send('This tag does not exist.')
             return
 
         saveServerJson(serverID, settings)
 
         # Respond to the user
-        await self.sparcli.say('This tag has been deleted.')
+        await ctx.send('This tag has been deleted.')
 
     async def tagAdd(self, ctx, tagName, serverID=None, runWithExec=False):
 
         settings = getServerJson(serverID)
         zz = settings[{False: 'Tags', True: 'Etags'}[runWithExec]]
         if len(zz) > 30:
-            await self.sparcli.say('There are already 30 tags on this server. You can\'t add any more.')
+            await ctx.send('There are already 30 tags on this server. You can\'t add any more.')
             return
 
         # Deal with idiots - trying to make tag without name
         if tagName == None:
-            await self.sparcli.say('What is the tag name you want to add?')
-            nameMessage = await self.sparcli.wait_for_message(author=ctx.message.author)
+            await ctx.send('What is the tag name you want to add?')
+            check = lambda mes: mes.author == ctx.message.author
+            nameMessage = await self.sparcli.wait_for('message', check=check)
             tagName = nameMessage.content
 
             # If someone tries to tag a command
@@ -183,12 +185,13 @@ class Tags:
                 return
 
         # Tell them thhat you're making tag and being nice
-        await self.sparcli.say('Creating tag with name `{}`. What is the indended content?'.format(tagName))
-        contentMessage = await self.sparcli.wait_for_message(author=ctx.message.author)
+        await ctx.send('Creating tag with name `{}`. What is the indended content?'.format(tagName))
+        check = lambda mes: mes.author == ctx.message.author
+        contentMessage = await self.sparcli.wait_for('message', check=check)
         content = contentMessage.content if contentMessage.content != '' else contentMessage.attachments[0]['url']
 
         # Get the serverID
-        serverID = ctx.message.server.id if serverID == None else serverID
+        serverID = ctx.message.guild.id if serverID == None else serverID
 
         # Save it into the server configs
         settings = getServerJson(serverID)
@@ -196,7 +199,7 @@ class Tags:
         saveServerJson(serverID, settings)
 
         # Respond to the user
-        await self.sparcli.say('This tag has been created.')
+        await ctx.send('This tag has been created.')
 
 
 def setup(bot):

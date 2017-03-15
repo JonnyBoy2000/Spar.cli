@@ -1,4 +1,5 @@
-q = ['Cogs.Admin',
+q = [
+     'Cogs.Admin',
      'Cogs.Misc',
      'Cogs.OwnerOnly',
      'Cogs.Internet',
@@ -9,7 +10,7 @@ q = ['Cogs.Admin',
      'Cogs.Bible',
      'Cogs.Reddit',
      'Cogs.Steam',
-     'Cogs.Music',
+     # 'Cogs.Music',
      'Cogs.LEGO',
      'Cogs.Levels'
 ]

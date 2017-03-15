@@ -53,16 +53,16 @@ class Steam:
         Usage :: steamsearch watch_dogs
               :: steamsearch papers, please'''
 
-        await self.sparcli.send_typing(ctx.message.server)
+        await ctx.channel.trigger_typing()
 
         # Try and get the game from the game list
         gameID = self.gameFinder(gameName)
         if gameID == None:
-            await self.sparcli.say('I was unable to find the ID of that game on the Steam API.')
+            await ctx.send('I was unable to find the ID of that game on the Steam API.')
             return
 
         # Send it to the information formatter
-        await self.getSteamGameInfo(gameID)
+        await self.getSteamGameInfo(ctx, gameID)
 
     @commands.command(pass_context=True)
     async def steamgame(self, ctx, *, gameURL:str):
@@ -71,7 +71,7 @@ class Steam:
               :: steamgame steam://store/252870/
               :: steamgame 252870'''
 
-        await self.sparcli.send_typing(ctx.message.server)
+        await ctx.channel.trigger_typing()
 
         # Try and get the game ID
         gameID = None 
@@ -83,18 +83,18 @@ class Steam:
             except ValueError:
                 pass
         if gameID == None:
-            await self.sparcli.say('I was unable to find the ID of that game on the Steam API.')
+            await ctx.send('I was unable to find the ID of that game on the Steam API.')
             return
 
-        await self.getSteamGameInfo(gameID)
+        await self.getSteamGameInfo(ctx, gameID)
 
-    async def getSteamGameInfo(self, gameID:str=None):
+    async def getSteamGameInfo(self, ctx, gameID:str=None):
         '''Gets the data of a game on Steam. Can only be done through ID'''
 
         # Get the data from Steam
         steamData = get(self.gameInfo.format(gameID)).json()
         if steamData[str(gameID)]['success'] == False:
-            await self.sparcli.say('I was unable to find the ID of that game on the Steam API.')
+            await ctx.send('I was unable to find the ID of that game on the Steam API.')
             return
 
         # Get the embed information
@@ -138,7 +138,7 @@ class Steam:
         e = makeEmbed(name=retData['Name'], icon=self.steamIcon, colour=1, values=retData, image=gameImage)
 
         # Return to user
-        await self.sparcli.say('', embed=e)
+        await ctx.send('', embed=e)
 
 
 def setup(bot):
