@@ -235,6 +235,16 @@ class Misc:
         e = makeEmbed(name='Your permissions in this channel', values=o)
         await self.sparcli.say('', embed=e)
 
+    @commands.command(pass_context=True)
+    async def vote(self, ctx, *, whatToVoteFor:str):
+        '''
+        Lets you vote on an item.
+        '''
+
+        q = await self.sparcli.say('A vote has been started for subject `{}`.'.format(whatToVoteFor))
+        await self.sparcli.add_reaction(q, '👍')
+        await self.sparcli.add_reaction(q, '👎')
+
 
 def setup(bot):
     bot.add_cog(Misc(bot))
