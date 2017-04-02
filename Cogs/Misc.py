@@ -1,5 +1,5 @@
 from discord.ext import commands
-from discord import Embed, Member
+from discord import Embed, Member, TextChannel
 from datetime import datetime
 from collections import OrderedDict
 from asyncio import sleep
@@ -42,6 +42,20 @@ class Misc:
         Usage :: echo <Content>'''
 
         await ctx.send(content)
+
+    @commands.command()
+    async def echo(self, ctx, *, content: str):
+        await self.sparcli.say(content)
+
+    @commands.command()
+    async def echoin(self, ctx, channel:TextChannel, *, content: str):
+        await channel.send(content)
+
+    @commands.command()
+    async def echoserver(self, ctx, serverName:str, channelName:str, *, content:str)
+        server = [i for i in self.sparcli.guilds if i.name.lower() == serverName.lower()][0]
+        channel = [i for i in server.text_channels if i.name.lower() == channelName.lower()][0]
+        await channel.send(content)
 
     @commands.command()
     async def info(self, ctx, user:Member=None):
