@@ -1,5 +1,5 @@
 from discord.ext import commands
-from discord import Embed, Member
+from discord import Embed, Member, Emoji, Object
 from datetime import datetime
 from collections import OrderedDict
 from asyncio import sleep
@@ -37,10 +37,29 @@ class Misc:
 
     @commands.command()
     async def echo(self, *, content: str):
-        '''Makes the bot print back what the user said
-        Usage :: echo <Content>'''
-
         await self.sparcli.say(content)
+
+    @commands.command(pass_context=True)
+    async def echoin(self, ctx, channel:str, *, content: str):
+        if channel.isdigit():
+            channel = Object(channel)
+        elif channel.startswith('<#') and channel.endswith('>'):
+            channel = Object(channel[2:-1])
+        else:
+            channel = [i for i in ctx.message.server.channels if i.name.lower() == channel.lower()][0]
+        await self.sparcli.send_message(channel, content)
+
+    @commands.command(pass_context=True)
+    async def echoserver(self, ctx, serverName:str, channelName:str, *, content:str):
+        server = [i for i in self.sparcli.servers if i.name.lower() == serverName.lower()][0]
+
+        if channelName.isdigit():
+            channel = Object(channelName)
+        elif channelName.startswith('<#') and channelName.endswith('>'):
+            channel = Object(channelName[2:-1])
+        else:
+            channel = [i for i in server.channels if i.name.lower() == channelName.lower()][0]
+        await self.sparcli.send_message(channel, content)
 
     @commands.command(pass_context=True)
     async def info(self, ctx, user:Member=None):
