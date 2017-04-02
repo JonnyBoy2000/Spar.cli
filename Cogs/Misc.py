@@ -216,6 +216,16 @@ class Misc:
         e = makeEmbed(user=member, values=o)
         await ctx.send('', embed=e)
 
+    @commands.command()
+    async def vote(self, ctx, *, whatToVoteFor:str):
+        '''
+        Lets you vote on an item.
+        '''
+
+        q = await ctx.send('A vote has been started for subject `{}`.'.format(whatToVoteFor))
+        await q.add_reaction('👍')
+        await q.add_reaction('👎')
+
 
 def setup(bot):
     bot.add_cog(Misc(bot))
