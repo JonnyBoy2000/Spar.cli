@@ -264,6 +264,11 @@ class Misc:
         await self.sparcli.add_reaction(q, '👍')
         await self.sparcli.add_reaction(q, '👎')
 
+    @commands.command(pass_context=True)
+    async def addreaction(self, ctx, postID:str, emoji:Emoji):
+        q = await self.sparcli.get_message(ctx.message.channel, postID)
+        await self.sparcli.add_reaction(q, emoji)
+
 
 def setup(bot):
     bot.add_cog(Misc(bot))
