@@ -73,41 +73,77 @@ def getTextRoles(ctx, hitString, speak=False, sparcli=None):
         await sparcli.send_message(ctx.message.channel, 'There were `{}` hits for that string within this server\'s roles.'.format(len(hits)))
     return len(hits)
 
+
+def makeEmbed(**kwargs):
+    '''
+    Creates an embed messasge with specified inputs.
+    Parameters
+    ----------
+        author
+        author_url
+        author_icon
+        user
+        colour
+        values
+        inline
+        thumbnail
+        image
+        footer
+        footer_icon
+    '''
+
+    # Get the attributes from the user
+    empty = Embed.Empty
+    if True:
+
+        # Get the author/title information
+        author = kwargs.get('author', None)
+        author_url = kwargs.get('author_url', empty)
+        author_icon = kwargs.get('author_icon', empty)
+        user = kwargs.get('user', None)
+
+        # Get the colour
+        colour = kwargs.get('colour', 0)
+
+        # Get the values
+        values = kwargs.get('values', {})
+        inline = kwargs.get('inline', True)
+
+        # Images
+        thumbnail = kwargs.get('thumbnail', False)
+        image = kwargs.get('image', False)
+
+        # Footer
+        footer = kwargs.get('footer', empty)
+        footer_icon = kwargs.get('footer_icon', empty)
+
+    # Correct the icon and author with the member, if necessary
+    if user == None:
+        author = user.display_name
+        author_icon = user.avatar_url
+        try:
+            colour = user.colour.value 
+        except AttributeError:
+            pass
+
     # Create an embed object with the specified colour
     embedObj = Embed(colour=colour)
 
-    # Set the author and URL
-    if user != None and name == Embed.Empty:
-        name = user.name
-    if user != None and icon == Embed.Empty:
-        icon = user.avatar_url if user.avatar_url != None else user.default_avatar_url
-    embedObj.set_author(name=name, icon_url=icon)
+    # Set the normal attributes
+    embedObj.set_author(name=author, url=author_url, icon_url=author_icon)
+    embedObj.set_footer(text=footer, icon_url=footer_icon)
+    
+    # Set the attributes that have no default
+    if image: embedObj.set_icon(url=image)
+    if thumbnail: embedObj.set_thumbnail(url=thumbnail)
 
-    # Create all of the fields
-    for i, o in values.items():
-        q = o
-        w = True
-        if type(o) == tuple:
-            q = o[0]
-            w = o[1]
-        if q == '':
-            q = 'None'
-        embedObj.add_field(name=i, value='{}'.format(q), inline=w)
-
-    # Set thumbnail and image
-    if thumbnail != None:
-        embedObj.set_thumbnail(url=thumbnail)
-    if image != None:
-        embedObj.set_image(url=image)
-
-    # Set the footer
-    footerFixed = []
-    for i in footer:
-        if i == None:
-            i = Embed.Empty
-        footerFixed.append(i)
-    embedObj.set_footer(text=footerFixed[0], icon_url=footerFixed[1])
-
+    # Set the fields
+    for i, o in fields.items():
+        p = inline
+        if type(o) in [tuple, list]:
+            p = o[1]
+            o = o[0]
+        embedObj.add_field(name=i, value=o, inline=p)
 
     # Return to user
     return embedObj
