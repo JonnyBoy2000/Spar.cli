@@ -61,38 +61,17 @@ def getPermissions(channel=None, permissionCheck=None, firstPerson=None, secondP
     return isAbove if isAbove else 'You do not have permission to use this command against this user.'
 
 
-async def getTextRoles(ctx):
+def getTextRoles(ctx, hitString, speak=False, sparcli=None):
     '''Gets non-tagged and tagged roles from a message's ctx'''
 
-    # Try and see if the role was pinged
-    roleToGive = ctx.message.role_mentions
-    if roleToGive == []:
+    serverRoles = ctx.message.server.roles 
+    hits = [i for i in serverRoles if hitString.lower() in i.name.lower()]
+    if len(hits) == 1:
+        return hits[0]
 
-        # Find it from the names of the roles on the server
-        serverRoleObjects = ctx.message.server.roles
-        serverRoleNames = [i.name for i in serverRoleObjects]
-        results = []
-
-        for i, n in enumerate(serverRoleNames):
-            # i is index, n is name
-            if whatToChange.lower() in n.lower():
-                results.append(i)
-
-        # Check if there was more than one relevant result
-        if len(results) == 0:
-            await self.sparcli.say('There were no results for roles with that name on this server.')
-            return 0
-        elif len(results) > 1:
-            await self.sparcli.say('There were too many results for roles with that name on this server.')
-            return 0
-        else:
-            roleToGive = [serverRoleObjects[results[0]]]
-
-    return roleToGive[0]
-
-
-def makeEmbed(*, name=Embed.Empty, icon=Embed.Empty, colour=0xDEADBF, values={}, user=None, thumbnail=None, image=None, footer=[Embed.Empty, Embed.Empty]):
-    '''Creates an embed messasge with specified inputs'''
+    if speak:
+        await sparcli.send_message(ctx.message.channel, 'There were `{}` hits for that string within this server\'s roles.'.format(len(hits)))
+    return len(hits)
 
     # Create an embed object with the specified colour
     embedObj = Embed(colour=colour)

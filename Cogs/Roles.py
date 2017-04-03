@@ -1,8 +1,8 @@
 from discord.ext import commands
 from discord import Colour, Member, Permissions
 from discord.errors import NotFound as Forbidden
+from Cogs.Utils.Configs import getServerJson, saveServerJson
 from Cogs.Utils.Discord import getTextRoles
-from Cogs.Utils.Configs import getServerJson
 from Cogs.Utils.Misc import colourFixer
 from Cogs.Utils.Permissions import permissionChecker, botPermission
 
@@ -15,45 +15,42 @@ class RoleManagement:
     @commands.command(pass_context=True, aliases=['changecolour', 'changerolecolour', 'changerole', 'rolecolor', 'changecolor', 'changerolecolor'])
     @permissionChecker(check='manage_roles')
     @botPermission(check='manage_roles')
-    async def rolecolour(self, ctx, rolecolour: str, *, rolename: str):
+    async def rolecolour(self, ctx, roleColour: str, *, roleName: str):
         '''Changes the colour of a specified role
         Usage :: rolecolour <HexValue> <RoleName>
               :: rolecolour <HexValue> <RolePing>'''
 
         # Get the role colour
-        rolecolour = colourFixer(rolecolour)
+        roleColour = colourFixer(roleColour)
 
         # Get the role itself
-        role = await getTextRoles(ctx)
-        if role is 0:
-            return
+        role = getTextRoles(ctx, roleName, speak=True, sparcli=sparcli)
+        if type(role) == int: return
 
         # Change the role colour
-        colour = Colour(int(rolecolour, 16))
-        try:
-            await self.sparcli.edit_role(ctx.message.server, role, colour=colour)
-        except Forbidden:
-            await self.sparcli.say('I was unable to edit the role.')
-            return
-
-        # Print to user
+        colour = Colour(int(roleColour, 16))
+        await self.sparcli.edit_role(ctx.message.server, role, colour=colour)
         await self.sparcli.say('The colour of the role `{0.name}` has been changed to value `{1.value}`.'.format(role, colour))
 
-    @commands.command(pass_context=True)
+    @commands.group(pass_context=True)
     @botPermission(check='manage_roles')
-    async def iam(self, ctx, *, whatRoleToAdd: str):
+    async def iam(self, ctx, *, roleName: str):
         '''If allowed, the bot will give you a mentioned role
         Usage :: iam <RoleName>
               :: iam <RolePing>
               :: iam list'''
 
-        # Get a list if the user wanted to
-        if whatRoleToAdd.lower() == 'list':
-            await self.iamlist(ctx)
-            return
+        if roleName == 'list':
+            return await self.iamlist(ctx)
 
-        roleToGive = await getTextRoles(ctx)
-        if roleToGive == 0:
+        connectedRoles = [i for i in ctx.message.server.roles if roleName.lower() in i.name.lower()]
+        if len(connectedRoles) == 1:
+            roleToGive = connectedRoles[0]
+        elif len(connectedRoles) == 0:
+            await self.sparcli.say('This server has no roles that match that hitstring.')
+            return 
+        else:
+            await self.sparcli.say('This server has too many roles that match that hitstring.')
             return
 
         # See what you're allowed to self-assign
@@ -70,12 +67,8 @@ class RoleManagement:
             await self.sparcli.say('You already have that role.')
             return
 
-        # You can - add it to the user
-        try:
-            await self.sparcli.add_roles(ctx.message.author, roleToGive)
-            await self.sparcli.say('The role `{0.name}` with ID `{0.id}` has been sucessfully added to you.'.format(roleToGive))
-        except Forbidden:
-            await self.sparcli.say('I was unable to add that role to you.')
+        await self.sparcli.add_roles(ctx.message.author, roleToGive)
+        await self.sparcli.say('The role `{0.name}` with ID `{0.id}` has been sucessfully added to you.'.format(roleToGive))
 
     async def iamlist(self, ctx):
         '''Gives a list of roles that you can self-assign'''
@@ -89,6 +82,61 @@ class RoleManagement:
 
         # Print back out the user
         await self.sparcli.say('The following roles are self-assignable: ```\n* {}```'.format('\n* '.join(assignableRoles)))
+
+    @commands.group(pass_context=True)
+    @permissionChecker(check='manage_roles')
+    async def youare(self, ctx):
+        pass
+
+    @youare.command(pass_context=True, name='add', aliases=['now'])
+    @permissionChecker(check='manage_roles')
+    async def youareAdd(self, ctx, *, roleName:str):
+
+        # Get the role itself
+        roleToGive = getTextRoles(ctx, roleName, speak=True, sparcli=sparcli)
+        if type(roleToGive) == int: return
+
+        # Read from the server configs
+        serverSettings = getServerJson(ctx.message.server.id)
+        allowableIDs = serverSettings['SelfAssignableRoles']
+
+        if roleToGive.id not in allowableIDs:
+            allowableIDs.append(roleToGive.id)
+        else:
+            await self.sparcli.say('This role can already be self-assigned.')
+            return
+
+        # Plonk the settings back into the file storage
+        serverSettings['SelfAssignableRoles'] = allowableIDs
+        saveServerJson(ctx.message.server.id, serverSettings)
+
+        # Print out to the user
+        await self.sparcli.say('The role `{0.name}` with ID `{0.id}` can now be self-assigned.'.format(roleToGive))
+
+    @youare.command(pass_context=True, name='del', aliases=['not', 'delete'])
+    @permissionChecker(check='manage_roles')
+    async def youareDel(self, ctx, *, roleName:str):
+
+        # Get the role itself
+        roleToGive = getTextRoles(ctx, roleName, speak=True, sparcli=sparcli)
+        if type(roleToGive) == int: return
+
+        # Read from the server configs
+        serverSettings = getServerJson(ctx.message.server.id)
+        allowableIDs = serverSettings['SelfAssignableRoles']
+
+        if roleToGive.id in allowableIDs:
+            allowableIDs.remove(roleToGive.id)
+        else:
+            await self.sparcli.say('This role cannot be self-assigned.')
+            return
+
+        # Plonk the settings back into the file storage
+        serverSettings['SelfAssignableRoles'] = allowableIDs
+        saveServerJson(ctx.message.server.id, serverSettings)
+
+        # Print out to the user
+        await self.sparcli.say('The role `{0.name}` with ID `{0.id}` can no longer be self-assigned.'.format(roleToGive))
 
     @commands.command(pass_context=True, aliases=['makecolor'])
     @permissionChecker(check='manage_roles')
