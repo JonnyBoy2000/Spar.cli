@@ -95,7 +95,7 @@ class Reddit:
         redditData['Top Post'] = '[Click here!](http://reddit.com{0.permalink})'.format(topLink)
 
         # Make an embed from it
-        e = makeEmbed(name=redditor.name, icon=self.redditIcon, colour=0xff4006, values=redditData)
+        e = makeEmbed(name=redditor.name, icon=self.redditIcon, colour=0xff4006, fields=redditData)
 
         # Print to user
         await self.sparcli.say('', embed=e)
@@ -139,9 +139,9 @@ class Reddit:
 
         # Make the embed
         if makeThumb:
-            e = makeEmbed(name=title, icon=self.redditIcon, colour=0xff4006, image=post.url, values=postValues)
+            e = makeEmbed(name=title, icon=self.redditIcon, colour=0xff4006, image=post.url, fields=postValues)
         else:
-            e = makeEmbed(name=title, icon=self.redditIcon, colour=0xff4006, values=postValues)
+            e = makeEmbed(name=title, icon=self.redditIcon, colour=0xff4006, fields=postValues)
 
         # Return to user
         await self.sparcli.say('', embed=e)

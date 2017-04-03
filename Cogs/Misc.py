@@ -25,8 +25,8 @@ class Misc:
         permissionsID = '469888119'
         baseLink = 'https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions={}'
         inviteLink = baseLink.format(clientID, permissionsID)
-        em = makeEmbed(user=self.sparcli.user, values={'Invite me!':'[Click here!]({})'.format(inviteLink)})
-        await self.sparcli.say(inviteLink, embed=em)
+        # em = makeEmbed(user=self.sparcli.user, fields={'Invite me!':'[Click here!]({})'.format(inviteLink)})
+        await self.sparcli.say(inviteLink)
 
     @commands.command()
     async def git(self):
@@ -90,7 +90,7 @@ class Misc:
         topColour = u.colour.value
 
         # Create an embed out of it
-        embedMessage = makeEmbed(user=u, values=userInfo, image=userIcon, colour=topColour)
+        embedMessage = makeEmbed(user=u, fields=userInfo, image=userIcon, colour=topColour)
 
         # Send it out to the user
         await self.sparcli.say('', embed=embedMessage)
@@ -158,7 +158,7 @@ class Misc:
         for u, i in c.items():
             o[i.cog_name][u] = (i.help.split('\n')[0], False)
 
-        e = [makeEmbed(name=u, values=i, user=self.sparcli.user, colour=randint(0, 0xFFFFFF)) for u, i in o.items()]
+        e = [makeEmbed(name=u, fields=i, user=self.sparcli.user, colour=randint(0, 0xFFFFFF)) for u, i in o.items()]
         for i in e:
             await self.sparcli.send_message(usr, '', embed=i)
 
@@ -251,7 +251,7 @@ class Misc:
         o['Ban Members'] = w[p.ban_members]
         o['Administrator'] = w[p.administrator]
 
-        e = makeEmbed(name='Your permissions in this channel', values=o)
+        e = makeEmbed(name='Your permissions in this channel', fields=o)
         await self.sparcli.say('', embed=e)
 
     @commands.command(pass_context=True)

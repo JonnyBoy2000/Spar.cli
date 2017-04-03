@@ -1,7 +1,6 @@
 from discord.ext import commands 
 from discord import opus, ClientException
 from ctypes.util import find_library
-from Cogs.Utils.Discord import makeEmbed
 from Cogs.Utils.Permissions import permissionChecker
 from Cogs.Utils.VoiceHandler import ServerVoice
 

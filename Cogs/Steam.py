@@ -135,7 +135,7 @@ class Steam:
                 del retData[i]
 
         # Make it into an embed
-        e = makeEmbed(name=retData['Name'], icon=self.steamIcon, colour=1, values=retData, image=gameImage)
+        e = makeEmbed(name=retData['Name'], icon=self.steamIcon, colour=1, fields=retData, image=gameImage)
 
         # Return to user
         await self.sparcli.say('', embed=e)

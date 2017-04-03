@@ -193,7 +193,7 @@ async def updateSender(before, after, updateChecks, embedName, sendEnable, overr
             changedThings[updateChecks[i].title()] = '`{}` changed into `{}`'.format(beforeChecks[i], afterChecks[i])
 
     # Format everything into a nice embed
-    em = makeEmbed(name=embedName.format(after.name), values=changedThings, user=sparcli.user)
+    em = makeEmbed(name=embedName.format(after.name), fields=changedThings, user=sparcli.user)
     await sendIfEnabled(sparcli, after, sendEnable, embed=em, overrideChannel={True:after,False:None}[override])
 
 

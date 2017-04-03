@@ -52,7 +52,7 @@ class Scriptures:
             passageReadings['{}:{}'.format(chapterNumber, i)] = chapterPassages[str(i)]['verse']
 
         # Make it into an embed
-        em = makeEmbed(values=passageReadings, icon=self.biblePicture, name=chapterName)
+        em = makeEmbed(fields=passageReadings, icon=self.biblePicture, name=chapterName)
 
         # Boop it to the user
         await self.sparcli.say('', embed=em)

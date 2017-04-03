@@ -97,7 +97,7 @@ def makeEmbed(**kwargs):
     if True:
 
         # Get the author/title information
-        author = kwargs.get('author', None)
+        author = kwargs.get('author', empty)
         author_url = kwargs.get('author_url', empty)
         author_icon = kwargs.get('author_icon', empty)
         user = kwargs.get('user', None)
@@ -106,7 +106,7 @@ def makeEmbed(**kwargs):
         colour = kwargs.get('colour', 0)
 
         # Get the values
-        values = kwargs.get('values', {})
+        fields = kwargs.get('values', {})
         inline = kwargs.get('inline', True)
 
         # Images
@@ -118,7 +118,7 @@ def makeEmbed(**kwargs):
         footer_icon = kwargs.get('footer_icon', empty)
 
     # Correct the icon and author with the member, if necessary
-    if user == None:
+    if user != None:
         author = user.display_name
         author_icon = user.avatar_url
         try:
