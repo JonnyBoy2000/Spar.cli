@@ -5,6 +5,7 @@ from Cogs.Utils.Configs import getTokens
 app = Flask(__name__)
 
 
+# Used to validate refresh tokens
 tokens = getTokens()['Reddit']
 redditFull = Reddit(
     client_id=tokens['ID'],
@@ -19,6 +20,7 @@ def indexPage():
     return 'Yup, it works.'
 
 
+# Used as part of the webserver of the bot
 @app.route('/SparCli/reddit/callback', methods=['GET'])
 def result():
 
@@ -64,4 +66,5 @@ def result():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
+    # app.run()
 
