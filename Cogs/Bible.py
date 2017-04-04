@@ -13,21 +13,19 @@ class Scriptures:
         self.biblePicture = 'http://pacificbible.com/wp/wp-content/uploads/2015/03/holy-bible.png'
 
     def getBiblePassage(self, passage):
-        '''Goes through the getbible api to get a list of applicable bible passages'''
+        '''
+        Goes through the getbible api to get a list of applicable bible passages.
+        '''
         toRetrieveFrom = self.bible.format(passage)
-        data = get(toRetrieveFrom).content
-        strData = str(data)
-        realData = strData[3:-3] # Takes off some characters that shouldn't be there
-        jsonData = loads(realData)
-        return jsonData
+        site = get(toRetrieveFrom)
+        return loads(site.text[1:-2])
 
 
     @commands.command(aliases=['christianity', 'bible'])
     async def christian(self, *, passage:str):
-        '''Gets a passage from the bible
-        Usage :: christian luke 14:34
-              :: christian luke 14:34-36'''
-
+        '''
+        Gets a passage from the bible.
+        '''
 
         # Generate the string that'll be sent to the site
         getString = passage
@@ -41,7 +39,11 @@ class Scriptures:
             passage = lastpassage = int(tempPass)
 
         # Actually go get all the data from the site
-        bibleData = self.getBiblePassage(getString)
+        try:
+            bibleData = self.getBiblePassage(getString)
+        except Exception:
+            await self.sparcli.say('I was unable to get that passage.')
+            return
 
         # Get the nice passages and stuff
         passageReadings = OrderedDict()
@@ -52,7 +54,7 @@ class Scriptures:
             passageReadings['{}:{}'.format(chapterNumber, i)] = chapterPassages[str(i)]['verse']
 
         # Make it into an embed
-        em = makeEmbed(fields=passageReadings, icon=self.biblePicture, name=chapterName)
+        em = makeEmbed(fields=passageReadings, author_icon=self.biblePicture, author=chapterName)
 
         # Boop it to the user
         await self.sparcli.say('', embed=em)

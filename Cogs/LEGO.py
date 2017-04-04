@@ -43,7 +43,7 @@ class LEGO:
         else:
             z = 'None available.'
         o['Price'] = z
-        e = makeEmbed(name=name, image=image, fields=o)
+        e = makeEmbed(author=name, image=image, fields=o)
         await self.sparcli.say('', embed=e)
 
 

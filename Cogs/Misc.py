@@ -127,7 +127,7 @@ class Misc:
         intColour = int(fixColour, 16)
 
         # Actually print it out
-        await self.sparcli.say('', embed=makeEmbed(colour=intColour, name='#'+fixColour.upper()))
+        await self.sparcli.say('', embed=makeEmbed(colour=intColour, author='#'+fixColour.upper()))
 
     @commands.command(pass_context=True, aliases=['mycolor'])
     async def mycolour(self, ctx):
@@ -141,26 +141,7 @@ class Misc:
         hexColour = hex(colour)[2:].upper()
 
         # Actually print it out
-        await self.sparcli.say('', embed=makeEmbed(colour=colour, name='#'+hexColour))
-
-    @commands.command(pass_context=True)
-    async def help2(self, ctx):
-        '''Shows this message'''
-
-        usr = ctx.message.author 
-        c = self.sparcli.commands
-        o = OrderedDict()
-        cogList = list(self.sparcli.cogs.keys())
-        cogList.sort()
-        for i in cogList:
-            o[i] = OrderedDict()
-        o[None] = OrderedDict()
-        for u, i in c.items():
-            o[i.cog_name][u] = (i.help.split('\n')[0], False)
-
-        e = [makeEmbed(name=u, fields=i, user=self.sparcli.user, colour=randint(0, 0xFFFFFF)) for u, i in o.items()]
-        for i in e:
-            await self.sparcli.send_message(usr, '', embed=i)
+        await self.sparcli.say('', embed=makeEmbed(colour=colour, author='#'+hexColour))
 
     @commands.command(pass_context=True)
     @botPermission(check='attach_files')
@@ -251,7 +232,7 @@ class Misc:
         o['Ban Members'] = w[p.ban_members]
         o['Administrator'] = w[p.administrator]
 
-        e = makeEmbed(name='Your permissions in this channel', fields=o)
+        e = makeEmbed(fields=o)
         await self.sparcli.say('', embed=e)
 
     @commands.command(pass_context=True)

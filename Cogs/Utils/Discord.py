@@ -61,7 +61,7 @@ def getPermissions(channel=None, permissionCheck=None, firstPerson=None, secondP
     return isAbove if isAbove else 'You do not have permission to use this command against this user.'
 
 
-def getTextRoles(ctx, hitString, speak=False, sparcli=None):
+async def getTextRoles(ctx, hitString, speak=False, sparcli=None):
     '''Gets non-tagged and tagged roles from a message's ctx'''
 
     serverRoles = ctx.message.server.roles 
@@ -93,20 +93,20 @@ def makeEmbed(**kwargs):
     '''
 
     # Get the attributes from the user
-    empty = Embed.Empty
+    Empty = Embed.Empty
     if True:
 
         # Get the author/title information
-        author = kwargs.get('author', empty)
-        author_url = kwargs.get('author_url', empty)
-        author_icon = kwargs.get('author_icon', empty)
+        author = kwargs.get('author', Empty)
+        author_url = kwargs.get('author_url', Empty)
+        author_icon = kwargs.get('author_icon', Empty)
         user = kwargs.get('user', None)
 
         # Get the colour
         colour = kwargs.get('colour', 0)
 
         # Get the values
-        fields = kwargs.get('values', {})
+        fields = kwargs.get('fields', {})
         inline = kwargs.get('inline', True)
 
         # Images
@@ -114,13 +114,13 @@ def makeEmbed(**kwargs):
         image = kwargs.get('image', False)
 
         # Footer
-        footer = kwargs.get('footer', empty)
-        footer_icon = kwargs.get('footer_icon', empty)
+        footer = kwargs.get('footer', Empty)
+        footer_icon = kwargs.get('footer_icon', Empty)
 
     # Correct the icon and author with the member, if necessary
     if user != None:
-        author = user.display_name
-        author_icon = user.avatar_url
+        author = user.display_name if author == Empty else author
+        author_icon = user.avatar_url if author_icon == Empty else author_icon
         try:
             colour = user.colour.value 
         except AttributeError:
@@ -130,7 +130,8 @@ def makeEmbed(**kwargs):
     embedObj = Embed(colour=colour)
 
     # Set the normal attributes
-    embedObj.set_author(name=author, url=author_url, icon_url=author_icon)
+    if author != Empty:
+        embedObj.set_author(name=author, url=author_url, icon_url=author_icon)
     embedObj.set_footer(text=footer, icon_url=footer_icon)
     
     # Set the attributes that have no default

@@ -24,7 +24,7 @@ class RoleManagement:
         roleColour = colourFixer(roleColour)
 
         # Get the role itself
-        role = getTextRoles(ctx, roleName, speak=True, sparcli=sparcli)
+        role = await getTextRoles(ctx, roleName, speak=True, sparcli=sparcli)
         if type(role) == int: return
 
         # Change the role colour
@@ -93,7 +93,7 @@ class RoleManagement:
     async def youareAdd(self, ctx, *, roleName:str):
 
         # Get the role itself
-        roleToGive = getTextRoles(ctx, roleName, speak=True, sparcli=sparcli)
+        roleToGive = await getTextRoles(ctx, roleName, speak=True, sparcli=sparcli)
         if type(roleToGive) == int: return
 
         # Read from the server configs
@@ -118,7 +118,7 @@ class RoleManagement:
     async def youareDel(self, ctx, *, roleName:str):
 
         # Get the role itself
-        roleToGive = getTextRoles(ctx, roleName, speak=True, sparcli=sparcli)
+        roleToGive = await getTextRoles(ctx, roleName, speak=True, sparcli=sparcli)
         if type(roleToGive) == int: return
 
         # Read from the server configs
