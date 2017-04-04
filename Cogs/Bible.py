@@ -1,5 +1,5 @@
 from discord.ext import commands 
-from requests import get 
+from aiohttp import get 
 from json import loads 
 from collections import OrderedDict
 from Cogs.Utils.Discord import makeEmbed
@@ -12,13 +12,16 @@ class Scriptures:
         self.bible = 'https://getbible.net/json?scrip={}'
         self.biblePicture = 'http://pacificbible.com/wp/wp-content/uploads/2015/03/holy-bible.png'
 
-    def getBiblePassage(self, passage):
+    async def getBiblePassage(self, passage):
         '''
         Goes through the getbible api to get a list of applicable bible passages.
         '''
-        toRetrieveFrom = self.bible.format(passage)
-        site = get(toRetrieveFrom)
-        return loads(site.text[1:-2])
+
+        toRetrieveFrom = self.bible.format(passage.replace(' ', '%20'))
+        # return toRetrieveFrom
+        async with get(toRetrieveFrom) as r:
+            text = await r.text()
+        return loads(text[1:-2])
 
 
     @commands.command(aliases=['christianity', 'bible'])
@@ -40,10 +43,13 @@ class Scriptures:
 
         # Actually go get all the data from the site
         try:
-            bibleData = self.getBiblePassage(getString)
+            bibleData = await self.getBiblePassage(getString)
         except Exception:
             await self.sparcli.say('I was unable to get that passage.')
             return
+
+        # await self.sparcli.say('```json\n{}```'.format(bibleData))
+        # await self.sparcli.say(str(bibleData)[:2000])
 
         # Get the nice passages and stuff
         passageReadings = OrderedDict()

@@ -4,7 +4,7 @@ from datetime import datetime
 from collections import OrderedDict
 from asyncio import sleep
 from random import randint
-from requests import get
+from aiohttp import get
 from Cogs.Utils.Discord import makeEmbed
 from Cogs.Utils.Misc import colourFixer
 from Cogs.Utils.Permissions import botPermission
@@ -187,8 +187,8 @@ class Misc:
 
         # Get the meme image from the site
         siteURL = 'https://memegen.link/custom/{}/{}.jpg?alt={}'.format(topText, bottomText, imageLink)
-        site = get(siteURL)
-        image = site.content
+        async with get(siteURL) as r:
+            image = await r.content
         with open('SPARCLI_RAW_IMAGE_DOWNLOAD.png', 'wb') as a: a.write(image)
         await self.sparcli.send_file(ctx.message.channel, 'SPARCLI_RAW_IMAGE_DOWNLOAD.png', content=author.mention)
 

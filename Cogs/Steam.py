@@ -1,5 +1,5 @@
 from discord.ext import commands 
-from requests import get
+from aiohttp import get
 from collections import OrderedDict
 from random import choice
 from Cogs.Utils.Discord import makeEmbed
@@ -32,12 +32,7 @@ class Steam:
         self.sparcli = sparcli
         self.gameInfo = 'http://store.steampowered.com/api/appdetails?appids={}&format=json'
         self.steamIcon = 'https://image.freepik.com/free-icon/steam-logo-games-website_318-40350.jpg'
-        self.steamGames = []
-
-        everyGame = 'http://api.steampowered.com/ISteamApps/GetAppList/v0001/'
-        gameResp = get(everyGame)
-        gameDict = gameResp.json()
-        self.steamGames = gameDict['applist']['apps']['app']
+        self.steamGames = [] # gameDict['applist']['apps']['app']
 
     def gameFinder(self, gameName:str):
         '''Returns a game ID as found from its name on the game list'''
@@ -53,7 +48,15 @@ class Steam:
         Usage :: steamsearch watch_dogs
               :: steamsearch papers, please'''
 
-        await self.sparcli.send_typing(ctx.message.server)
+        await self.sparcli.send_typing(ctx.message.channel)
+
+        # Populate the list if necessary
+        if not self.steamGames:
+            everyGame = 'http://api.steampowered.com/ISteamApps/GetAppList/v0001/'
+            async with get(everyGame) as r:
+                gameResp = await r.json()
+            gameDict = gameResp
+            self.steamGames = gameDict['applist']['apps']['app']
 
         # Try and get the game from the game list
         gameID = self.gameFinder(gameName)
@@ -71,7 +74,7 @@ class Steam:
               :: steamgame steam://store/252870/
               :: steamgame 252870'''
 
-        await self.sparcli.send_typing(ctx.message.server)
+        await self.sparcli.send_typing(ctx.message.channel)
 
         # Try and get the game ID
         gameID = None 
@@ -92,14 +95,17 @@ class Steam:
         '''Gets the data of a game on Steam. Can only be done through ID'''
 
         # Get the data from Steam
-        steamData = get(self.gameInfo.format(gameID)).json()
+        async with get(self.gameInfo.format(gameID)) as r:
+            steamData = await r.json()
+
+        # Check to see if it was aquired properly
         if steamData[str(gameID)]['success'] == False:
             await self.sparcli.say('I was unable to find the ID of that game on the Steam API.')
             return
 
         # Get the embed information
         retData = OrderedDict()
-        priceFormatter = lambda x: 'GPB{}.{}'.format(str(x)[:-2], str(x)[-2:]) if len(str(x)) > 2 else 'GPB0.' + str(x)
+        priceFormatter = lambda y, x: '{}{}.{}'.format(y, str(x)[:-2], str(x)[-2:]) if len(str(x)) > 2 else y + '0.' + str(x)
         gameData = steamData[gameID]['data']
         retData['Name'] = gameData['name']
         desc = gameData['short_description']
@@ -118,9 +124,9 @@ class Steam:
         try:
             priceTemp = gameData['price_overview']
             if priceTemp['initial'] != priceTemp['final']:
-                retData['Price'] = '~~{}~~ {}'.format(priceFormatter(priceTemp['initial']), priceFormatter(priceTemp['final']))
+                retData['Price'] = '~~{}~~ {}'.format(priceFormatter(priceTemp['currency'], priceTemp['initial']), priceFormatter(priceTemp['currency'], priceTemp['final']))
             else:
-                retData['Price'] = priceFormatter(priceTemp['initial'])
+                retData['Price'] = priceFormatter(priceTemp['currency'], priceTemp['initial'])
         except KeyError:
             # The game is not released/does not have a price
             pass
@@ -135,7 +141,7 @@ class Steam:
                 del retData[i]
 
         # Make it into an embed
-        e = makeEmbed(author=retData['Name'], icon=self.steamIcon, colour=1, fields=retData, image=gameImage)
+        e = makeEmbed(author=retData['Name'], author_icon=self.steamIcon, colour=1, fields=retData, image=gameImage)
 
         # Return to user
         await self.sparcli.say('', embed=e)

@@ -1,6 +1,6 @@
 from discord.ext import commands
 from discord import Member
-from requests import get
+from aiohttp import get
 from Cogs.Utils.Discord import getPermissions
 from Cogs.Utils.Permissions import permissionChecker, botPermission
 
@@ -80,7 +80,11 @@ class Admin:
 
         # Sets it as the server image
         server = ctx.message.server
-        await self.sparcli.edit_server(server, icon=get(icon).content)
+        iconContent = None
+        async with get(icon) as r:
+            iconContent = await r.content
+            
+        await self.sparcli.edit_server(server, icon=iconContent)
         await self.sparcli.say('Server icon has been updated.')
 
 

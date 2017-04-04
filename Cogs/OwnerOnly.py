@@ -50,7 +50,8 @@ class OwnerOnly:
             return
 
         # Load up the image
-        imageData = get(avatarUrl).content
+        async with get(avatarUrl) as r:
+            imageData = await r.content
 
         # Set profile picture
         await self.sparcli.edit_profile(avatar=imageData)

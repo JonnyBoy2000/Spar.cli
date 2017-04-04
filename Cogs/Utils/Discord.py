@@ -135,7 +135,7 @@ def makeEmbed(**kwargs):
     embedObj.set_footer(text=footer, icon_url=footer_icon)
     
     # Set the attributes that have no default
-    if image: embedObj.set_icon(url=image)
+    if image: embedObj.set_image(url=image)
     if thumbnail: embedObj.set_thumbnail(url=thumbnail)
 
     # Set the fields

@@ -1,6 +1,6 @@
 from discord.ext import commands
 from discord import Member
-from requests import get
+from aiohttp import get
 from random import choice
 
 # Import translator
@@ -49,52 +49,47 @@ class Internet:
                 pass
 
         # Set up noun list
-        nounstr = str(get('http://www.desiquintans.com/downloads/nounlist/nounlist.txt').content)[2:]
-        self.nounlist = nounstr.split('\\n')
+        self.nounlist = [] # nounstr.split('\\n')
 
     @commands.command(pass_context=True)
     async def cat(self, ctx):
-        '''Gives a random picture of a cat
-        Usage :: cat'''
+        '''
+        Gives a random picture of a cat.
+        '''
 
         # Send typing, so you can see it's being processed
         await self.sparcli.send_typing(ctx.message.server)
 
-        # Loop to keep track of rate limiting
-        while True:
-            # Try to load the page
-            try:
-                page = get('http://thecatapi.com/api/images/get?format=src')
-                break
-            except:
-                pass
+        async with get('http://thecatapi.com/api/images/get?format=src') as r:
+            page = await r.url
 
         # Give the url of the loaded page
-        returnUrl = page.url
-        await self.sparcli.say(returnUrl)
+        await self.sparcli.say(page)
 
     @commands.command(pass_context=True)
     async def pun(self, ctx):
-        '''Gives a random pun from the depths of the internet
-        Usage :: pun'''
+        '''
+        Gives a random pun from the depths of the internet.
+        '''
 
         # Send typing, so you can see it's being processed
         await self.sparcli.send_typing(ctx.message.server)
 
         # Read from page
-        page = get('http://www.punoftheday.com/cgi-bin/randompun.pl')
+        async with get('http://www.punoftheday.com/cgi-bin/randompun.pl') as r:
+            page = await r.text
 
         # Scrape the raw HTML
-        rawPun = page.text.split('dropshadow1')[1][6:].split('<')[0]
+        rawPun = page.split('dropshadow1')[1][6:].split('<')[0]
 
         # Boop it out
         await self.sparcli.say(rawPun)
 
     @commands.command(pass_context=True)
     async def trans(self, ctx, langTo: str, *, toChange: str):
-        '''Translates from one language into another
-        Usage :: trans <LanguageShorthand> <Content>
-              :: trans en Wie geht es?'''
+        '''
+        Translates from one language into another.
+        '''
 
         # See if the translator has been logged into
         if self.translator == None:
@@ -123,22 +118,26 @@ class Internet:
 
     @commands.command(pass_context=True)
     async def wolfram(self, ctx, *, toDo: str):
-        '''Searches WolframAlpha for the given term. Returns text
-        Usage :: wolfram <SearchTerm>'''
+        '''
+        Searches WolframAlpha for the given term. Returns text.
+        '''
 
         # Call the internal search function
         await self.wolframSearch(ctx, toDo, False)
 
     @commands.command(pass_context=True)
     async def iwolfram(self, ctx, *, toDo: str):
-        '''Searches WolframAlpha for the given term. Returns images
-        Usage :: iwolfram <SearchTerm>'''
+        '''
+        Searches WolframAlpha for the given term. Returns images.
+        '''
 
         # Call the internal search function
         await self.wolframSearch(ctx, toDo, True)
 
     async def wolframSearch(self, ctx, whatToSearch, displayImages):
-        '''Sends the actual search term to the Wolfram servers'''
+        '''
+        Sends the actual search term to the Wolfram servers.
+        '''
 
         # See if the Wolfram API has been loaded
         if self.wolfClient == None:
@@ -174,12 +173,16 @@ class Internet:
 
     @commands.command(pass_context=True)
     async def throw(self, ctx, *, member: Member=None):
-        '''Throws a random thing at a user
-        Usage :: throw
-              :: throw <@User>'''
+        '''
+        Throws a random thing at a user.
+        '''
 
-        # Get a tagged user, if there is one
-        # member will either me membertype or nonetype
+        # Populate list if necessary
+        if not self.nounlist:
+            nounSite = 'http://www.desiquintans.com/downloads/nounlist/nounlist.txt'
+            async with get(nounSite) as r:
+                nounstr = await r.text[2:]
+            self.nounlist = nounstr.split('\\n')
 
         # Get thrown object
         toThrow = choice(self.nounlist)
