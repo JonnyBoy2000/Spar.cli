@@ -42,25 +42,35 @@ class Levels:
 
     @commands.command(pass_context=True)
     async def leaderboard(self, ctx):
+        '''
+        Shows you the top ten members on your server.
+        '''
 
+        # Get all of the users in the server and reverse their values
         leaderboard = {i: o for o, i in getMoneyJson(str(ctx.message.server.id)).items()}
+
+        # Get the total experience and sort it highest to lowest
         xpStains = [i for i in leaderboard.keys()]
         xpStains = sorted(xpStains, reverse=True)
 
+        # Go through and get the first ten people (as IDs)
         lads = []
         for i in range(10):
             z = xpStains[i]
             lads.append([leaderboard[z], z])
 
+        # Go through and convert all of those IDs into member objects
         ladz = []
         for i in lads:
             if ctx.message.server.get_member(i[0]):
                 ladz.append([ctx.message.server.get_member(i[0]), i[1]])
 
+        # Sort it all out into a nicely returnable string
         ret = ''
         for i in ladz:
             ret = ret + i[0].display_name + ' - **Lvl {:.2f}** \n'.format(i[1]/375)
 
+        # Print it out to the user like a pleb
         await self.sparcli.say(ret)
 
 

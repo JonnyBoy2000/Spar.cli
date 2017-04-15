@@ -145,7 +145,7 @@ class Reddit:
         # Return to user
         await self.sparcli.say('', embed=e)
 
-    @commands.group(pass_context=True, name='reddit')
+    @commands.group(pass_context=True, name='reddit', enabled=False)
     async def redditCommand(self, ctx):
         '''
         Grouping for the reddit handling commands. See `help reddit` for more
@@ -153,7 +153,7 @@ class Reddit:
 
         if ctx.invoked_subcommand is None: await self.sparcli.say('Please refer to this command\'s help for how to use it properly.')
 
-    @redditCommand.command(pass_context=True, name='login')
+    @redditCommand.command(pass_context=True, name='login', enabled=False)
     async def redditLogin(self, ctx):
         '''
         Lets you log into a reddit account so the bot knows who you are
@@ -175,7 +175,7 @@ class Reddit:
             'Please click here to authorize your reddit account link :: \n<{}>'.format(authURL)
         )
 
-    @redditCommand.command(pass_context=True, name='logout')
+    @redditCommand.command(pass_context=True, name='logout', enabled=False)
     async def redditLogout(self, ctx):
         '''
         Logs you out of a reddit instance
@@ -201,7 +201,7 @@ Please manually revoke access to Spar.cli for full recognition that you are dico
 <https://www.reddit.com/prefs/apps>'
         )
 
-    @commands.group(pass_context=True, name='redditpost')
+    @commands.group(pass_context=True, name='redditpost', enabled=False)
     async def redditSubmit(self, ctx):
         '''
         Handles all reddit posting. See `help reddit post` for details.
@@ -209,7 +209,7 @@ Please manually revoke access to Spar.cli for full recognition that you are dico
 
         if ctx.invoked_subcommand is None: await self.sparcli.say('Please refer to this command\'s help for how to use it properly.')
 
-    @redditSubmit.command(pass_context=True, name='text')
+    @redditSubmit.command(pass_context=True, name='text', enabled=False)
     async def redditSubmitText(self, ctx):
         '''
         Lets you submit a text post to any given subreddit
@@ -266,7 +266,7 @@ Please manually revoke access to Spar.cli for full recognition that you are dico
         await self.sparcli.add_reaction(mess, '🔽')
         self.postHandler[mess] = post
 
-    @redditSubmit.command(pass_context=True, name='link')
+    @redditSubmit.command(pass_context=True, name='link', enabled=False)
     async def redditSubmitLink(self, ctx):
         '''
         Lets you submit a text post to any given subreddit

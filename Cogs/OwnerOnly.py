@@ -1,6 +1,6 @@
 from discord.ext import commands
 from discord import Game, Status
-from requests import get
+from aiohttp import get
 from random import choice
 from sys import exit
 from os import execl
@@ -17,8 +17,9 @@ class OwnerOnly:
     @commands.command(pass_context=True, hidden=True, aliases=['playing'])
     @permissionChecker(check='is_owner')
     async def game(self, ctx, *, game: str=None):
-        '''Change what the bot is playing
-        Usage :: game <Content>'''
+        '''
+        Change what the bot is playing.
+        '''
 
         # Change the game
         await self.sparcli.change_presence(game=Game(name=game))
@@ -27,8 +28,9 @@ class OwnerOnly:
     @commands.command(pass_context=True, hidden=True)
     @permissionChecker(check='is_owner')
     async def ev(self, ctx, *, content: str):
-        '''Evaluates a given Python expression
-        Usage :: ev <Python>'''
+        '''
+        Evaluates a given Python expression.
+        '''
 
         # Eval and print the answer
         await self.sparcli.say(eval(content))
@@ -36,9 +38,9 @@ class OwnerOnly:
     @commands.command(pass_context=True, hidden=True)
     @permissionChecker(check='is_owner')
     async def av(self, ctx, *, avatarUrl: str=None):
-        '''Changes the bot's avatar to a set URL
-        Usage :: av <ImageLink>
-              :: av <ImageUpload>'''
+        '''
+        Changes the bot's avatar to a set URL.
+        '''
 
         # Checks for the URL - either passed as argument or embed
         try:
@@ -60,8 +62,9 @@ class OwnerOnly:
     @commands.command(pass_context=True, hidden=True)
     @permissionChecker(check='is_owner')
     async def kill(self, ctx):
-        '''Kills the bot. Makes it deaded.
-        Usage :: kill'''
+        '''
+        Kills the bot. Makes it deaded.
+        '''
 
         # If it is, tell the user the bot it dying
         killMessages = ['I am deded. Rip me.',
@@ -80,8 +83,9 @@ class OwnerOnly:
     @commands.command(pass_context=True, hidden=True)
     @permissionChecker(check='is_owner')
     async def rld(self, ctx, extention: str=None, doFully:str=False):
-        '''Reload an extention on the bot
-        Usage :: rld <Extention>'''
+        '''
+        Reload an extention on the bot.
+        '''
 
         # Get list of loaded extentions
         if extention == None:
@@ -120,8 +124,9 @@ class OwnerOnly:
     @commands.command(pass_context=True, hidden=True)
     @permissionChecker(check='is_owner')
     async def loadmessage(self, ctx, messageID: str):
-        '''Loads a message into the bot chache
-        Usage :: loadmessage <MessageID>'''
+        '''
+        Loads a message into the bot chache.
+        '''
 
         # Find and add the message
         messageToAdd = await self.sparcli.get_message(ctx.message.channel, messageID)
@@ -131,8 +136,9 @@ class OwnerOnly:
     @commands.command(pass_context=True, hidden=True, aliases=['rs'])
     @permissionChecker(check='is_owner')
     async def restart(self, ctx):
-        '''Restarts the bot. Literally everything.
-        Usage :: restart'''
+        '''
+        Restarts the bot. Literally everything.
+        '''
 
         # If it is, tell the user the bot it dying
         await self.sparcli.say('Now restarting.')

@@ -1,14 +1,12 @@
-from discord.ext import commands 
+from discord.ext import commands
+from collections import OrderedDict
+from random import choice
+from Cogs.Utils.Discord import makeEmbed
+from Cogs.Utils.Configs import getTokens
 try:
     from brickfront import Client
 except ImportError:
     raise Exception('You need to install Brickfront for this class to work.')
-from collections import OrderedDict
-from random import choice
-from sys import path
-path.append('../')  # Move path so you can get the Utils folder
-from Cogs.Utils.Discord import makeEmbed
-from Cogs.Utils.Configs import getTokens
 
 
 class LEGO:

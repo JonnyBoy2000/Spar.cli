@@ -16,9 +16,9 @@ class RoleManagement:
     @permissionChecker(check='manage_roles')
     @botPermission(check='manage_roles')
     async def rolecolour(self, ctx, roleColour: str, *, roleName: str):
-        '''Changes the colour of a specified role
-        Usage :: rolecolour <HexValue> <RoleName>
-              :: rolecolour <HexValue> <RolePing>'''
+        '''
+        Changes the colour of a specified role.
+        '''
 
         # Get the role colour
         roleColour = colourFixer(roleColour)
@@ -32,13 +32,12 @@ class RoleManagement:
         await self.sparcli.edit_role(ctx.message.server, role, colour=colour)
         await self.sparcli.say('The colour of the role `{0.name}` has been changed to value `{1.value}`.'.format(role, colour))
 
-    @commands.group(pass_context=True)
+    @commands.command(pass_context=True)
     @botPermission(check='manage_roles')
     async def iam(self, ctx, *, roleName: str):
-        '''If allowed, the bot will give you a mentioned role
-        Usage :: iam <RoleName>
-              :: iam <RolePing>
-              :: iam list'''
+        '''
+        If allowed, the bot will give you a mentioned role.
+        '''
 
         if roleName == 'list':
             return await self.iamlist(ctx)

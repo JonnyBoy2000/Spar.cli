@@ -1,7 +1,6 @@
 from discord.ext import commands
 from discord import Member
 from aiohttp import get
-from Cogs.Utils.Discord import getPermissions
 from Cogs.Utils.Permissions import permissionChecker, botPermission
 
 
@@ -14,30 +13,35 @@ class Admin:
     @permissionChecker(check='ban_members', compare=True)
     @botPermission(check='ban_members', compare=True)
     async def ban(self, ctx, user:Member=None, *, reason: str='Unspecified'):
-        '''Bans a user from the server.
-        Usage :: ban <Mention> <Reason...>'''
+        '''
+        Bans a user from the server.
+        '''
 
         await self.sparcli.ban(user)
         # Todo :: make this print out in a config-determined channel
-        await self.sparcli.say('**{0}** `({0.id})` has been banned for reason `{1}`.'.format(user, reason))
+        author = ctx.message.author
+        await self.sparcli.say('**{0}** `({0.id})` has been banned for reason `{1}` by user {2.mention} `({2.id})`.'.format(user, reason, author))
 
     @commands.command(pass_context=True)
     @permissionChecker(check='kick_members', compare=True)
     @botPermission(check='kick_members', compare=True)
     async def kick(self, ctx, user: Member, *, reason: str=None):
-        '''Kicks a user from the server.
-        Usage :: kick <Mention> <Reason...>'''
+        '''
+        Kicks a user from the server.
+        '''
 
         await self.sparcli.kick(user)
         # Todo :: make this print out in a config-determined channel
-        await self.sparcli.say('**{0}** `({0.id})` has been kicked for reason `{1}`.'.format(user, reason))
+        author = ctx.message.author
+        await self.sparcli.say('**{0}** `({0.id})` has been kicked for reason `{1}` by user {2.mention} `({2.id})`.'.format(user, reason, author))
 
     @commands.command(pass_context=True)
     @permissionChecker(check='manage_messages')
     @botPermission(check='manage_messages')
     async def purge(self, ctx, amount: int):
-        '''Deletes a number of messages from a channel
-        Usage :: purge <Number>'''
+        '''
+        Deletes a number of messages from a channel.
+        '''
 
         # Make sure the calling member isn't an idiot
         if amount >= 500:
@@ -54,8 +58,9 @@ class Admin:
     @permissionChecker(check='manage_nicknames', compare=True)
     @botPermission(check='manage_nicknames', compare=True)
     async def rename(self, ctx, user:Member, *, name:str=None):
-        '''Changes the nickname of a member
-        Usage :: rename <UserMention> <Name>'''
+        '''
+        Changes the nickname of a member.
+        '''
 
         await self.sparcli.change_nickname(user, name)
         await self.sparcli.say('Name updated successfully.')
@@ -64,9 +69,9 @@ class Admin:
     @permissionChecker(check='manage_server')
     @botPermission(check='manage_server')
     async def serverimage(self, ctx, *, icon:str=None):
-        '''Changes the icon of the server
-        Usage :: serverimage <ImageURL>
-              :: serverimage <ImageUpload>'''
+        '''
+        Changes the icon of the server.
+        '''
 
         # Sees if there's an image as an icon
         if icon != None:
@@ -76,6 +81,7 @@ class Admin:
             try:
                 icon = ctx.message.attachments[0]['url']
             except (KeyError, IndexError):
+                await self.sparcli.say('You need to pass an image to change the server icon to.')
                 return
 
         # Sets it as the server image

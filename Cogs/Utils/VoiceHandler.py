@@ -206,6 +206,9 @@ class ServerVoice(object):
         o['Dislikes'] = dislikes 
         o['Description'] = (fdesc, False)
 
+        if o['Description'][0] == '':
+            del o['Description']
+
         e = makeEmbed(author='Now Playing!', fields=o, user=self.sparcli.user)
         q = await self.sparcli.send_message(channel, 'React with ⏭ to vote skip. 3 votes (4 reactions) are required.', embed=e)
         await self.sparcli.add_reaction(q, '⏭')
