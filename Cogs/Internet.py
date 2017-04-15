@@ -51,17 +51,17 @@ class Internet:
         # Set up noun list
         self.nounlist = [] # nounstr.split('\\n')
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, aliases=['🐱'])
     async def cat(self, ctx):
         '''
         Gives a random picture of a cat.
         '''
 
         # Send typing, so you can see it's being processed
-        await self.sparcli.send_typing(ctx.message.server)
+        await self.sparcli.send_typing(ctx.message.channel)
 
         async with get('http://thecatapi.com/api/images/get?format=src') as r:
-            page = await r.url
+            page = r.url
 
         # Give the url of the loaded page
         await self.sparcli.say(page)
@@ -73,11 +73,11 @@ class Internet:
         '''
 
         # Send typing, so you can see it's being processed
-        await self.sparcli.send_typing(ctx.message.server)
+        await self.sparcli.send_typing(ctx.message.channel)
 
         # Read from page
         async with get('http://www.punoftheday.com/cgi-bin/randompun.pl') as r:
-            page = await r.text
+            page = await r.text()
 
         # Scrape the raw HTML
         rawPun = page.split('dropshadow1')[1][6:].split('<')[0]
@@ -105,7 +105,7 @@ class Internet:
                 return
 
         # Send typing, so you can see it's being processed
-        await self.sparcli.send_typing(ctx.message.server)
+        await self.sparcli.send_typing(ctx.message.channel)
 
         # Make sure that the language is supported
         if langTo not in self.translator.get_languages():
@@ -152,7 +152,7 @@ class Internet:
                 return
 
         # Send typing, so you can see it's being processed
-        await self.sparcli.send_typing(ctx.message.server)
+        await self.sparcli.send_typing(ctx.message.channel)
 
         # Sends query to Wolfram
         wolfResults = self.wolfClient.query(whatToSearch)
@@ -179,10 +179,10 @@ class Internet:
 
         # Populate list if necessary
         if not self.nounlist:
-            nounSite = 'http://www.desiquintans.com/downloads/nounlist/nounlist.txt'
+            nounSite = 'http://178.62.68.157/raw/nouns.txt'
             async with get(nounSite) as r:
-                nounstr = await r.text[2:]
-            self.nounlist = nounstr.split('\\n')
+                nounstr = await r.text()
+            self.nounlist = nounstr.split('\n')
 
         # Get thrown object
         toThrow = choice(self.nounlist)
