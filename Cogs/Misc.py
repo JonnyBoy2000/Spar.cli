@@ -7,7 +7,7 @@ from random import randint
 from aiohttp import get
 from Cogs.Utils.Discord import makeEmbed
 from Cogs.Utils.Misc import colourFixer
-from Cogs.Utils.Permissions import botPermission
+from Cogs.Utils.Permissions import botPermission, permissionChecker
 
 
 class Misc:
@@ -17,11 +17,12 @@ class Misc:
 
     @commands.command()
     async def invite(self):
-        '''Gives the bot's invite link
-        Usage :: invite'''
+        '''
+        Gives the bot's invite link.
+        '''
 
         # https://discordapi.com/permissions.html
-        clientID = '252880131540910080'
+        clientID = self.sparcli.user.id
         permissionsID = '469888119'
         baseLink = 'https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions={}'
         inviteLink = baseLink.format(clientID, permissionsID)
@@ -30,27 +31,54 @@ class Misc:
 
     @commands.command()
     async def git(self):
-        '''Gives the link to the bot's GitHub page/code
-        Usage :: git'''
+        '''
+        Gives the link to the bot's GitHub page/code.
+        '''
 
         await self.sparcli.say('https://github.com/4Kaylum/Spar.cli/')
 
     @commands.command()
     async def echo(self, *, content: str):
+        '''
+        Echos some content back at you.
+        '''
+
         await self.sparcli.say(content)
 
     @commands.command(pass_context=True)
     async def echoin(self, ctx, channel:str, *, content: str):
+        '''
+        Echos some content back into another channel.
+        '''
+
+        # Is it a plain ID?
         if channel.isdigit():
-            channel = Object(channel)
+            channel = ctx.message.server.get_channel(channel)
+
+        # Is it a server tag?
         elif channel.startswith('<#') and channel.endswith('>'):
-            channel = Object(channel[2:-1])
+            channel = ctx.message.server.get_channel(channel[2:-1])
+
+        # Is it a channel name?
         else:
             channel = [i for i in ctx.message.server.channels if i.name.lower() == channel.lower()][0]
-        await self.sparcli.send_message(channel, content)
+
+        # Make sure that the user is able to send messages to the channel they're tyring to
+        if channel.permissions_for(ctx.message.author).send_messages == False:
+            await self.sparcli.say('Sorry, but you don\'t have permission to send messages in that channel, so I certainly won\'t.')
+            return
+
+        # Try and send the message
+        try:
+            await self.sparcli.send_message(channel, content)
+        except Exception:
+            await self.sparcli.say('I don\'t seem to be able to send messages to that channel.')
 
     @commands.command(pass_context=True)
+    @permissionChecker(check='is_owner')
     async def echoserver(self, ctx, serverName:str, channelName:str, *, content:str):
+
+        # It'll only be the owner sending this so there doesn't need to be any error handling.
         server = [i for i in self.sparcli.servers if i.name.lower() == serverName.lower()][0]
 
         if channelName.isdigit():
@@ -63,9 +91,9 @@ class Misc:
 
     @commands.command(pass_context=True)
     async def info(self, ctx, user:Member=None):
-        '''Gives info on the mentioned user
-        Usage :: info <UserPing>
-              :: info'''
+        '''
+        Gives info on the mentioned user.
+        '''
 
         # Get the user who was pinged
         u = user if user != None else ctx.message.author
@@ -97,11 +125,9 @@ class Misc:
 
     @commands.command(pass_context=True, aliases=['clear'])
     async def clean(self, ctx, amount: int=50, user: Member=None):
-        '''Checks a given amount of messages, and removes ones from a certain user
-        Defaults to 50, with the user being the bot
-        Usage :: clean
-              :: clean <Number>
-              :: clean <Number> <UserMention>'''
+        '''
+        Checks a given amount of messages, and removes ones from a certain user.
+        '''
 
         # Default to itself
         if user == None:
@@ -116,9 +142,9 @@ class Misc:
 
     @commands.command(aliases=['color'])
     async def colour(self, colour:str):
-        '''Gives the colour of a hex code in an embed
-        Usage :: colour <Hex>
-              :: color <Hex>'''
+        '''
+        Gives the colour of a hex code in an embed.
+        '''
 
         # Fix up the hex code, if necessary
         fixColour = colourFixer(colour)
@@ -131,8 +157,9 @@ class Misc:
 
     @commands.command(pass_context=True, aliases=['mycolor'])
     async def mycolour(self, ctx):
-        '''Gives you the hex colour that your user is displayed as
-        Usage :: mycolour'''
+        '''
+        Gives you the hex colour that your user is displayed as.
+        '''
 
         user = ctx.message.author 
         colour = user.colour.value 
@@ -147,7 +174,7 @@ class Misc:
     @botPermission(check='attach_files')
     async def meme(self, ctx, topText:str=None, bottomText:str=None, imageLink:str=None):
         '''
-        Creates a meme from a top and bottom text with a given image
+        Creates a meme from a top and bottom text with a given image.
         '''
 
         # Create some shorthand
@@ -177,9 +204,10 @@ class Misc:
 
         # Delete the user/bot messages that were prompted for
         if sentMessages:
-            await self.sparcli.delete_messages(sentMessages)
             if ctx.message.server.me.permissions_in(ctx.message.channel).manage_messages:
-                await self.sparcli.delete_messages(userMessages)
+                await self.sparcli.delete_messages(sentMessages + userMessages)
+            else:
+                await self.sparcli.delete_messages(sentMessages)
 
         if '' in [topText, bottomText, imageLink]:
             await self.sparcli.say('You can\'t have empty content fields. Aborting command.')
@@ -244,11 +272,6 @@ class Misc:
         q = await self.sparcli.say('A vote has been started for subject `{}`.'.format(whatToVoteFor))
         await self.sparcli.add_reaction(q, '👍')
         await self.sparcli.add_reaction(q, '👎')
-
-    @commands.command(pass_context=True)
-    async def addreaction(self, ctx, postID:str, emoji:Emoji):
-        q = await self.sparcli.get_message(ctx.message.channel, postID)
-        await self.sparcli.add_reaction(q, emoji)
 
 
 def setup(bot):
