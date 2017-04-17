@@ -42,11 +42,11 @@ class Scriptures:
         matches = finditer(r'[\d]+', passage)
         matchList = [i for i in matches]
         if len(matchList) == 2:
-            passage = matchList[1].group()
+            passage = int(matchList[1].group())
             lastpassage = passage 
         elif len(matchlist) == 3:
-            passage = matchList[1].group()
-            lastpassage = matchlist[2].group()
+            passage = int(matchList[1].group())
+            lastpassage = int(matchlist[2].group())
         else:
             await self.sparcli.say('I was unable to get that passage.')
             return
