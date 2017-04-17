@@ -105,7 +105,11 @@ class Music:
             await serverHandler.skipChecker(reaction.message)
 
     async def on_message(self, message):
-        if serverHandler.looping == False: await serverHandler.loop()
+
+        # Start the serverhandler looping
+        serverHandler = self.voice[message.server]
+        if serverHandler.looping == False: 
+            await serverHandler.loop()
 
 
 def setup(bot):
