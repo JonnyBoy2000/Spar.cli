@@ -70,7 +70,9 @@ class RoleManagement:
         await self.sparcli.say('The role `{0.name}` with ID `{0.id}` has been sucessfully added to you.'.format(roleToGive))
 
     async def iamlist(self, ctx):
-        '''Gives a list of roles that you can self-assign'''
+        '''
+        Gives a list of roles that you can self-assign.
+        '''
 
         # Get all the stuff on the server that you can give to yourself
         serverSettings = getServerJson(ctx.message.server.id)
@@ -141,9 +143,9 @@ class RoleManagement:
     @permissionChecker(check='manage_roles')
     @botPermission(check='manage_roles')
     async def makecolour(self, ctx, colour:str, user:Member=None):
-        '''Creates a new role with a given colour, and assigns it to a user
-        Usage :: makecolour <HexValue> <Mention>
-              :: makecolour <HexValue>'''
+        '''
+        Creates a new role with a given colour, and assigns it to a user.
+        '''
 
         # Fix up some variables
         server = ctx.message.server

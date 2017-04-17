@@ -94,7 +94,7 @@ class Reddit:
         redditData['Top Post'] = '[Click here!](http://reddit.com{0.permalink})'.format(topLink)
 
         # Make an embed from it
-        e = makeEmbed(name=redditor.name, icon=self.redditIcon, colour=0xff4006, fields=redditData)
+        e = makeEmbed(author=redditor.name, author_icon=self.redditIcon, colour=0xff4006, fields=redditData)
 
         # Print to user
         await self.sparcli.say('', embed=e)
@@ -138,9 +138,9 @@ class Reddit:
 
         # Make the embed
         if makeThumb:
-            e = makeEmbed(name=title, icon=self.redditIcon, colour=0xff4006, image=post.url, fields=postValues)
+            e = makeEmbed(author=title, author_icon=self.redditIcon, colour=0xff4006, image=post.url, fields=postValues)
         else:
-            e = makeEmbed(name=title, icon=self.redditIcon, colour=0xff4006, fields=postValues)
+            e = makeEmbed(author=title, author_icon=self.redditIcon, colour=0xff4006, fields=postValues)
 
         # Return to user
         await self.sparcli.say('', embed=e)
@@ -196,9 +196,10 @@ class Reddit:
         saveRedditInstances(q)
 
         # Say to the user.
-        await self.sparcli.send_message(author, 'Your authentication details have been deleted. \n\
-Please manually revoke access to Spar.cli for full recognition that you are diconnected :: \
-<https://www.reddit.com/prefs/apps>'
+        await self.sparcli.send_message(author, 
+            'Your authentication details have been deleted. \n'
+            'Please manually revoke access to Spar.cli for full recognition that you are diconnected :: '
+            '<https://www.reddit.com/prefs/apps>'
         )
 
     @commands.group(pass_context=True, name='redditpost', enabled=False)
@@ -328,6 +329,8 @@ Please manually revoke access to Spar.cli for full recognition that you are dico
         Controls reaction adding as means of upvotes in this class
         '''
 
+        # Check if the message that had the reaction added to it
+        # is a user-sbumitted post
         redditPost = None
         for i, o in self.postHandler.items():
             try:
@@ -340,23 +343,27 @@ Please manually revoke access to Spar.cli for full recognition that you are dico
         if redditPost == None:
             return
 
+        # Checks if the user is logged in
         if member.id not in getRedditInstances()['Tokens']:
             return
 
+        # Checks if the emoji is correct
         if reaction.emoji not in ['🔼', '🔽']:
             return
 
+        # Generate a reddit instance for the user
         redditLocal = generateRedditObject(member.id)
         redditLocal.read_only = False
-        # redditPost = self.postHandler[reaction.message]
+        
+        # Upvote and downvote as necessary
         if reaction.emoji == '🔼':
             q = redditLocal.submission(id=redditPost.id_from_url(redditPost.shortlink))
             q.upvote()
-
         elif reaction.emoji == '🔽':
             q = redditLocal.submission(id=redditPost.id_from_url(redditPost.shortlink))
             q.downvote()
 
+        # Set the user to read only before leaving it to the mercy of garbage collection
         redditLocal.read_only = True
 
 

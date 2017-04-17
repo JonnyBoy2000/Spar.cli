@@ -2,6 +2,7 @@ from discord.ext import commands
 from aiohttp import get
 from collections import OrderedDict
 from random import choice
+from re import finditer
 from Cogs.Utils.Discord import makeEmbed
 
 
@@ -44,9 +45,9 @@ class Steam:
 
     @commands.command(pass_context=True)
     async def steamsearch(self, ctx, *, gameName:str):
-        '''Gets the information of a game from Steam
-        Usage :: steamsearch watch_dogs
-              :: steamsearch papers, please'''
+        '''
+        Gets the information of a game from Steam.
+        '''
 
         await self.sparcli.send_typing(ctx.message.channel)
 
@@ -68,31 +69,30 @@ class Steam:
         await self.getSteamGameInfo(gameID)
 
     @commands.command(pass_context=True)
-    async def steamgame(self, ctx, *, gameURL:str):
-        '''Gets the information of a game from Steam
-        Usage :: steamgame http://store.steampowered.com/app/252870/
-              :: steamgame steam://store/252870/
-              :: steamgame 252870'''
+    async def steamid(self, ctx, *, gameURL:str):
+        '''
+        Gets the information of a game from Steam URL.
+        '''
 
         await self.sparcli.send_typing(ctx.message.channel)
 
-        # Try and get the game ID
-        gameID = None 
-        gameSplit = gameURL.split('/')
-        for i in gameSplit:
-            try:
-                int(i)
-                gameID = i
-            except ValueError:
-                pass
-        if gameID == None:
+        # Grab the game ID from the user input
+        regexMatches = finditer(r'\d+', gameURL)
+        regexList = [i for i in regexMatches]
+
+        # Parse it as a group
+        if len(regexList) == 0:
             await self.sparcli.say('I was unable to find the ID of that game on the Steam API.')
             return
-
-        await self.getSteamGameInfo(gameID)
+        else:
+            await self.getSteamGameInfo(regexList[0].group())
 
     async def getSteamGameInfo(self, gameID:str=None):
-        '''Gets the data of a game on Steam. Can only be done through ID'''
+        '''
+        Gets the data of a game on Steam. Can only be done through ID.
+        '''
+
+        # TODO: REDO THIS AS `dict.get(item, default)` SO AS TO MAKE IT CLEANER
 
         # Get the data from Steam
         async with get(self.gameInfo.format(gameID)) as r:

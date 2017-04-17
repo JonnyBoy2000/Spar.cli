@@ -1,6 +1,6 @@
+from sys import argv
 import discord
 from discord.ext import commands
-from sys import argv
 from Cogs.Utils.Configs import *
 from Cogs.Utils.Updates import *
 from Cogs.Utils.Discord import messageToStarboard, makeEmbed
@@ -15,14 +15,18 @@ def getCommandPrefix(bot, message):
         serverSettings = getServerJson(message.server.id)
         serverPrefix = serverSettings['CommandPrefix']
     except AttributeError:
-        return [';', '<@252880131540910080> ']
+        return ['; ', ';', '<@252880131540910080> ']
 
     # Load the server prefix as defined
     return [serverPrefix + ' ', serverPrefix, '<@252880131540910080> ']
 
 
 sparcli = commands.Bot(
-    command_prefix=getCommandPrefix, description='ApplePy 2.0, pretty much.', pm_help=True, formatter=commands.formatter.HelpFormatter(show_check_failure=True))
+    command_prefix=getCommandPrefix, 
+    description='ApplePy 2.0, pretty much.', 
+    pm_help=True, 
+    formatter=commands.formatter.HelpFormatter(show_check_failure=True)
+)
 
 
 
@@ -30,31 +34,32 @@ sparcli = commands.Bot(
 async def on_command_error(error, ctx):
     channel = ctx.message.channel
     server = ctx.message.server
+    toSay = None
 
     if isinstance(error, BotPermissionsTooLow):
         # This should run if the bot doesn't have permissions to do a thing to a user
-        await sparcli.send_message(channel, 'That user is too high ranked for me to perform that action on them.')
+        toSay = 'That user is too high ranked for me to perform that action on them.'
         
     elif isinstance(error, MemberPermissionsTooLow):
         # This should run if the member calling a command doens't have permission to call it
-        await sparcli.send_message(channel, 'That user is too high ranked for you to run that command on them.')
+        toSay = 'That user is too high ranked for you to run that command on them.'
         
     elif isinstance(error, MemberMissingPermissions):
         # This should be run should the member calling the command not be able to run it
-        await sparcli.send_message(channel, 'You are missing the permissions required to run that command.')
+        toSay = 'You are missing the permissions required to run that command.'
 
     elif isinstance(error, BotMissingPermissions):
         # This should be run if the bot can't run what it needs to
-        await sparcli.send_message(channel, 'I\'m missing the permissions required to run this command.')
+        toSay = 'I\'m missing the permissions required to run this command.'
 
     elif isinstance(error, DoesntWorkInPrivate):
         # This is to be run if the command is sent in PM
-        await sparcli.send_message(channel, 'This command does not work in PMs.')
+        toSay = 'This command does not work in PMs.'
         
-    if isinstance(error, commands.errors.CheckFailure):
+    elif isinstance(error, commands.errors.CheckFailure):
         # This should never really occur
         # This is if the command check fails
-        await sparcli.send_message(channel, 'Command check failed. Unknown error; please mention `Caleb#2831`.')
+        toSay = 'Command check failed. Unknown error; please mention `Caleb#2831`.'
         
     else:
         # Who knows what happened? Not me. Raise the error again, and print to console
@@ -62,6 +67,8 @@ async def on_command_error(error, ctx):
         try: print(ctx.message.content + '\n')
         except: print('Could not print.' + '\n')
         raise(error)
+
+    await sparcli.send_message(channel, toSay)
 
 
 @sparcli.event
@@ -73,7 +80,14 @@ async def on_server_join(server):
     saveServerJson(server.id, z)
 
     # Say hi
-    await sparcli.send_message(server, 'Hey! I\'ve just been added to this server. I\'m Spar.cli, and I\'ll try and do a good job c;')
+    toSay = 'Hey! I\'ve just been added to this server. I\'m Spar.cli, and I\'ll try and do a good job c;'
+    try:
+        await sparcli.send_message(server, toSay)
+    except Exception:
+        try:
+            await sparcli.send_message(server.owner, toSay)
+        except Exception:
+            pass
 
 
 @sparcli.event
@@ -157,7 +171,7 @@ async def on_member_remove(member):
 
 @sparcli.event
 async def on_channel_update(before, after):
-    await updateSender(before, after, ['topic', 'name', 'bitrate'], 'Channel Update :: {}!', 'Channelupdates', True)
+    await updateSender(before, after, ['topic', 'name'], 'Channel Update :: {}!', 'Channelupdates', True)
 
 
 @sparcli.event 
@@ -221,13 +235,14 @@ async def on_ready():
         z = fixJson(z)
         saveServerJson(server.id, z)
 
+    # Reccursively fix any globals too
     z = getServerJson('Globals')
     z = fixJson(z)
     saveServerJson('Globals', z)
 
+    # Changed the bot's game
     game = '@Spar.cli help'
     await sparcli.change_presence(game=discord.Game(name=game))
 
 
 sparcli.run(argv[1])
-

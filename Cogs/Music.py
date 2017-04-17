@@ -36,22 +36,6 @@ class Music:
             if z == False:
                 return
         await serverHandler.addToQueue(nameOfSong)
-        if serverHandler.looping == False: await serverHandler.loop()
-
-    @commands.command(pass_context=True)
-    async def bestsong(self, ctx):
-        '''Plays the best song.'''
-
-        nameOfSong = 'https://www.youtube.com/watch?v=miomuSGoPzI'
-
-        serverHandler = self.voice[ctx.message.server]
-        serverHandler.lastChannel = ctx.message.channel
-        if serverHandler.voiceClient == None:
-            z = await serverHandler.joinVC(ctx.message.author)
-            if z == False:
-                return
-        await serverHandler.addToQueue(nameOfSong)
-        if serverHandler.looping == False: await serverHandler.loop()
 
     @commands.command(pass_context=True, aliases=['disconnect', 'dc'])
     async def leave(self, ctx):
@@ -66,7 +50,6 @@ class Music:
         else:
             await serverHandler.disconnect()
             await self.sparcli.say('Disconnected from the VC.')
-        if serverHandler.looping == False: await serverHandler.loop()
 
     @commands.command(pass_context=True, aliases=['v'])
     async def volume(self, ctx, volume:int=20):
@@ -80,7 +63,6 @@ class Music:
         z = serverHandler.setVolume(volume)
 
         await self.sparcli.say('The volume has been set to {}%.'.format(z))
-        if serverHandler.looping == False: await serverHandler.loop()
 
     @commands.command(pass_context=True)
     async def queued(self, ctx):
@@ -98,8 +80,6 @@ class Music:
             out = 'There is currently nothing queued to be played :c'
         await self.sparcli.say(out)
 
-        if serverHandler.looping == False: await serverHandler.loop()
-
     @commands.command(pass_context=True)
     @permissionChecker(check='administrator')
     async def forceskip(self, ctx):
@@ -115,8 +95,6 @@ class Music:
         else:
             await serverHandler.skipChecker(ctx.message, force=True)
 
-        if serverHandler.looping == False: await serverHandler.loop()
-
     async def on_reaction_add(self, reaction, user):
         '''
         Checks reactions and etc
@@ -126,6 +104,7 @@ class Music:
         if serverHandler.songInfoMessage == reaction.message.id:
             await serverHandler.skipChecker(reaction.message)
 
+    async def on_message(self, message):
         if serverHandler.looping == False: await serverHandler.loop()
 
 

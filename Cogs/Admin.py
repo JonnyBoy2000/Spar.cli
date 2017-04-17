@@ -20,7 +20,8 @@ class Admin:
         await self.sparcli.ban(user)
         # Todo :: make this print out in a config-determined channel
         author = ctx.message.author
-        await self.sparcli.say('**{0}** `({0.id})` has been banned for reason `{1}` by user {2.mention} `({2.id})`.'.format(user, reason, author))
+        toSay = '**{0}** `({0.id})` has been banned for reason `{1}` by user {2.mention} `({2.id})`.'.format(user, reason, author)
+        await self.sparcli.say(toSay)
 
     @commands.command(pass_context=True)
     @permissionChecker(check='kick_members', compare=True)
@@ -33,7 +34,8 @@ class Admin:
         await self.sparcli.kick(user)
         # Todo :: make this print out in a config-determined channel
         author = ctx.message.author
-        await self.sparcli.say('**{0}** `({0.id})` has been kicked for reason `{1}` by user {2.mention} `({2.id})`.'.format(user, reason, author))
+        toSay = '**{0}** `({0.id})` has been kicked for reason `{1}` by user {2.mention} `({2.id})`.'.format(user, reason, author)
+        await self.sparcli.say(toSay)
 
     @commands.command(pass_context=True)
     @permissionChecker(check='manage_messages')

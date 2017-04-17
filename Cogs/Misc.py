@@ -26,7 +26,6 @@ class Misc:
         permissionsID = '469888119'
         baseLink = 'https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions={}'
         inviteLink = baseLink.format(clientID, permissionsID)
-        # em = makeEmbed(user=self.sparcli.user, fields={'Invite me!':'[Click here!]({})'.format(inviteLink)})
         await self.sparcli.say(inviteLink)
 
     @commands.command()
@@ -216,8 +215,9 @@ class Misc:
         # Get the meme image from the site
         siteURL = 'https://memegen.link/custom/{}/{}.jpg?alt={}'.format(topText, bottomText, imageLink)
         async with get(siteURL) as r:
-            image = await r.content
-        with open('SPARCLI_RAW_IMAGE_DOWNLOAD.png', 'wb') as a: a.write(image)
+            image = await r.content()
+        with open('SPARCLI_RAW_IMAGE_DOWNLOAD.png', 'wb') as a: 
+            a.write(image)
         await self.sparcli.send_file(ctx.message.channel, 'SPARCLI_RAW_IMAGE_DOWNLOAD.png', content=author.mention)
 
     @commands.command(pass_context=True)
@@ -248,9 +248,6 @@ class Misc:
         o['Attach Files'] = w[p.attach_files]
         o['Read Message History'] = w[p.read_message_history]
         o['Mention Everyone'] = w[p.mention_everyone]
-        o['Mute Members'] = w[p.mute_members]
-        o['Deafen Members'] = w[p.deafen_members]
-        o['Move Members'] = w[p.move_members]
         o['Change Nickanme'] = w[p.change_nickname]
         o['Manage Nicknames'] = w[p.manage_nicknames]
         o['Manage Roles'] = w[p.manage_roles]

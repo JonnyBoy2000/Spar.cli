@@ -2,6 +2,7 @@ from discord.ext import commands
 from aiohttp import get 
 from json import loads 
 from collections import OrderedDict
+from re import finditer
 from Cogs.Utils.Discord import makeEmbed
 
 
@@ -17,8 +18,10 @@ class Scriptures:
         Goes through the getbible api to get a list of applicable bible passages.
         '''
 
+        # Format the URL string
         toRetrieveFrom = self.bible.format(passage.replace(' ', '%20'))
-        # return toRetrieveFrom
+        
+        # Send the request to the site and return it as a JSON dictionary
         async with get(toRetrieveFrom) as r:
             text = await r.text()
         return loads(text[1:-2])
@@ -30,16 +33,23 @@ class Scriptures:
         Gets a passage from the bible.
         '''
 
+        # TODO: MAKE ALL THIS CLEANER TO WORK WITH
+
         # Generate the string that'll be sent to the site
         getString = passage
 
         # Work out how many different quotes you need to get
-        tempPass = passage.split(':')[1]  # Gets the 34-35 from 14:34-35
-        if len(tempPass.split('-')) == 2:
-            passage = int(tempPass.split('-')[0])
-            lastpassage = int(tempPass.split('-')[1])
+        matches = finditer(r'[\d]+', passage)
+        matchList = [i for i in matches]
+        if len(matchList) == 2:
+            passage = matchList[1].group()
+            lastpassage = passage 
+        elif len(matchlist) == 3:
+            passage = matchList[1].group()
+            lastpassage = matchlist[2].group()
         else:
-            passage = lastpassage = int(tempPass)
+            await self.sparcli.say('I was unable to get that passage.')
+            return
 
         # Actually go get all the data from the site
         try:
@@ -47,9 +57,6 @@ class Scriptures:
         except Exception:
             await self.sparcli.say('I was unable to get that passage.')
             return
-
-        # await self.sparcli.say('```json\n{}```'.format(bibleData))
-        # await self.sparcli.say(str(bibleData)[:2000])
 
         # Get the nice passages and stuff
         passageReadings = OrderedDict()

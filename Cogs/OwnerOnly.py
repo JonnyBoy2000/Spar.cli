@@ -67,14 +67,16 @@ class OwnerOnly:
         '''
 
         # If it is, tell the user the bot it dying
-        killMessages = ['I am deded. Rip me.',
-                        'Killing.',
-                        'And with this, I am ending.',
-                        '*Finally*.',
-                        '\'Bout time, mate.',
-                        'At least it\'s better than how Snape went out.',
-                        'Dead or not, I\'m still more loved than BlackBox.',
-                        'In my culture, this is called "delayed abortion".']
+        killMessages = [
+            'I am deded. Rip me.',
+            'Killing.',
+            'And with this, I am ending.',
+            '*Finally*.',
+            '\'Bout time, mate.',
+            'At least it\'s better than how Snape went out.',
+            'Dead or not, I\'m still more loved than BlackBox.',
+            'In my culture, this is called "delayed abortion".'
+        ]
         toSay = choice(killMessages)
         await self.sparcli.say(toSay)
         await self.sparcli.change_presence(status=Status.invisible, game=None)

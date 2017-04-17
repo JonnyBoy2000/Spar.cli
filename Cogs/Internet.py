@@ -1,6 +1,7 @@
 from discord.ext import commands
 from discord import Member
 from aiohttp import get
+from re import finditer
 from random import choice
 
 # Import translator
@@ -80,10 +81,16 @@ class Internet:
             page = await r.text()
 
         # Scrape the raw HTML
-        rawPun = page.split('dropshadow1')[1][6:].split('<')[0]
+        r = r'(<div class=\"dropshadow1\">\n<p>).*(</p>\n</div>)'
+        foundPun = [i for i in finditer(r, page)][0].group()
+
+        # Filter out the pun
+        r = r'(>).*(<)'
+        filteredPun = [i for i in finditer(r, foundPun)][0].group()
 
         # Boop it out
-        await self.sparcli.say(rawPun)
+        fullPun = filteredPun[1:-1]
+        await self.sparcli.say(fullPun)
 
     @commands.command(pass_context=True)
     async def trans(self, ctx, langTo: str, *, toChange: str):
