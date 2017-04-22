@@ -5,6 +5,7 @@ from Cogs.Utils.Configs import *
 from Cogs.Utils.Updates import *
 from Cogs.Utils.Messages import makeEmbed
 from Cogs.Utils.Extentions import q as initialExtentions
+from Cogs.Utils.PrintableMessage import PrintableMessage
 
 
 def getCommandPrefix(bot, message):
@@ -63,14 +64,7 @@ async def on_message_edit(before, after):
 @sparcli.event
 async def on_message(message):
     
-    # See if it's a PM
-    if message.server != None:
-        f = '{0.timestamp} :: {0.server.id} :: {0.author.id} :: {0.id}'
-    else:
-        f = '{0.timestamp} ::  Private Message   :: {0.author.id} :: {0.id}'
-
-    # Print out to console
-    print(f.format(message))
+    print(PrintableMessage(message))
 
     # Make the bot not respond to other bots
     if message.author.bot:
