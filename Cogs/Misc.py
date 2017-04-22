@@ -5,7 +5,7 @@ from collections import OrderedDict
 from asyncio import sleep
 from random import randint
 from aiohttp import get
-from Cogs.Utils.Discord import makeEmbed
+from Cogs.Utils.Messages import makeEmbed
 from Cogs.Utils.Misc import colourFixer
 from Cogs.Utils.Permissions import botPermission, permissionChecker
 

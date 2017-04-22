@@ -1,6 +1,6 @@
 from discord.ext import commands
 from discord import Channel
-from Cogs.Utils.Discord import getTextRoles
+from Cogs.Utils.Messages import getTextRoles
 from Cogs.Utils.Configs import getServerJson, saveServerJson
 from Cogs.Utils.GuiConfig import addEmojiList, updateFromEmoji, updateFromMessage
 from Cogs.Utils.Permissions import permissionChecker

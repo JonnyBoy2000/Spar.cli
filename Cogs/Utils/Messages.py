@@ -4,64 +4,6 @@ from discord import Embed
 from discord.ext import commands
 
 
-def checkPerm(**check):
-    def predicate(ctx):
-        return getPermissions(errReturn=bool, ctx=ctx, check=check['check'])
-    return commands.check(predicate)
-
-
-def getPermissions(channel=None, permissionCheck=None, firstPerson=None, secondPerson=None, *, errReturn=str, **kwargs):
-    '''Gives the permissions in a channel for a user, 
-    and returns the bool of whether the user has that permission.
-    This will also give whether a certain role is above that of a second person's'''
-
-    # Loads from kwargs
-    if firstPerson == None:
-        channel = kwargs['ctx'].message.channel 
-        firstPerson = kwargs['ctx'].message.author 
-        permissionCheck = kwargs['check']
-        try: 
-            secondPerson = kwargs['person']
-        except: 
-            secondPerson = None
-
-    # Check if you're looking for the owner
-    ownerIDs = ['141231597155385344', '155459369545367552']
-    try:
-        ownerIDs = ownerIDs + kwargs['owners']
-    except KeyError:
-        pass
-
-    # Run the actual owner checks
-    if permissionCheck == 'is_owner':
-        isOwner = firstPerson.id in ownerIDs
-        if errReturn == bool:
-            return isOwner
-        return isOwner if isOwner else 'You need to be an owner to use this command.'
-    if firstPerson.id in ownerIDs:
-        return True 
-
-    # Otherwise, just get the permissions
-    perms = channel.permissions_for(firstPerson)
-    
-    # Let admins do everything
-    if perms.administrator:
-        return True
-
-    # Get the intended permission 
-    canGo = getattr(perms, permissionCheck)
-    if secondPerson == None:
-        if errReturn == bool:
-            return canGo
-        return canGo if canGo else 'You do not have permission to use this command.'
-
-    # See if you can run the role on the selected user
-    isAbove = firstPerson.top_role.position > secondPerson.top_role.position
-    if errReturn == bool:
-        return isAbove
-    return isAbove if isAbove else 'You do not have permission to use this command against this user.'
-
-
 async def getTextRoles(ctx, hitString, speak=False, sparcli=None):
     '''Gets non-tagged and tagged roles from a message's ctx'''
 

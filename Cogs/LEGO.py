@@ -1,7 +1,7 @@
 from discord.ext import commands
 from collections import OrderedDict
 from random import choice
-from Cogs.Utils.Discord import makeEmbed
+from Cogs.Utils.Messages import makeEmbed
 from Cogs.Utils.Configs import getTokens
 try:
     from brickfront import Client

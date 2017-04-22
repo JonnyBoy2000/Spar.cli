@@ -2,7 +2,7 @@ from discord.ext import commands
 from discord import Colour, Member, Permissions
 from discord.errors import NotFound as Forbidden
 from Cogs.Utils.Configs import getServerJson, saveServerJson
-from Cogs.Utils.Discord import getTextRoles
+from Cogs.Utils.Messages import getTextRoles
 from Cogs.Utils.Misc import colourFixer
 from Cogs.Utils.Permissions import permissionChecker, botPermission
 

@@ -3,7 +3,7 @@ from string import punctuation as AllPunctuation
 from asyncio import sleep
 from datetime import timedelta
 from collections import OrderedDict
-from .Discord import makeEmbed
+from .Messages import makeEmbed
 
 
 class ServerVoice(object):

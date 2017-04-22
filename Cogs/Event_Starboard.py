@@ -1,6 +1,6 @@
 from discord.ext import commands 
 from Cogs.Utils.Configs import getServerJson
-from Cogs.Utils.Discord import messageToEmbed
+from Cogs.Utils.Messages import messageToEmbed
 
 
 class StarboardManagement:

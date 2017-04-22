@@ -3,7 +3,7 @@ from aiohttp import get
 from collections import OrderedDict
 from random import choice
 from re import finditer
-from Cogs.Utils.Discord import makeEmbed
+from Cogs.Utils.Messages import makeEmbed
 
 
 '''

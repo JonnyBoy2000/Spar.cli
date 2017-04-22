@@ -1,6 +1,6 @@
 from discord.ext import commands
 from Cogs.Utils.Configs import getServerJson, saveServerJson
-from Cogs.Utils.Discord import getPermissions
+from Cogs.Utils.Messages import getPermissions
 from Cogs.Utils.Permissions import permissionChecker
 
 

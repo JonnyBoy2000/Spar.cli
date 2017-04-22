@@ -3,7 +3,7 @@ from aiohttp import get
 from json import loads 
 from collections import OrderedDict
 from re import finditer
-from Cogs.Utils.Discord import makeEmbed
+from Cogs.Utils.Messages import makeEmbed
 
 
 class Scriptures:
