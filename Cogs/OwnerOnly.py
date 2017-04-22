@@ -1,10 +1,10 @@
-from discord.ext import commands
 from discord import Game, Status
 from aiohttp import get
-from random import choice
 from sys import exit
 from os import execl
-from sys import exit, executable, argv
+from sys import exit, executable, argv, exc_info
+from traceback import format_exception
+from discord.ext import commands
 from Cogs.Utils.Permissions import permissionChecker
 from Cogs.Utils.Extentions import q as initialExtentions
 
@@ -33,7 +33,14 @@ class OwnerOnly:
         '''
 
         # Eval and print the answer
-        await self.sparcli.say(eval(content))
+        try:
+            output = eval(content)
+        except Exception:
+            type_, value_, traceback_ = exc_info()
+            ex = format_exception(type_, value_, traceback_)
+            output = ''.join(ex)
+        await self.sparcli.say('```python\n{}```'.format(output))
+
 
     @commands.command(pass_context=True, hidden=True)
     @permissionChecker(check='is_owner')
@@ -67,18 +74,7 @@ class OwnerOnly:
         '''
 
         # If it is, tell the user the bot it dying
-        killMessages = [
-            'I am deded. Rip me.',
-            'Killing.',
-            'And with this, I am ending.',
-            '*Finally*.',
-            '\'Bout time, mate.',
-            'At least it\'s better than how Snape went out.',
-            'Dead or not, I\'m still more loved than BlackBox.',
-            'In my culture, this is called "delayed abortion".'
-        ]
-        toSay = choice(killMessages)
-        await self.sparcli.say(toSay)
+        await self.sparcli.say('*Finally*.')
         await self.sparcli.change_presence(status=Status.invisible, game=None)
         exit()
 
@@ -104,7 +100,11 @@ class OwnerOnly:
             # Plonk the initial extentions into a dictionary
             eF = {i.split('.')[1].lower(): i for i in initialExtentions}
             # Finish finish them off to be actual real extentions
-            extention = [eF[i] for i in eF.keys() if extention.lower() in i][0]
+            try:
+                extention = [eF[i] for i in eF.keys() if extention.lower() in i][0]
+            except IndexError:
+                # await self.sparcli.say('No extention was found by the name `{}`.'.format(extention))
+                extention = 'Cogs.' + extention 
 
         # Unload the extention
         await self.sparcli.say("Reloading extension **{}**...".format(extention))
@@ -116,8 +116,11 @@ class OwnerOnly:
         # Load the new one
         try:
             self.sparcli.load_extension(extention)
-        except ImportError:
-            await self.sparcli.say("That extention does not exist.")
+        except Exception:
+            type_, value_, traceback_ = exc_info()
+            ex = format_exception(type_, value_, traceback_)
+            output = ''.join(ex)
+            await self.sparcli.say('```python\n{}```'.format(output))
             return
 
         # Boop the user
