@@ -5,7 +5,6 @@ from Cogs.Utils.Configs import *
 from Cogs.Utils.Updates import *
 from Cogs.Utils.Discord import messageToStarboard, makeEmbed
 from Cogs.Utils.Extentions import q as initialExtentions
-from Cogs.Utils.Exceptions import *
 
 
 def getCommandPrefix(bot, message):
