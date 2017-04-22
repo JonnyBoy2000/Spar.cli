@@ -1,6 +1,7 @@
+from time import strftime
+from re import finditer
 from discord import Embed
 from discord.ext import commands
-from time import strftime
 
 
 def checkPerm(**check):
@@ -108,6 +109,7 @@ def makeEmbed(**kwargs):
         # Get the values
         fields = kwargs.get('fields', {})
         inline = kwargs.get('inline', True)
+        description = kwargs.get('description', Empty)
 
         # Images
         thumbnail = kwargs.get('thumbnail', False)
@@ -133,6 +135,7 @@ def makeEmbed(**kwargs):
     if author != Empty:
         embedObj.set_author(name=author, url=author_url, icon_url=author_icon)
     embedObj.set_footer(text=footer, icon_url=footer_icon)
+    embedObj.description = description
     
     # Set the attributes that have no default
     if image: embedObj.set_image(url=image)
@@ -150,40 +153,23 @@ def makeEmbed(**kwargs):
     return embedObj
 
 
-def messageToStarboard(message):
-    '''Created an embeddable message as a quote for use of the starboard event reference'''
+def messageToEmbed(message):
 
-    # Get the amount of stars on the message
-    starAmount = [i.count for i in message.reactions if i.emoji == '⭐']
-    try:
-        starAmount = starAmount[0]
-    except IndexError:
-        return False, False
+    # Get some default values that'll be in the embed
+    author = message.author 
+    description = message.content
+    image = False
 
-    # Thus, make the text from the message
-    starboardText = '⭐ **{0}** from `{1.id}` in {2.mention}'.format(
-        starAmount, message, message.channel)
+    # Check to see if any images were added
+    regexMatch = r'.+(.png)|.+(.jpg)|.+(.jpeg)|.+(.gif)'
+    if len(message.attachments) > 0:
+        attachment = message.attachments[0]
+        matchList = [i for i in finditer(regexMatch, attachment['filename'])]
+        if len(matchList) > 0:
+            image = attachment['url']
 
-    # From here, make the embed
-    embedObj = Embed(colour=0xFFA930)
-    user = message.author
-    embedIcon = user.avatar_url if user.avatar_url != None else user.default_avatar_url
-    embedObj.set_author(name=str(user), icon_url=embedIcon)
+    # Get the time the message was created
+    createdTime = '.'.join(str(message.timestamp).split('.')[:-1])
 
-    # Get timestamp
-    date = message.timestamp
-    formtattedDate = date.strftime('%c')
-    con = message.clean_content if message.clean_content != '' else 'None'
-
-    atch = message.attachments
-    if len(atch) > 0:
-        if atch[0]['url'][-4:] in ['.png','.jpg']:
-            embedObj.set_image(url=atch[0]['url'])
-
-    # Add content
-    if con != 'None':
-        embedObj.add_field(name='Message :: ', value=con)
-    embedObj.set_footer(text=formtattedDate)
-
-    # Return to user
-    return starboardText, embedObj
+    # Make and return the embed
+    return makeEmbed(user=author, description=description, image=image, footer=createdTime)

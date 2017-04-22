@@ -11,6 +11,9 @@ q = ['Cogs.Admin',
      'Cogs.Steam',
      'Cogs.Music',
      # 'Cogs.LEGO',
-     'Cogs.Levels'
+     'Cogs.Levels',
+     'Cogs.Event_Members',
+     'Cogs.Event_Starboard',
+     'Cogs.Event_Errors',
 ]
 
