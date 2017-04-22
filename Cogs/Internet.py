@@ -265,7 +265,7 @@ class Internet:
                 url = '/'.join(v.split('/')[:-1])
 
         # Return to user
-        em = makeEmbed(user=ctx.message.server.me, fields=o, author_url=url, author='Click here for UrbanDictionary', inline=False)
+        em = makeEmbed(fields=o, author_url=url, author='Click here for UrbanDictionary', inline=False)
         await self.sparcli.say(embed=em)
 
 
