@@ -1,8 +1,11 @@
-from discord.ext import commands
-from discord import Member
 from aiohttp import get
 from re import finditer
 from random import choice
+from collections import OrderedDict
+from discord import Member
+from discord.ext import commands
+from Cogs.Utils.Configs import getTokens
+from Cogs.Utils.Messages import makeEmbed
 
 # Import translator
 try:
@@ -18,14 +21,12 @@ try:
 except ImportError:
     wolframalphaImported = False
 
-from sys import path
-from Cogs.Utils.Configs import getTokens
-
 
 class Internet:
 
     def __init__(self, sparcli):
         self.sparcli = sparcli
+        self.urbanSite = 'https://api.urbandictionary.com/v0/define?term={}'
         self.translator = None
         self.wolfClient = None
         self.nounlist = []
@@ -205,6 +206,67 @@ class Internet:
         # Throw the object
         atUser = '.' if member == None else ' at {}.'.format(member.mention)
         await self.sparcli.say('Thrown {} {}{}'.format(aOrAn, toThrow, atUser))
+
+    @commands.command(pass_context=True)
+    async def urban(self, ctx, *, searchTerm:str):
+        '''
+        Allows you to search UrbanDictionary for a specific term.
+        '''
+
+        CHARACTER_LIMIT = 250
+
+        # Make the url nice and safe
+        searchTerm = searchTerm.replace(' ', '%20')
+        async with get(self.urbanSite.format(searchTerm)) as r:
+            siteData = await r.json()
+
+        # Get the definitions
+        definitionList = siteData['list']
+        o = OrderedDict()
+        counter = 0
+        url = None
+
+        if definitionList == []:
+            await self.sparcli.say('No definitions found for the search term `{}`.'.format(searchTerm))
+            return
+
+        # Go through and get the definitions
+        for definitionObject in definitionList:
+
+            # Iterate the counter and setup some temp variables
+            counter += 1
+            author = definitionObject['author']
+            definition = definitionObject['definition']
+
+            # Cut off the end of too-long definitions
+            if len(definition) > CHARACTER_LIMIT:
+                deflist = []
+
+                # Split it per word
+                for q in definition.split(' '):
+
+                    # Check if it's above the limit
+                    if len(' '.join(deflist + [q])) > CHARACTER_LIMIT:
+                        break 
+                    else:
+                        deflist.append(q)
+
+                # Plonk some elipsies on the end
+                definition = ' '.join(deflist) + '...'
+
+            # Put it into the dictionary
+            o['{} - {}'.format(counter, author)] = definition
+            if counter == 3:
+                break 
+
+            # Get a working URL
+            if url == None:
+                v = definitionObject['permalink']
+                url = '/'.join(v.split('/')[:-1])
+
+        # Return to user
+        em = makeEmbed(user=ctx.message.server.me, fields=o, author_url=url, author='Click here for UrbanDictionary', inline=False)
+        await self.sparcli.say(embed=em)
 
 
 def setup(bot):
