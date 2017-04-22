@@ -33,6 +33,9 @@ class LevelUser(object):
         self.lastAdded = {}
 
     def increment(self, server):
+        if server == None:
+            return
+
         serverID = server.id
         increment = randint(0, 50)
 
