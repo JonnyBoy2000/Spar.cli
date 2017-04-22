@@ -9,7 +9,7 @@ try:
 except ImportError:
     raise Exception('You need to install Praw for this class to work.')
 from collections import OrderedDict
-from Cogs.Utils.Discord import makeEmbed
+from Cogs.Utils.Messages import makeEmbed
 from Cogs.Utils.Configs import getTokens, getRedditInstances, saveRedditInstances
 
 '''

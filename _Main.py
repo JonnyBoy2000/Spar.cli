@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 from Cogs.Utils.Configs import *
 from Cogs.Utils.Updates import *
-from Cogs.Utils.Discord import messageToStarboard, makeEmbed
+from Cogs.Utils.Messages import makeEmbed
 from Cogs.Utils.Extentions import q as initialExtentions
 
 
