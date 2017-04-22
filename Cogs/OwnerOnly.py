@@ -1,4 +1,4 @@
-from discord import Game, Status
+from discord import Status
 from aiohttp import get
 from sys import exit
 from os import execl
@@ -13,17 +13,6 @@ class OwnerOnly:
 
     def __init__(self, bot):
         self.sparcli = bot
-
-    @commands.command(pass_context=True, hidden=True, aliases=['playing'])
-    @permissionChecker(check='is_owner')
-    async def game(self, ctx, *, game: str=None):
-        '''
-        Change what the bot is playing.
-        '''
-
-        # Change the game
-        await self.sparcli.change_presence(game=Game(name=game))
-        await self.sparcli.say('Game changed to **{}**.'.format(game))
 
     @commands.command(pass_context=True, hidden=True)
     @permissionChecker(check='is_owner')
