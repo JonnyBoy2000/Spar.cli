@@ -1,9 +1,9 @@
-from discord import Status
 from aiohttp import get
 from sys import exit
 from os import execl
 from sys import exit, executable, argv, exc_info
 from traceback import format_exception
+from discord import Status
 from discord.ext import commands
 from Cogs.Utils.Permissions import permissionChecker
 from Cogs.Utils.Extentions import q as initialExtentions
@@ -139,6 +139,35 @@ class OwnerOnly:
         await self.sparcli.change_presence(status=Status.dnd, game=None)
         execl(executable, *([executable] + argv))
 
+    @commands.command(pass_context=True, hidden=True)
+    @permissionChecker(check='is_owner')
+    async def serverinvite(self, ctx, *, serverName:str):
+        '''
+        Gets an invite for a given server's name.
+        '''
+
+        serverName = serverName.casefold()
+        try:
+            serverObject = [i for i in self.sparcli.servers if i.name.casefold() == serverName][0]
+        except Exception:
+            type_, value_, traceback_ = exc_info()
+            ex = format_exception(type_, value_, traceback_)
+            output = ''.join(ex)
+            await self.sparcli.say('```python\n{}```'.format(output))
+            return
+
+        try:
+            inviteList = await self.sparcli.invites_from(serverObject)
+            inviteObject = [i for i in inviteList][0]
+        except Exception:
+            try:
+                inviteObject = await self.sparcli.create_invite(serverObject)
+            except Exception:
+                await self.sparcli.say('I was unable to get an invite link for the server `{0.name}` (`{0.id}`).'.format(serverObject))
+                return
+
+        await self.sparcli.say('The invite link has been PM\'d to you.')
+        await self.sparcli.whisper(inviteObject.url)
 
 def setup(bot):
     bot.add_cog(OwnerOnly(bot))
