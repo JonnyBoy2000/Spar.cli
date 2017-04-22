@@ -8,7 +8,7 @@ class StarboardManagement:
     def __init__(self, sparcli):
         self.sparcli = sparcli
         self.STAR_EMOJI = '⭐'
-        self.starboardCache = {}  # message id: message
+        self.starboardCache = {}  # reactionMessageID: starboardMessage
 
     async def starboard(self, reaction):
         '''
@@ -28,16 +28,16 @@ class StarboardManagement:
             return
 
         # Get the message from the cache if it exists, else None
-        createdMessage = self.starboardCache.get(message.id, None)
-        if createdMessage == None:
+        starboardMessage = self.starboardCache.get(message.id, None)
+        if starboardMessage == None:
             newPost = True 
         else:
             newPost = False 
 
         # Make sure that there are enough reactions on the message to keep it
         starReaction = [i for i in message.reactions if i.emoji == self.STAR_EMOJI]
-        if len(starReaction) == 0:
-            await self.sparcli.delete_message(createdMessage)
+        if len(starReaction) == 0 and starboardMessage != None:
+            await self.sparcli.delete_message(starboardMessage)
             del self.starboardCache[message.id]
             return
 
@@ -60,9 +60,9 @@ class StarboardManagement:
         # Return to the user
         if newPost:
             said = await self.sparcli.send_message(channelObject, helpfulString, embed=embeddedMessage)
-            self.starboardCache[said.id] = said
+            self.starboardCache[message.id] = said
         else:
-            await self.sparcli.edit_message(createdMessage, helpfulString, embed=embeddedMessage)
+            await self.sparcli.edit_message(starboardMessage, helpfulString, embed=embeddedMessage)
 
 
     async def on_reaction_add(self, reaction, member):

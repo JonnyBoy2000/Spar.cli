@@ -52,6 +52,7 @@ def getWorkingJson(folder, serverID):
             jsonData = loads(a.read())
     return jsonData
 
+
 def saveWorkingJson(folder, serverID, jsonData):
     '''
     Writes a JSON file into savedata
@@ -111,6 +112,7 @@ def getTokens():
     # Return it to user
     return tokenReading
 
+
 def getRedditInstances():
     '''
     Gets all the stored Discord user IDs which are tied to refresh tokens for reddit
@@ -120,6 +122,7 @@ def getRedditInstances():
         tokenReading = loads(a.read())
 
     return tokenReading
+
 
 def saveRedditInstances(data):
     '''
