@@ -9,17 +9,18 @@
         "Channelupdates": false,
         "Joins": false,
         "Bans": false,
-        "Starboard": false
+        "Starboard": false,
+        "Kicks": false
     },
     "Channels": {
         "Bans": "",
         "Leaves": "",
         "Joins": "",
         "Starboard": "",
-        "Serverupdates": ""
+        "Serverupdates": "",
+        "Kicks": ""
     },
     "Messages": {
-        "Bans": "**{name}** has been banned!",
         "Leaves": "**{name}** has just left the server!",
         "Joins": "{mention} has just joined the server!"
     },

@@ -1,7 +1,8 @@
-from discord.ext import commands
-from discord import Member
 from aiohttp import get
+from discord import Member
+from discord.ext import commands
 from Cogs.Utils.Permissions import permissionChecker, botPermission
+from Cogs.Utils.Configs import getServerJson
 
 
 class Admin:
@@ -12,30 +13,76 @@ class Admin:
     @commands.command(pass_context=True)
     @permissionChecker(check='ban_members', compare=True)
     @botPermission(check='ban_members', compare=True)
-    async def ban(self, ctx, user:Member=None, *, reason: str='Unspecified'):
+    async def ban(self, ctx, user:Member, *, reason:str=None):
         '''
         Bans a user from the server.
         '''
 
-        await self.sparcli.ban(user)
-        # Todo :: make this print out in a config-determined channel
+        if reason == None:
+            await self.sparcli.say('You must provide a reason for this.')
+            return
+
+        # Setup some local variables
+        userToDo = user 
         author = ctx.message.author
-        toSay = '**{0}** `({0.id})` has been banned for reason `{1}` by user {2.mention} `({2.id})`.'.format(user, reason, author)
-        await self.sparcli.say(toSay)
+        serverData = getServerJson(ctx.message.server.id)
+
+        # Perform the actions in the local channel
+        await self.sparcli.ban(userToDo)
+        await self.sparcli.say('Done.')
+
+        # See if you need to copy over to another channel
+        if serverData['Toggles']['Bans']:
+
+            # Generate a nice message
+            toSay = ('**Ban**\n'
+                     '**User:** {user} (`{user.id}`)\n'
+                     '**Reason:** {reason}\n'
+                     '**Moderator:** {moderator} (`{moderator.id}`)').format(user=userToDo, reason=reason, moderator=author)
+
+            # Determine where to send it
+            channelID = serverData['Channels']['Kicks']
+            channelObject = ctx.message.server.get_channel(channelID) if channelID else ctx.message.server 
+
+            # Boop
+            await self.sparcli.send_message(channelObject, toSay)
 
     @commands.command(pass_context=True)
     @permissionChecker(check='kick_members', compare=True)
     @botPermission(check='kick_members', compare=True)
-    async def kick(self, ctx, user: Member, *, reason: str=None):
+    async def kick(self, ctx, user:Member, *, reason:str=None):
         '''
         Kicks a user from the server.
         '''
 
-        await self.sparcli.kick(user)
-        # Todo :: make this print out in a config-determined channel
+        if reason == None:
+            await self.sparcli.say('You must provide a reason for this.')
+            return
+
+        # Setup some local variables
+        userToDo = user 
         author = ctx.message.author
-        toSay = '**{0}** `({0.id})` has been kicked for reason `{1}` by user {2.mention} `({2.id})`.'.format(user, reason, author)
-        await self.sparcli.say(toSay)
+        serverData = getServerJson(ctx.message.server.id)
+
+        # Perform the actions in the local channel
+        await self.sparcli.kick(userToDo)
+        await self.sparcli.say('Done.')
+
+        # See if you need to copy over to another channel
+        if serverData['Toggles']['Kicks']:
+
+            # Generate a nice message
+            toSay = ('**Kick**\n'
+                     '**User:** {user} (`{user.id}`)\n'
+                     '**Reason:** {reason}\n'
+                     '**Moderator:** {moderator} (`{moderator.id}`)').format(user=userToDo, reason=reason, moderator=author)
+
+            # Determine where to send it
+            channelID = serverData['Channels']['Kicks']
+            channelObject = ctx.message.server.get_channel(channelID) if channelID else ctx.message.server 
+
+            # Boop
+            await self.sparcli.send_message(channelObject, toSay)
 
     @commands.command(pass_context=True)
     @permissionChecker(check='manage_messages')
