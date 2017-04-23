@@ -30,6 +30,23 @@ class OwnerOnly:
             output = ''.join(ex)
         await self.sparcli.say('```python\n{}```'.format(output))
 
+    @commands.command(pass_context=True, hidden=True)
+    @permissionChecker(check='is_owner')
+    async def ex(self, ctx, *, content: str):
+        '''
+        Executes a given Python expression.
+        '''
+
+        # Eval and print the answer
+        try:
+            exec(content)
+            output = 'Done.'
+        except Exception:
+            type_, value_, traceback_ = exc_info()
+            ex = format_exception(type_, value_, traceback_)
+            output = ''.join(ex)
+        await self.sparcli.say('```python\n{}```'.format(output))
+
 
     @commands.command(pass_context=True, hidden=True)
     @permissionChecker(check='is_owner')
