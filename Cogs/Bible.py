@@ -27,13 +27,14 @@ class Scriptures:
         return loads(text[1:-2])
 
 
-    @commands.command(aliases=['christianity', 'bible'])
-    async def christian(self, *, passage:str):
+    @commands.command(pass_context=True, aliases=['christianity', 'bible'])
+    async def christian(self, ctx, *, passage:str):
         '''
         Gets a passage from the bible.
         '''
 
         # TODO: MAKE ALL THIS CLEANER TO WORK WITH
+        await self.sparcli.send_typing(ctx.message.channel)
 
         # Generate the string that'll be sent to the site
         getString = passage
@@ -44,9 +45,9 @@ class Scriptures:
         if len(matchList) == 2:
             passage = int(matchList[1].group())
             lastpassage = passage 
-        elif len(matchlist) == 3:
+        elif len(matchList) == 3:
             passage = int(matchList[1].group())
-            lastpassage = int(matchlist[2].group())
+            lastpassage = int(matchList[2].group())
         else:
             await self.sparcli.say('I was unable to get that passage.')
             return
