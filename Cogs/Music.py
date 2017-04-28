@@ -111,6 +111,11 @@ class Music:
         if serverHandler.looping == False: 
             await serverHandler.loop()
 
+    async def on_server_join(self, server):
+
+        # Make sure the bot knows to add things to its cache when it joins a server
+        self.voice[server] = ServerVoice(bot=self.sparcli, server=server, voiceClient=voiceClientInServer)
+
 
 def setup(bot):
     bot.add_cog(Music(bot))
