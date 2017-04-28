@@ -78,7 +78,14 @@ def permissionChecker(**kwargs):
 
         # Check that the user has permission to actually do what they want to
         permissionsInChannel = channel.permissions_for(author)
-        return getattr(permissionsInChannel, check)
+        if getattr(permissionsInChannel, 'administrator'):
+            return True
+        z = getattr(permissionsInChannel, check)
+        if z:
+            return z
+        else:
+            raise MemberMissingPermissions
+            return False
 
     return commands.check(predicate)
 
@@ -113,6 +120,7 @@ def botPermission(**kwargs):
             raise BotMissingPermissions
         elif getattr(perms, check) == False:
             # Compare, but the bot can't run the command
+            raise BotMissingPermissions
             return False 
         else:
             # The bot has permission to run the command, now checking if can be run on the
