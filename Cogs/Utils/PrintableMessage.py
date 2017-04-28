@@ -1,4 +1,5 @@
 class PrintableMessage(object):
+    MAX_TIMESTAMP_LENGTH = 26
     MAX_PRIVATE_BOOL = 6
     MAX_GUILD_NAME = 15
     MAX_GUILD_ID = 18
@@ -20,6 +21,12 @@ class PrintableMessage(object):
 
     def getOutput(self):
         workingOutput = []
+
+        # Add on the timestamp
+        timestamp = str(self.message.timestamp)[:PrintableMessage.MAX_TIMESTAMP_LENGTH]
+        if len(timestamp) < PrintableMessage.MAX_TIMESTAMP_LENGTH:
+            timestamp = ' ' * (PrintableMessage.MAX_TIMESTAMP_LENGTH - len(timestamp)) + timestamp 
+        workingOutput.append(timestamp)
 
         # Add on the boolean for server or PMs
         private = {False:'Server',True:'PMs'}[self.private]
