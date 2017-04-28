@@ -13,7 +13,7 @@ class Config:
 
     @commands.command(pass_context=True, name='prefix', aliases=['setprefix', 'prefixset'])
     @permissionChecker(check='administrator')
-    async def prefixCommand(self, ctx, prefix: str):
+    async def prefixCommand(self, ctx, *, prefix: str):
         '''
         Changes the command prefix for the server.
         '''
