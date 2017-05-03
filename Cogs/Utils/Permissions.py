@@ -129,13 +129,15 @@ def botPermission(**kwargs):
 
         # Makes sure that there actually are mentions
         if mentions == []:
-            raise BotPermissionsTooLow 
-            return False 
-        user = mentions[0]
+            user = ctx.message.author
+        else:
+            user = mentions[0]
 
         x = botMember.top_role.position > user.top_role.position
         if x == True:
             return True
-        raise BotPermissionsTooLow
+        else:
+            raise BotPermissionsTooLow
+            return False
 
     return commands.check(predicate)
