@@ -280,6 +280,36 @@ class Internet:
         em = makeEmbed(fields=o, author_url=url, author='Click here for UrbanDictionary', inline=False)
         await self.sparcli.say(embed=em)
 
+    @commands.command(pass_context=True)
+    async def xkcd(self, ctx, comicNumber:int='Latest'):
+        '''
+        Gets you an xkcd comic strip
+        '''
+
+        await self.sparcli.send_typing(ctx.message.channel)
+
+        # Parse the comic input into a URL
+        if comicNumber == 'Latest':
+            comicURL = 'http://xkcd.com/info.0.json'
+        else:
+            comicURL = 'https://xkcd.com/{}/info.0.json'.format(comicNumber)
+
+        async with get(comicURL) as r:
+            try:
+                data = await r.json()
+            except Exception:
+                await self.sparcli.say('Comic `{}` does not exist.'.format(comicNumber))
+                return
+
+        title = data['safe_title']
+        alt = data['alt']
+        image = data['img']
+        number = data['num']
+        url = 'https://xkcd.com/{}'.format(number)
+        await self.sparcli.say(embed=makeEmbed(author=title, author_url=url, description=alt, image=image))
+
+
+
 
 def setup(bot):
     bot.add_cog(Internet(bot))
