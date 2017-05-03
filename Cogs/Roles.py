@@ -24,7 +24,7 @@ class RoleManagement:
         roleColour = colourFixer(roleColour)
 
         # Get the role itself
-        role = await getTextRoles(ctx, roleName, speak=True, sparcli=sparcli)
+        role = await getTextRoles(ctx, roleName, speak=True, sparcli=self.sparcli)
         if type(role) == int: return
 
         # Change the role colour
@@ -33,7 +33,7 @@ class RoleManagement:
         await self.sparcli.say('The colour of the role `{0.name}` has been changed to value `{1.value}`.'.format(role, colour))
 
     @commands.command(pass_context=True)
-    @botPermission(check='manage_roles')
+    @botPermission(check='manage_roles', compare=True)
     async def iam(self, ctx, *, roleName: str):
         '''
         If allowed, the bot will give you a mentioned role.
@@ -94,7 +94,7 @@ class RoleManagement:
     async def youareAdd(self, ctx, *, roleName:str):
 
         # Get the role itself
-        roleToGive = await getTextRoles(ctx, roleName, speak=True, sparcli=sparcli)
+        roleToGive = await getTextRoles(ctx, roleName, speak=True, sparcli=self.sparcli)
         if type(roleToGive) == int: return
 
         # Read from the server configs
@@ -119,7 +119,7 @@ class RoleManagement:
     async def youareDel(self, ctx, *, roleName:str):
 
         # Get the role itself
-        roleToGive = await getTextRoles(ctx, roleName, speak=True, sparcli=sparcli)
+        roleToGive = await getTextRoles(ctx, roleName, speak=True, sparcli=self.sparcli)
         if type(roleToGive) == int: return
 
         # Read from the server configs
