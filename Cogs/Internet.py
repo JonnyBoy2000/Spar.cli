@@ -267,7 +267,7 @@ class Internet:
                 definition = ' '.join(deflist) + '...'
 
             # Put it into the dictionary
-            o['{} - {}'.format(counter, author)] = definition
+            o['Definition #{} by {}'.format(counter, author)] = definition
             if counter == 3:
                 break 
 
