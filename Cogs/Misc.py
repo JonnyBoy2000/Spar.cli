@@ -5,7 +5,7 @@ from collections import OrderedDict
 from asyncio import sleep
 from random import randint
 from aiohttp import get
-from Cogs.Utils.Messages import makeEmbed
+from Cogs.Utils.Messages import makeEmbed, getTextRoles
 from Cogs.Utils.Misc import colourFixer
 from Cogs.Utils.Permissions import botPermission, permissionChecker
 
@@ -164,6 +164,25 @@ class Misc:
         colour = user.colour.value 
 
         # Fix the hex to an int
+        hexColour = hex(colour)[2:].upper()
+
+        # Actually print it out
+        await self.sparcli.say('', embed=makeEmbed(colour=colour, author='#'+hexColour))
+
+    @commands.command(pass_context=True, aliases=['colorof'])
+    async def colourof(self, ctx, *, roleName:str=None):
+        '''
+        Gives you the colour of a role.
+        '''
+
+        # Get the role itself
+        role = await getTextRoles(ctx, roleName, speak=True, sparcli=self.sparcli)
+        if type(role) == int: return
+
+        # Get the role colour
+        colour = role.colour.value 
+
+        # Turn it to a hex digit
         hexColour = hex(colour)[2:].upper()
 
         # Actually print it out
