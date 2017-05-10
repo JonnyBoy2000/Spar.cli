@@ -100,9 +100,10 @@ class Misc:
         # Generate a dictionary of their information
         userInfo = OrderedDict()
         userIcon = u.avatar_url if u.avatar_url != None else u.default_avatar_url
+        userIconPNG = userIcon.replace('.webp?size=', '.png?size=')
         userInfo['Username'] = u.name 
         userInfo['Discriminator'] = u.discriminator 
-        userInfo['Icon'] = '[Click here!]({})'.format(userIcon)
+        userInfo['Icon'] = '[Click here!]({})'.format(userIconPNG)
         userInfo['Nickname'] = '{}'.format(u.display_name)
         userInfo['ID'] = u.id
         userInfo['Bot'] = u.bot 
