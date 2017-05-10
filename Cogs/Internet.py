@@ -2,6 +2,7 @@ from aiohttp import get
 from re import finditer
 from random import choice, randint
 from collections import OrderedDict
+from datetime import timedelta
 from discord import Member
 from discord.ext import commands
 from Cogs.Utils.Configs import getTokens
@@ -357,6 +358,79 @@ class Internet:
         e = makeEmbed(author=pokemonName, colour=colour, fields=o, image=image)
         await self.sparcli.say('', embed=e)
 
+    @commands.command(pass_context=True, aliases=['ow'])
+    async def overwatch(self, ctx, *, battleTag:str):
+        '''
+        Gives you an overview of some Overwatch stats for the PC
+        '''
+        await self.overwatchStats(ctx, battleTag, 'pc')
+
+    @commands.command(pass_context=True)
+    async def overwatchps4(self, ctx, *, battleTag:str):
+        '''
+        Gives you an overview of some Overwatch stats for PSN
+        '''
+        await self.overwatchStats(ctx, battleTag, 'psn')
+
+    async def overwatchStats(self, ctx, battleTag, platform):
+
+        await self.sparcli.send_typing(ctx.message.channel)
+
+        # Auguste-2993
+        url = 'https://owapi.net/api/v3/u/{}/blob?platform={}'.format(battleTag.replace('#', '-'), platform)
+        async with get(url, headers={'User-Agent': 'Discord bot Sparcli by Caleb#2831'}) as r:
+            data = await r.json()
+        if data.get('msg', False):
+            await self.sparcli.say('This user could not be found.')
+            return
+
+        adata = data['us'] or data['eu'] or data['kr']
+        if adata == None:
+            adata = data['any']
+        data = adata['stats']['quickplay']
+
+        # Get the relevant data from the retrieved stuff
+        o = OrderedDict()
+        t = data['overall_stats']  # Temp variable
+        o['Overall Stats'] = '{wins} wins vs {losses} losses over {games} games ({winrate}% win rate)'.format(
+            wins=t['wins'],
+            losses=t['losses'],
+            games=t['games'],
+            winrate=t['win_rate']
+        )
+        o['Rank'] = t['tier'].title()
+        o['Level'] = '{}'.format((int(t['prestige']) * 100) + int(t['level']))
+        o['SR'] = int(t['comprank'])
+
+        t = adata['heroes']['playtime']['quickplay']
+        v = []
+        b = []
+        for y, u in t.items():
+            v.append(y)
+            b.append(u)
+        mostUsed = v[b.index(max(b))]
+        maxTime = timedelta(hours=max(b))
+        o['Most Used Hero'] = '{} ({})'.format(mostUsed.title(), str(maxTime))
+
+        t = data['game_stats']
+        o['Total Eliminations'] = int(t['eliminations'])
+        o['Total Deaths'] = int(t['deaths'])
+
+        o['Total Solo Kills'] = int(t['solo_kills'])
+        o['Total Final Blows'] = int(t['final_blows'])
+        o['Total Damage Done'] = int(t['damage_done'])
+        o['Total Healing Done'] = int(t['healing_done'])
+
+        o['Most Solo Kills in Game'] = int(t['solo_kills_most_in_game'])
+        o['Most Final Blows in Game'] = int(t['final_blows_most_in_game'])
+        o['Most Damage Done in Game'] = int(t['damage_done_most_in_game'])
+        o['Most Healing Done in Game'] = int(t['healing_done_most_in_game'])
+
+        o['Best Killstreak in Game'] = int(t['kill_streak_best'])
+
+        # Format into an embed
+        e = makeEmbed(author='Quickplay Overwatch Stats for {}'.format(battleTag), fields=o)
+        await self.sparcli.say('', embed=e)
 
 
 def setup(bot):
