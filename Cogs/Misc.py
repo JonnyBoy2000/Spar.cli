@@ -1,10 +1,11 @@
-from discord.ext import commands
-from discord import Embed, Member, Emoji, Object
+from os import remove
 from datetime import datetime
 from collections import OrderedDict
 from asyncio import sleep
 from random import randint
 from aiohttp import get
+from discord import Embed, Member, Emoji, Object
+from discord.ext import commands
 from Cogs.Utils.Messages import makeEmbed, getTextRoles
 from Cogs.Utils.Misc import colourFixer
 from Cogs.Utils.Permissions import botPermission, permissionChecker
@@ -198,35 +199,35 @@ class Misc:
 
         # Create some shorthand
         author = ctx.message.author
-        sentMessages = []
-        userMessages = []
+        # sentMessages = []
+        # userMessages = []
 
-        # Fill any blank spots
-        if None in [topText, bottomText, imageLink]:
-            z = await self.sparcli.say('What is the top text for your image?')
-            sentMessages.append(z)
-            z = await self.sparcli.wait_for_message(author=author)
-            topText = z.content
-            userMessages.append(z)
+        # # Fill any blank spots
+        # if None in [topText, bottomText, imageLink]:
+        #     z = await self.sparcli.say('What is the top text for your image?')
+        #     sentMessages.append(z)
+        #     z = await self.sparcli.wait_for_message(author=author)
+        #     topText = z.content
+        #     userMessages.append(z)
 
-            z = await self.sparcli.say('What is the bottom text for your image?')
-            sentMessages.append(z)
-            z = await self.sparcli.wait_for_message(author=author)
-            bottomText = z.content
-            userMessages.append(z)
+        #     z = await self.sparcli.say('What is the bottom text for your image?')
+        #     sentMessages.append(z)
+        #     z = await self.sparcli.wait_for_message(author=author)
+        #     bottomText = z.content
+        #     userMessages.append(z)
 
-            z = await self.sparcli.say('What is the image URL to add the text to?')
-            sentMessages.append(z)
-            z = await self.sparcli.wait_for_message(author=author)
-            imageLink = z.content
-            userMessages.append(z)
+        #     z = await self.sparcli.say('What is the image URL to add the text to?')
+        #     sentMessages.append(z)
+        #     z = await self.sparcli.wait_for_message(author=author)
+        #     imageLink = z.content
+        #     userMessages.append(z)
 
-        # Delete the user/bot messages that were prompted for
-        if sentMessages:
-            if ctx.message.server.me.permissions_in(ctx.message.channel).manage_messages:
-                await self.sparcli.delete_messages(sentMessages + userMessages)
-            else:
-                await self.sparcli.delete_messages(sentMessages)
+        # # Delete the user/bot messages that were prompted for
+        # if sentMessages:
+        #     if ctx.message.server.me.permissions_in(ctx.message.channel).manage_messages:
+        #         await self.sparcli.delete_messages(sentMessages + userMessages)
+        #     else:
+        #         await self.sparcli.delete_messages(sentMessages)
 
         if '' in [topText, bottomText, imageLink]:
             await self.sparcli.say('You can\'t have empty content fields. Aborting command.')
@@ -235,10 +236,11 @@ class Misc:
         # Get the meme image from the site
         siteURL = 'https://memegen.link/custom/{}/{}.jpg?alt={}'.format(topText, bottomText, imageLink)
         async with get(siteURL) as r:
-            image = await r.content()
+            image = await r.read()
         with open('SPARCLI_RAW_IMAGE_DOWNLOAD.png', 'wb') as a: 
             a.write(image)
         await self.sparcli.send_file(ctx.message.channel, 'SPARCLI_RAW_IMAGE_DOWNLOAD.png', content=author.mention)
+        os.remove('SPARCLI_RAW_IMAGE_DOWNLOAD.png')
 
     @commands.command(pass_context=True)
     async def permissions(self, ctx, member:Member=None):
