@@ -95,6 +95,26 @@ class Music:
         else:
             await serverHandler.skipChecker(ctx.message, force=True)
 
+    @commands.command(pass_context=True)
+    async def musicisfucked(self, ctx):
+        '''
+        For when the music stops working.
+        '''
+
+        i = ctx.message.server
+
+        serverHandler = self.voice[i]
+        if serverHandler.voiceClient == None:
+            pass
+        else:
+            await serverHandler.disconnect()
+
+        del self.voice[i]
+
+        voiceClientInServer = self.sparcli.voice_client_in(i)
+        self.voice[i] = ServerVoice(bot=self.sparcli, server=i, voiceClient=voiceClientInServer)
+        await self.sparcli.say('Done!')
+
     async def on_reaction_add(self, reaction, user):
         '''
         Checks reactions and etc
@@ -107,7 +127,14 @@ class Music:
     async def on_message(self, message):
 
         # Start the serverhandler looping
-        serverHandler = self.voice[message.server]
+        try:
+            serverHandler = self.voice[message.server]
+        except KeyError:
+            i = message.server
+            voiceClientInServer = self.sparcli.voice_client_in(i)
+            self.voice[i] = ServerVoice(bot=self.sparcli, server=i, voiceClient=voiceClientInServer)
+            serverHandler = self.voice[i]
+
         if serverHandler.looping == False: 
             await serverHandler.loop()
 
