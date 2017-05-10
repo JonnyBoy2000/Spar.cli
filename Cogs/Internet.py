@@ -308,6 +308,54 @@ class Internet:
         url = 'https://xkcd.com/{}'.format(number)
         await self.sparcli.say(embed=makeEmbed(author=title, author_url=url, description=alt, image=image))
 
+    @commands.command(pass_context=True, aliases=['poke', 'pkmn'])
+    async def pokemon(self, ctx, *, pokemonName:str):
+        '''
+        Gives you information on a given Pokemon
+        '''
+
+        await self.sparcli.send_typing(ctx.message.channel)
+        pokeSite = 'http://pokeapi.co/api/v2/pokemon/{}'.format(pokemonName)
+        typeColours = {
+            'Normal': 11052922, 
+            'Fire': 15630640, 
+            'Water': 6525168, 
+            'Electric': 16240684, 
+            'Grass': 8046412, 
+            'Ice': 9886166, 
+            'Fighting': 12725800, 
+            'Poison': 10698401, 
+            'Ground': 14860133, 
+            'Flying': 11112435, 
+            'Psychic': 16340359, 
+            'Bug': 10926362, 
+            'Rock': 11968822, 
+            'Ghost': 7559063, 
+            'Dragon': 7288316, 
+            'Dark': 7362374, 
+            'Steel': 12040142, 
+            'Fairy': 14058925
+        }
+
+        async with get(pokeSite) as r:
+            data = await r.json()
+
+        if data.get('detail', False):
+            await self.sparcli.say('That Pokémon could not be found.')
+            return
+
+        # Format the information nicely
+        o = OrderedDict()
+        pokemonName = data['name'].title()
+        o['Pokédex Number'] = data['id']
+        o['Types'] = ', '.join([i['type']['name'].title() for i in data['types']])
+        colour = typeColours.get(data['types'][0]['type']['name'].title(), 0)
+        o['Abilities'] = ', '.join([i['ability']['name'].replace('-', ' ').title() for i in data['abilities']])
+        o['Height'] = '{}m'.format(data['height']/10.0)
+        o['Weight'] = '{}kg'.format(data['weight']/10.0)
+        image = 'https://img.pokemondb.net/artwork/{}.jpg'.format(pokemonName.lower())
+        e = makeEmbed(author=pokemonName, colour=colour, fields=o, image=image)
+        await self.sparcli.say('', embed=e)
 
 
 
