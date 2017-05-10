@@ -27,7 +27,7 @@ def makeEmbed(**kwargs):
         author_icon
         user
         colour
-        values
+        fields
         inline
         thumbnail
         image
