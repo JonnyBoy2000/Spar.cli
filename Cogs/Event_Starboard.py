@@ -77,6 +77,21 @@ class StarboardManagement:
         if reaction.emoji == self.STAR_EMOJI:
             await self.starboard(reaction)
 
+    async def on_message_delete(self, message):
+        starboardMessage = self.starboardCache.get(message.id, None)
+        if starboardMessage != None:
+            await self.sparcli.delete_message(starboardMessage)
+            del self.starboardCache[message.id]
+
+    async def on_message_edit(self, before, after):
+        starboardMessage = self.starboardCache.get(after.id, None)
+        if starboardMessage != None:
+            z = [i for i in after.reactions]
+            if len(z) == 0:
+                pass
+            else:
+                await self.starboard(z[0])
+
 
 def setup(bot):
     bot.add_cog(StarboardManagement(bot))
