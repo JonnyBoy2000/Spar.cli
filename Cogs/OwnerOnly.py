@@ -185,6 +185,7 @@ class OwnerOnly:
 
         await self.sparcli.say('The invite link has been PM\'d to you.')
         await self.sparcli.whisper(inviteObject.url)
+        
 
 def setup(bot):
     bot.add_cog(OwnerOnly(bot))

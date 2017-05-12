@@ -1,6 +1,6 @@
 from aiohttp import get
 from re import finditer
-from random import choice, randint
+from random import choice
 from collections import OrderedDict
 from datetime import timedelta
 from discord import Member
@@ -32,6 +32,11 @@ class Internet:
         self.wolfClient = None
         self.nounlist = []
 
+        self.subredditCache = {}
+
+        self.dogCache = None
+        self.dogCacheTimeout = 10
+
         # Set up the translator, if you can
         if translatorImported != False:
             try:
@@ -53,33 +58,6 @@ class Internet:
 
         # Set up noun list
         self.nounlist = [] # nounstr.split('\\n')
-
-    @commands.command(pass_context=True, aliases=['🐱'])
-    async def cat(self, ctx):
-        '''
-        Gives a random picture of a cat.
-        '''
-
-        # Send typing, so you can see it's being processed
-        await self.sparcli.send_typing(ctx.message.channel)
-
-        while True:
-            try:
-                # async with get('http://thecatapi.com/api/images/get?format=src') as r:
-                #     page = r.url
-                # break
-
-                async with get('http://random.cat/meow') as r:
-                    data = await r.json()
-                page = data['file']
-                break
-            except Exception:
-                pass
-
-        # Give the url of the loaded page
-        # await self.sparcli.say(page)
-        em = makeEmbed(image=page, colour=randint(0, 0xFFFFFF))
-        await self.sparcli.say(embed=em)
 
     @commands.command(pass_context=True)
     async def pun(self, ctx):
