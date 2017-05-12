@@ -36,5 +36,40 @@ class Animals:
         em = makeEmbed(image=page, colour=randint(0, 0xFFFFFF))
         await self.sparcli.say(embed=em)
 
+    @commands.command(pass_context=True)
+    async def doggo(self, ctx):
+        '''
+        Gives a random picture of a doggo
+        '''
+
+        await self.randomSubredditImages(ctx, 'Dog', 'puppy')
+
+    @commands.command(pass_context=True)
+    async def fox(self, ctx):
+        '''
+        Gives a random picture of a fox
+        '''
+
+        await self.randomSubredditImages(ctx, 'Fox', 'foxes')
+
+    async def randomSubredditImages(self, ctx, animal, subreddit):
+        await self.sparcli.send_typing(ctx.message.channel)
+
+        if self.subredditCache.get('{}_Timeout'.format(animal), 10) == 10:
+            self.subredditCache['{}_Timeout'.format(animal)] = -1
+            async with get('https://www.reddit.com/r/{}/.json'.format(subreddit)) as r:
+                data = await r.json()
+            o = []
+            for i in data['data']['children']:
+                if i['data'].get('post_hint', None) == 'image':
+                    o.append(i['data']['url'])
+            self.subredditCache['{}'.format(animal)] = o 
+
+        randomDog = choice(self.subredditCache['{}'.format(animal)])
+        self.subredditCache['{}_Timeout'.format(animal)] += 1
+        em = makeEmbed(image=randomDog, colour=randint(0, 0xFFFFFF))
+        await self.sparcli.say(embed=em)
+
+
 def setup(bot):
     bot.add_cog(Animals(bot))
