@@ -1,6 +1,7 @@
 from aiohttp import get 
 from random import choice, randint
 from discord.ext import commands 
+from Cogs.Utils.Messages import makeEmbed
 
 
 class Animals:
