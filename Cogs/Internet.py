@@ -337,50 +337,96 @@ class Internet:
         await self.sparcli.say('', embed=e)
 
     @commands.command(pass_context=True, aliases=['ow'])
-    async def overwatch(self, ctx, *, battleTag:str):
+    async def overwatch(self, ctx, *, battleTag:str, playType:str='quickplay'):
         '''
         Gives you an overview of some Overwatch stats for the PC
         '''
-        await self.overwatchStats(ctx, battleTag, 'pc')
+        playType = battleTag.split(' ')[-1]
+        if playType == battleTag:
+            playType = 'quickplay'
+        if playType.lower() in ['comp', 'competitve', 'compet', 'c', 'com', 'competitivity']:
+            playType = 'competitive'
+        else:
+            playType = 'quickplay'
+        await self.overwatchStats(ctx, battleTag, 'pc', playType)
 
     @commands.command(pass_context=True)
-    async def overwatchps4(self, ctx, *, battleTag:str):
+    async def overwatchps4(self, ctx, *, battleTag:str, playType:str='quickplay'):
         '''
         Gives you an overview of some Overwatch stats for PSN
         '''
-        await self.overwatchStats(ctx, battleTag, 'psn')
+        playType = battleTag.split(' ')[-1]
+        if playType == battleTag:
+            playType = 'quickplay'
+        if playType.lower() in ['comp', 'competitve', 'compet', 'c', 'com', 'competitivity']:
+            playType = 'competitive'
+        else:
+            playType = 'quickplay'
+        await self.overwatchStats(ctx, battleTag, 'psn', playType)
 
-    async def overwatchStats(self, ctx, battleTag, platform):
+    async def overwatchStats(self, ctx, battleTag, platform, playType):
 
         await self.sparcli.send_typing(ctx.message.channel)
 
-        # Auguste-2993
+        # Get the data from the server
         url = 'https://owapi.net/api/v3/u/{}/blob?platform={}'.format(battleTag.replace('#', '-'), platform)
         async with get(url, headers={'User-Agent': 'Discord bot Sparcli by Caleb#2831'}) as r:
+            if r.status is not 200:
+                await self.sparcli.say('Oh. The service for this API is down. Sorry. Try again later, maybe?')
+                return
             data = await r.json()
         if data.get('msg', False):
             await self.sparcli.say('This user could not be found.')
             return
 
-        adata = data['us'] or data['eu'] or data['kr']
-        if adata == None:
-            adata = data['any']
-        data = adata['stats']['quickplay']
+        # Determine which server to read from
+        tempDat = [data.get('us', {}), data.get('eu', {}), data.get('kr', {}), data.get('any', {})]
+        adata = None
+        for i in tempDat:
+
+            # Set a default
+            if adata == None: adata = i 
+
+            # Try - catch for keyerror
+            try:
+
+                # Determine their level
+                l = i['stats']['quickplay']['overall_stats']
+                maxLev = (l.get('prestige', 0) * 100) + l.get('level', 0)
+
+                # Determine the stored's level
+                try:
+                    k = adata['stats']['quickplay']['overall_stats']
+                    compLev = (k.get('prestige', 0) * 100) + k.get('level', 0)
+                except (KeyError, TypeError):
+                    compLev = -10
+
+                # Restore the server with the largest level
+                if maxLev > compLev:
+                    adata = i 
+
+            # Keyerror in comparison
+            except (KeyError, TypeError):
+                pass
+
+        # Set this up for quick usage
+        data = adata['stats'][playType]
 
         # Get the relevant data from the retrieved stuff
         o = OrderedDict()
         t = data['overall_stats']  # Temp variable
+        avatar = t.get('avatar')
         o['Overall Stats'] = '{wins} wins vs {losses} losses over {games} games ({winrate}% win rate)'.format(
-            wins=t['wins'],
-            losses=t['losses'],
-            games=t['games'],
-            winrate=t['win_rate']
+            wins=t.get('wins'),
+            losses=t.get('losses'),
+            games=t.get('games'),
+            winrate=t.get('win_rate')
         )
-        o['Rank'] = t['tier'].title()
-        o['Level'] = '{}'.format((int(t['prestige']) * 100) + int(t['level']))
-        o['SR'] = int(t['comprank'])
+        o['Rank'] = 'N/A' if not t.get('tier', 0) else t.get('tier').title()
+        o['Level'] = '{}'.format(int((t.get('prestige') * 100) + t.get('level')))
+        o['SR'] = 'N/A' if not t.get('comprank', 0) else int(t.get('comprank'))
 
-        t = adata['heroes']['playtime']['quickplay']
+        t = adata['heroes']['playtime'][playType]
         v = []
         b = []
         for y, u in t.items():
@@ -391,23 +437,23 @@ class Internet:
         o['Most Used Hero'] = '{} ({})'.format(mostUsed.title(), str(maxTime))
 
         t = data['game_stats']
-        o['Total Eliminations'] = int(t['eliminations'])
-        o['Total Deaths'] = int(t['deaths'])
+        o['Total Eliminations'] = 'N/A' if not t.get('eliminations', 0) else int(t.get('eliminations'))
+        o['Total Deaths'] = 'N/A' if not t.get('deaths', 0) else int(t.get('deaths'))
 
-        o['Total Solo Kills'] = int(t['solo_kills'])
-        o['Total Final Blows'] = int(t['final_blows'])
-        o['Total Damage Done'] = int(t['damage_done'])
-        o['Total Healing Done'] = int(t['healing_done'])
+        o['Total Solo Kills'] = 'N/A' if not t.get('solo_kills', 0) else int(t.get('solo_kills'))
+        o['Total Final Blows'] = 'N/A' if not t.get('final_blows', 0) else int(t.get('final_blows'))
+        o['Total Damage Done'] = 'N/A' if not t.get('damage_done', 0) else int(t.get('damage_done'))
+        o['Total Healing Done'] = 'N/A' if not t.get('healing_done', 0) else int(t.get('healing_done'))
 
-        o['Most Solo Kills in Game'] = int(t['solo_kills_most_in_game'])
-        o['Most Final Blows in Game'] = int(t['final_blows_most_in_game'])
-        o['Most Damage Done in Game'] = int(t['damage_done_most_in_game'])
-        o['Most Healing Done in Game'] = int(t['healing_done_most_in_game'])
+        o['Most Solo Kills in Game'] = 'N/A' if not t.get('solo_kills_most_in_game', 0) else int(t.get('solo_kills_most_in_game'))
+        o['Most Final Blows in Game'] = 'N/A' if not t.get('final_blows_most_in_game', 0) else int(t.get('final_blows_most_in_game'))
+        o['Most Damage Done in Game'] = 'N/A' if not t.get('damage_done_most_in_game', 0) else int(t.get('damage_done_most_in_game'))
+        o['Most Healing Done in Game'] = 'N/A' if not t.get('healing_done_most_in_game', 0) else int(t.get('healing_done_most_in_game'))
 
-        o['Best Killstreak in Game'] = int(t['kill_streak_best'])
+        o['Best Killstreak in Game'] = 'N/A' if not t.get('kill_streak_best', 0) else int(t.get('kill_streak_best'))
 
         # Format into an embed
-        e = makeEmbed(author='Quickplay Overwatch Stats for {}'.format(battleTag), fields=o)
+        e = makeEmbed(author='{} Overwatch Stats for {}'.format(playType.title(), battleTag), fields=o, author_icon=avatar)
         await self.sparcli.say('', embed=e)
 
 
