@@ -65,9 +65,10 @@ class GameStats(object):
         Gives you an overview of some Overwatch stats for the PC
         '''
         playType = battleTag.split(' ')[-1]
+        battleTag = battleTag.split(' ')[0]
         if playType == battleTag:
             playType = 'quickplay'
-        if playType.lower() in ['comp', 'competitve', 'compet', 'c', 'com', 'competitivity']:
+        if playType.lower() in ['comp', 'competitive', 'compet', 'c', 'com', 'competitivity']:
             playType = 'competitive'
         else:
             playType = 'quickplay'
@@ -79,9 +80,10 @@ class GameStats(object):
         Gives you an overview of some Overwatch stats for PSN
         '''
         playType = battleTag.split(' ')[-1]
+        battleTag = battleTag.split(' ')[0]
         if playType == battleTag:
             playType = 'quickplay'
-        if playType.lower() in ['comp', 'competitve', 'compet', 'c', 'com', 'competitivity']:
+        if playType.lower() in ['comp', 'competitive', 'compet', 'c', 'com', 'competitivity']:
             playType = 'competitive'
         else:
             playType = 'quickplay'
@@ -94,13 +96,13 @@ class GameStats(object):
         # Get the data from the server
         url = 'https://owapi.net/api/v3/u/{}/blob?platform={}'.format(battleTag.replace('#', '-'), platform)
         async with get(url, headers={'User-Agent': 'Discord bot Sparcli by Caleb#2831'}) as r:
-            if r.status is not 200:
+            if str(r.status)[0] == '5':
                 await self.sparcli.say('Oh. The service for this API is down. Sorry. Try again later, maybe?')
                 return
+            elif str(r.status)[0] == '4':
+                await self.sparcli.say('That resource could not be found on the server.')
+                return
             data = await r.json()
-        if data.get('msg', False):
-            await self.sparcli.say('This user could not be found.')
-            return
 
         # Determine which server to read from
         tempDat = [data.get('us', {}), data.get('eu', {}), data.get('kr', {}), data.get('any', {})]

@@ -2,7 +2,6 @@ from aiohttp import get
 from re import finditer
 from random import choice
 from collections import OrderedDict
-from datetime import timedelta
 from discord import Member
 from discord.ext import commands
 from Cogs.Utils.Configs import getTokens
