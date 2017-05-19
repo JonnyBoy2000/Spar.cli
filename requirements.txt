@@ -2,5 +2,5 @@ discord.py[voice]
 microsofttranslator
 wolframalpha==2.4
 youtube_dl
-brickfront
+brickfront==0.0.3
 praw
