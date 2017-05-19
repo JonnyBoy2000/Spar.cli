@@ -46,8 +46,12 @@ class Reddit:
 
         # Store data in a dict
         redditData = OrderedDict()
-        redditData['Comment Karma'] = redditor.comment_karma
-        redditData['Link Karma'] = redditor.link_karma
+        try:
+            redditData['Comment Karma'] = redditor.comment_karma
+            redditData['Link Karma'] = redditor.link_karma
+        except Exception as e:
+            await self.sparlci.say('This user could not be found.')
+            return
 
         tops = [i for i in redditor.top()]
         topComment = None 
@@ -81,7 +85,12 @@ class Reddit:
         subreddit = self.getSubreddit(name)
 
         # Get a random post
-        postGen = subreddit.hot()
+        try:
+            postGen = subreddit.hot()
+        except Exception as e:
+            await self.sparlci.say('This subreddit could not be found.')
+            return
+
         postList = [i for i in postGen]
         post = choice(postList)
         postValues = OrderedDict()
