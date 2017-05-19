@@ -9,8 +9,7 @@
 	"Reddit": {
 		"ID": "",
 		"Secret": "",
-		"User Agent": "",
-		"Redirect URI": ""
+		"User Agent": ""
 	},
 	"Brickset": {
 		"Secret": ""

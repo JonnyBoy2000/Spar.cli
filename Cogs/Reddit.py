@@ -1,16 +1,13 @@
-from discord import Object
-from discord.ext import commands 
+from collections import OrderedDict
 from random import choice
-from time import time
-from uuid import uuid4
-from json import dumps
 try:
     import praw
 except ImportError:
     raise Exception('You need to install Praw for this class to work.')
-from collections import OrderedDict
+from discord.ext import commands 
 from Cogs.Utils.Messages import makeEmbed
 from Cogs.Utils.Configs import getTokens, getRedditInstances, saveRedditInstances
+
 
 '''
 reddit = praw.Reddit(client_id='SI8pN3DSbt0zor',
@@ -18,30 +15,6 @@ reddit = praw.Reddit(client_id='SI8pN3DSbt0zor',
                      refresh_token='WeheY7PwgeCZj4S3QgUcLhKE5S2s4eAYdxM',
                      user_agent='testscript by /u/fakebot3')
 '''
-
-
-def generateUUID(amount:int) -> str:
-    '''
-    Generates a random UUID
-    '''
-
-    return str(uuid4())
-
-
-def generateRedditObject(discordID:str):
-    '''
-    Generates a reddit instance for a given Discord ID, otherwise None
-    '''
-
-    redditToken = getRedditInstances()['Tokens'][discordID]
-    tokens = getTokens()['Reddit']
-    q = praw.Reddit(
-        client_id=tokens['ID'],
-        client_secret=tokens['Secret'],
-        user_agent=tokens['User Agent'],
-        refresh_token=redditToken
-    )
-    return q
 
 
 class Reddit:
@@ -53,15 +26,12 @@ class Reddit:
         self.reddit = praw.Reddit(
             client_id=tokens['ID'],
             client_secret=tokens['Secret'],
-            user_agent=tokens['User Agent'],
-            redirect_uri=tokens['Redirect URI']
+            user_agent=tokens['User Agent']
         )
 
         self.getRedditor = lambda name: self.reddit.redditor(name)
         self.getSubreddit = lambda name: self.reddit.subreddit(name)
-        self.discordSays = self.reddit.subreddit('DiscordSays')
         self.redditIcon = 'http://rawapk.com/wp-content/uploads/2016/04/Reddit-The-Official-App-Icon.png'
-        self.postHandler = {}
 
     @commands.command(pass_context=True)
     async def reddituser(self, ctx, username:str):
@@ -144,227 +114,6 @@ class Reddit:
 
         # Return to user
         await self.sparcli.say('', embed=e)
-
-    @commands.group(pass_context=True, name='reddit', enabled=False)
-    async def redditCommand(self, ctx):
-        '''
-        Grouping for the reddit handling commands. See `help reddit` for more
-        '''
-
-        if ctx.invoked_subcommand is None: await self.sparcli.say('Please refer to this command\'s help for how to use it properly.')
-
-    @redditCommand.command(pass_context=True, name='login', enabled=False)
-    async def redditLogin(self, ctx):
-        '''
-        Lets you log into a reddit account so the bot knows who you are
-        '''
-
-        # Generate some constants
-        author = ctx.message.author
-        uuid = generateUUID(100)
-        authURL = self.reddit.auth.url(['identity', 'submit', 'vote'], dumps({'DiscordID':author.id, 'UUID':uuid}), 'permanent')
-
-        # Edit and save the reddit instances
-        q = getRedditInstances()
-        q['UUIDs'][author.id] = uuid
-        saveRedditInstances(q)
-
-        # Say to the user
-        await self.sparcli.send_message(
-            author, 
-            'Please click here to authorize your reddit account link :: \n<{}>'.format(authURL)
-        )
-
-    @redditCommand.command(pass_context=True, name='logout', enabled=False)
-    async def redditLogout(self, ctx):
-        '''
-        Logs you out of a reddit instance
-        '''
-
-        # Generate some constants
-        author = ctx.message.author
-        q = getRedditInstances()
-
-        # Delete the user from the system
-        try:
-            del q['Tokens'][author.id]
-        except KeyError:
-            await self.sparcli.send_message(author, 'You have no authenticated login with Spar.cli.')
-            return
-
-        # Save the instances
-        saveRedditInstances(q)
-
-        # Say to the user.
-        await self.sparcli.send_message(author, 
-            'Your authentication details have been deleted. \n'
-            'Please manually revoke access to Spar.cli for full recognition that you are diconnected :: '
-            '<https://www.reddit.com/prefs/apps>'
-        )
-
-    @commands.group(pass_context=True, name='redditpost', enabled=False)
-    async def redditSubmit(self, ctx):
-        '''
-        Handles all reddit posting. See `help reddit post` for details.
-        '''
-
-        if ctx.invoked_subcommand is None: await self.sparcli.say('Please refer to this command\'s help for how to use it properly.')
-
-    @redditSubmit.command(pass_context=True, name='text', enabled=False)
-    async def redditSubmitText(self, ctx):
-        '''
-        Lets you submit a text post to any given subreddit
-        '''
-
-        author = ctx.message.author
-        if not author.id in getRedditInstances()['Tokens']:
-            await self.sparcli.say('You do not have a logged in reddit instance - please use `reddit login` to authorize Spar.cli.')
-            return
-
-        # Generate some containers so that you can mass-delete the messages later
-        botMessages = []
-        userMessages = []
-
-        # Get the messages from the user
-        q = await self.sparcli.say('What subreddit would you like to submit to?')
-        w = await self.sparcli.wait_for_message(author=author)
-        botMessages.append(q); userMessages.append(w)
-
-        q = await self.sparcli.say('What will the title be?')
-        w = await self.sparcli.wait_for_message(author=author)
-        botMessages.append(q); userMessages.append(w)
-
-        q = await self.sparcli.say('What will the body text be?')
-        w = await self.sparcli.wait_for_message(author=author)
-        botMessages.append(q); userMessages.append(w)
-
-        # Delete the messages so it doesn't look like spamming
-        await self.sparcli.delete_messages(botMessages)
-        userContent = [i.content for i in userMessages]
-        if ctx.message.server.me.permissions_in(ctx.message.channel).manage_messages:
-            await self.sparcli.delete_messages(userMessages)
-
-        # Make sure that the user didn't leave anything blank
-        if '' in [i.content for i in userMessages]:
-            await self.sparcli.say('You cannot leave any of the messages blank - aborting.')
-            return
-
-        # Generate a local reddit instance
-        redditLocal = generateRedditObject(author.id)
-
-        # Actually submit the post to the redditz
-        redditLocal.read_only = False
-        sub = redditLocal.subreddit(userContent[0])
-        try:
-            post = sub.submit(userContent[1], selftext=userContent[2])
-        except Exception:
-            await self.sparcli.say('Post submission failed.')
-            redditLocal.read_only = True 
-            return
-        redditLocal.read_only = True
-        mess = await self.sparcli.say('Uploaded :: <{}>'.format(post.shortlink))
-        await self.sparcli.add_reaction(mess, '🔼')
-        await self.sparcli.add_reaction(mess, '🔽')
-        self.postHandler[mess] = post
-
-    @redditSubmit.command(pass_context=True, name='link', enabled=False)
-    async def redditSubmitLink(self, ctx):
-        '''
-        Lets you submit a text post to any given subreddit
-        '''
-
-        author = ctx.message.author
-        if not author.id in getRedditInstances()['Tokens']:
-            await self.sparcli.say('You do not have a logged in reddit instance - please use `reddit login` to authorize Spar.cli.')
-            return
-
-        # Generate some containers so that you can mass-delete the messages later
-        botMessages = []
-        userMessages = []
-
-        # Get the messages from the user
-        q = await self.sparcli.say('What subreddit would you like to submit to?')
-        w = await self.sparcli.wait_for_message(author=author)
-        botMessages.append(q); userMessages.append(w)
-
-        q = await self.sparcli.say('What will the title be?')
-        w = await self.sparcli.wait_for_message(author=author)
-        botMessages.append(q); userMessages.append(w)
-
-        q = await self.sparcli.say('What will the link be?')
-        w = await self.sparcli.wait_for_message(author=author)
-        botMessages.append(q); userMessages.append(w)
-
-        # Delete the messages so it doesn't look like spamming
-        await self.sparcli.delete_messages(botMessages)
-        userContent = [i.content for i in userMessages]
-        if ctx.message.server.me.permissions_in(ctx.message.channel).manage_messages:
-            await self.sparcli.delete_messages(userMessages)
-
-        # Make sure that the user didn't leave anything blank
-        if '' in [i.content for i in userMessages]:
-            await self.sparcli.say('You cannot leave any of the messages blank - aborting.')
-            return
-
-        # Generate a local reddit instance
-        redditLocal = generateRedditObject(author.id)
-
-        # Actually submit the post to the redditz
-        redditLocal.read_only = False
-        sub = redditLocal.subreddit(userContent[0])
-        try:
-            post = sub.submit(userContent[1], url=userContent[2])
-        except Exception:
-            await self.sparcli.say('Post submission failed.')
-            redditLocal.read_only = True 
-            return
-        redditLocal.read_only = True
-        mess = await self.sparcli.say('Uploaded :: <{}>'.format(post.shortlink))
-        await self.sparcli.add_reaction(mess, '🔼')
-        await self.sparcli.add_reaction(mess, '🔽')
-        self.postHandler[mess.id] = post 
-
-    async def on_reaction_add(self, reaction, member):
-        '''
-        Controls reaction adding as means of upvotes in this class
-        '''
-
-        # Check if the message that had the reaction added to it
-        # is a user-sbumitted post
-        redditPost = None
-        for i, o in self.postHandler.items():
-            try:
-                q = i.id
-                w = i 
-            except AttributeError:
-                q = w = i 
-            if reaction.message.id == q:
-                redditPost = o
-        if redditPost == None:
-            return
-
-        # Checks if the user is logged in
-        if member.id not in getRedditInstances()['Tokens']:
-            return
-
-        # Checks if the emoji is correct
-        if reaction.emoji not in ['🔼', '🔽']:
-            return
-
-        # Generate a reddit instance for the user
-        redditLocal = generateRedditObject(member.id)
-        redditLocal.read_only = False
-        
-        # Upvote and downvote as necessary
-        if reaction.emoji == '🔼':
-            q = redditLocal.submission(id=redditPost.id_from_url(redditPost.shortlink))
-            q.upvote()
-        elif reaction.emoji == '🔽':
-            q = redditLocal.submission(id=redditPost.id_from_url(redditPost.shortlink))
-            q.downvote()
-
-        # Set the user to read only before leaving it to the mercy of garbage collection
-        redditLocal.read_only = True
 
 
 def setup(bot):

@@ -1,7 +1,5 @@
 discord.py[voice]
-requests
 microsofttranslator
-requests
 wolframalpha==2.4
 youtube_dl
 brickfront
