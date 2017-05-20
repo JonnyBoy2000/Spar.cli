@@ -1,8 +1,8 @@
-from discord.ext import commands 
-from aiohttp import get 
+from aiohttp import ClientSession 
 from json import loads 
 from collections import OrderedDict
 from re import finditer
+from discord.ext import commands 
 from Cogs.Utils.Messages import makeEmbed
 
 
@@ -12,6 +12,10 @@ class Scriptures:
         self.sparcli = sparcli
         self.bible = 'https://getbible.net/json?scrip={}'
         self.biblePicture = 'http://pacificbible.com/wp/wp-content/uploads/2015/03/holy-bible.png'
+        self.session = ClientSession(loop=sparcli.loop)
+
+    def __unload(self):
+        self.session.close()  
 
     async def getBiblePassage(self, passage):
         '''
@@ -22,7 +26,7 @@ class Scriptures:
         toRetrieveFrom = self.bible.format(passage.replace(' ', '%20'))
         
         # Send the request to the site and return it as a JSON dictionary
-        async with get(toRetrieveFrom) as r:
+        async with self.session.get(toRetrieveFrom) as r:
             text = await r.text()
         return loads(text[1:-2])
 

@@ -1,4 +1,4 @@
-from aiohttp import get
+from aiohttp import ClientSession
 from collections import OrderedDict
 from datetime import timedelta
 from discord.ext import commands
@@ -9,6 +9,10 @@ class GameStats(object):
 
     def __init__(self, sparcli):
         self.sparcli = sparcli
+        self.session = ClientSession(loop=sparcli.loop)
+
+    def __unload(self):
+        self.session.close()  
 
     @commands.command(pass_context=True, aliases=['poke', 'pkmn'])
     async def pokemon(self, ctx, *, pokemonName:str):
@@ -39,7 +43,7 @@ class GameStats(object):
             'Fairy': 14058925
         }
 
-        async with get(pokeSite) as r:
+        async with self.session.get(pokeSite) as r:
             data = await r.json()
 
         if data.get('detail', False):
@@ -95,7 +99,7 @@ class GameStats(object):
 
         # Get the data from the server
         url = 'https://owapi.net/api/v3/u/{}/blob?platform={}'.format(battleTag.replace('#', '-'), platform)
-        async with get(url, headers={'User-Agent': 'Discord bot Sparcli by Caleb#2831'}) as r:
+        async with self.session.get(url, headers={'User-Agent': 'Discord bot Sparcli by Caleb#2831'}) as r:
             if str(r.status)[0] == '5':
                 await self.sparcli.say('Oh. The service for this API is down. Sorry. Try again later, maybe?')
                 return

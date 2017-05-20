@@ -1,4 +1,4 @@
-from aiohttp import get
+from aiohttp import ClientSession
 from discord import Member
 from discord.ext import commands
 from Cogs.Utils.Permissions import permissionChecker, botPermission
@@ -7,8 +7,10 @@ from Cogs.Utils.Configs import getServerJson
 
 class Admin:
 
-    def __init__(self, bot):
-        self.sparcli = bot
+    def __init__(self, sparcli):
+        self.sparcli = sparcli
+
+    def __unload(self):
 
     @commands.command(pass_context=True)
     @permissionChecker(check='ban_members', compare=True)
@@ -136,7 +138,7 @@ class Admin:
         # Sets it as the server image
         server = ctx.message.server
         iconContent = None
-        async with get(icon) as r:
+        async with self.session.get(icon) as r:
             iconContent = await r.content
             
         await self.sparcli.edit_server(server, icon=iconContent)

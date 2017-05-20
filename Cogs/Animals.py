@@ -1,4 +1,4 @@
-from aiohttp import get 
+from aiohttp import ClientSession 
 from random import choice, randint
 from discord.ext import commands 
 from Cogs.Utils.Messages import makeEmbed
@@ -9,6 +9,10 @@ class Animals:
     def __init__(self, sparcli):
         self.sparcli = sparcli
         self.subredditCache = {}
+        self.session = ClientSession(loop=sparcli.loop)
+
+    def __unload(self):
+        self.session.close()        
 
     @commands.command(pass_context=True, aliases=['🐱'])
     async def cat(self, ctx):
@@ -25,7 +29,7 @@ class Animals:
                 #     page = r.url
                 # break
 
-                async with get('http://random.cat/meow') as r:
+                async with self.session.get('http://random.cat/meow') as r:
                     data = await r.json()
                 page = data['file']
                 break
@@ -56,19 +60,29 @@ class Animals:
     async def randomSubredditImages(self, ctx, animal, subreddit):
         await self.sparcli.send_typing(ctx.message.channel)
 
+        # Check the timeout on the last retreival
         if self.subredditCache.get('{}_Timeout'.format(animal), 10) == 10:
+
+            # If triggered, set it to -1
             self.subredditCache['{}_Timeout'.format(animal)] = -1
-            async with get('https://www.reddit.com/r/{}/.json'.format(subreddit)) as r:
+
+            # Get new data
+            async with self.session.get('https://www.reddit.com/r/{}/.json'.format(subreddit)) as r:
                 data = await r.json()
             o = []
             for i in data['data']['children']:
                 if i['data'].get('post_hint', None) == 'image':
                     o.append(i['data']['url'])
+
+            # Store the gotten data
             self.subredditCache['{}'.format(animal)] = o 
 
-        randomDog = choice(self.subredditCache['{}'.format(animal)])
+        # Get the random animal
+        randomAnimal = choice(self.subredditCache['{}'.format(animal)])
         self.subredditCache['{}_Timeout'.format(animal)] += 1
-        em = makeEmbed(image=randomDog, colour=randint(0, 0xFFFFFF))
+
+        # Format and send
+        em = makeEmbed(image=randomAnimal, colour=randint(0, 0xFFFFFF))
         await self.sparcli.say(embed=em)
 
 

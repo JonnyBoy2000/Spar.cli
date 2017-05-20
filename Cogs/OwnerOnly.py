@@ -1,4 +1,4 @@
-from aiohttp import get
+from aiohttp import ClientSession
 from sys import exit
 from os import execl
 from sys import exit, executable, argv, exc_info
@@ -11,8 +11,12 @@ from Cogs.Utils.Extentions import q as initialExtentions
 
 class OwnerOnly:
 
-    def __init__(self, bot):
-        self.sparcli = bot
+    def __init__(self, sparcli):
+        self.sparcli = sparcli
+        self.session = ClientSession(loop=sparcli.loop)
+
+    def __unload(self):
+        self.session.close()
 
     @commands.command(pass_context=True, hidden=True)
     @permissionChecker(check='is_owner')
@@ -65,7 +69,7 @@ class OwnerOnly:
             return
 
         # Load up the image
-        async with get(avatarUrl) as r:
+        async with self.session.get(avatarUrl) as r:
             imageData = await r.content
 
         # Set profile picture

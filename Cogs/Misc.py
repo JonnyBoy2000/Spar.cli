@@ -3,7 +3,7 @@ from datetime import datetime
 from collections import OrderedDict
 from asyncio import sleep
 from random import randint
-from aiohttp import get
+from aiohttp import ClientSession
 from discord import Embed, Member, Emoji, Object
 from discord.ext import commands
 from Cogs.Utils.Messages import makeEmbed, getTextRoles
@@ -13,8 +13,12 @@ from Cogs.Utils.Permissions import botPermission, permissionChecker
 
 class Misc:
 
-    def __init__(self, bot):
-        self.sparcli = bot
+    def __init__(self, sparcli):
+        self.sparcli = sparcli
+        self.session = ClientSession(loop=sparcli.loop)
+
+    def __unload(self):
+        self.session.close() 
 
     @commands.command()
     async def invite(self):
@@ -235,7 +239,7 @@ class Misc:
 
         # Get the meme image from the site
         siteURL = 'https://memegen.link/custom/{}/{}.jpg?alt={}'.format(topText, bottomText, imageLink)
-        async with get(siteURL) as r:
+        async with self.session.get(siteURL) as r:
             image = await r.read()
         with open('SPARCLI_RAW_IMAGE_DOWNLOAD.png', 'wb') as a: 
             a.write(image)

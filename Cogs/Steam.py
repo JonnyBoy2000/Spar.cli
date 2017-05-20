@@ -1,8 +1,8 @@
-from discord.ext import commands 
-from aiohttp import get
+from aiohttp import ClientSession
 from collections import OrderedDict
 from random import choice
 from re import finditer
+from discord.ext import commands 
 from Cogs.Utils.Messages import makeEmbed
 
 
@@ -34,6 +34,10 @@ class Steam:
         self.gameInfo = 'http://store.steampowered.com/api/appdetails?appids={}&format=json'
         self.steamIcon = 'https://image.freepik.com/free-icon/steam-logo-games-website_318-40350.jpg'
         self.steamGames = [] # gameDict['applist']['apps']['app']
+        self.session = ClientSession(loop=sparcli.loop)
+
+    def __unload(self):
+        self.session.close()
 
     def gameFinder(self, gameName:str):
         '''Returns a game ID as found from its name on the game list'''
@@ -54,7 +58,7 @@ class Steam:
         # Populate the list if necessary
         if not self.steamGames:
             everyGame = 'http://api.steampowered.com/ISteamApps/GetAppList/v0001/'
-            async with get(everyGame) as r:
+            async with self.session.get(everyGame) as r:
                 gameResp = await r.json()
             gameDict = gameResp
             self.steamGames = gameDict['applist']['apps']['app']
@@ -95,7 +99,7 @@ class Steam:
         # TODO: REDO THIS AS `dict.get(item, default)` SO AS TO MAKE IT CLEANER
 
         # Get the data from Steam
-        async with get(self.gameInfo.format(gameID)) as r:
+        async with self.session.get(self.gameInfo.format(gameID)) as r:
             steamData = await r.json()
 
         # Check to see if it was aquired properly

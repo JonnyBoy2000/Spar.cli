@@ -56,7 +56,12 @@ class Internet:
                 pass
 
         # Set up noun list
-        self.nounlist = [] # nounstr.split('\\n')
+        self.nounlist = [] 
+
+        self.session = ClientSession(loop=sparcli.loop)
+
+    def __unload(self):
+        self.session.close()
 
     @commands.command(pass_context=True)
     async def pun(self, ctx):
@@ -68,7 +73,7 @@ class Internet:
         await self.sparcli.send_typing(ctx.message.channel)
 
         # Read from page
-        async with get('http://www.punoftheday.com/cgi-bin/randompun.pl') as r:
+        async with self.session.get('http://www.punoftheday.com/cgi-bin/randompun.pl') as r:
             page = await r.text()
 
         # Scrape the raw HTML
@@ -178,7 +183,7 @@ class Internet:
         # Populate list if necessary
         if not self.nounlist:
             nounSite = 'http://178.62.68.157/raw/nouns.txt'
-            async with get(nounSite) as r:
+            async with self.session.get(nounSite) as r:
                 nounstr = await r.text()
             self.nounlist = nounstr.split('\n')
 
@@ -207,7 +212,7 @@ class Internet:
 
         # Make the url nice and safe
         searchTerm = searchTerm.replace(' ', '%20')
-        async with get(self.urbanSite.format(searchTerm)) as r:
+        async with self.session.get(self.urbanSite.format(searchTerm)) as r:
             siteData = await r.json()
 
         # Get the definitions
@@ -272,7 +277,7 @@ class Internet:
         else:
             comicURL = 'https://xkcd.com/{}/info.0.json'.format(comicNumber)
 
-        async with get(comicURL) as r:
+        async with self.session.get(comicURL) as r:
             try:
                 data = await r.json()
             except Exception:
