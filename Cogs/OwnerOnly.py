@@ -6,6 +6,7 @@ from traceback import format_exception
 from discord import Status
 from discord.ext import commands
 from Cogs.Utils.Permissions import permissionChecker
+from Cogs.Utils.Configs import getServerJson, saveServerJson, fixJson
 from Cogs.Utils.Extentions import q as initialExtentions
 
 
@@ -227,6 +228,26 @@ class OwnerOnly:
 
         await self.sparcli.say('The invite link has been PM\'d to you.')
         await self.sparcli.whisper(inviteObject.url)
+
+    @commands.command(pass_context=True, hidden=True)
+    @permissionChecker(check='is_owner')
+    async def fixjson(self, ctx):
+        '''
+        Fixes all of the JSON config files
+        '''
+
+        # Load up any changes that would have been made to the configs
+        for server in self.sparcli.servers:
+            z = getServerJson(server.id)
+            z = fixJson(z)
+            saveServerJson(server.id, z)
+
+        # Reccursively fix any globals too
+        z = getServerJson('Globals')
+        z = fixJson(z)
+        saveServerJson('Globals', z)
+
+        await self.sparcli.say('Done.')
         
 
 def setup(bot):
