@@ -137,7 +137,7 @@ class Admin:
         '''
 
         serverSettings = getServerJson(ctx.message.server.id)
-        serverSettings['AutoModerator']['ForcedNicknames'][str(user.id)] = nickname
+        serverSettings['ForcedNicknames'][str(user.id)] = nickname
         saveServerJson(ctx.message.server.id, serverSettings)
         await self.sparcli.change_nickname(user, nickname)
         await self.sparcli.say('Nickname `{}` has been forced upon this user.'.format(nickname))
@@ -152,7 +152,7 @@ class Admin:
 
         serverSettings = getServerJson(ctx.message.server.id)
         try:
-            del serverSettings['AutoModerator']['ForcedNicknames'][str(user.id)]
+            del serverSettings['ForcedNicknames'][str(user.id)]
         except KeyError:
             await self.sparcli.say('This user doesn\'t have a forced nickname.')
             return

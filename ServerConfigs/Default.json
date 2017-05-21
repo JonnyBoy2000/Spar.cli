@@ -27,8 +27,6 @@
     "SelfAssignableRoles": [
     ],
     "CommandPrefix": ";",
-    "AutoModerator": {
-        "ForcedNicknames": {
-        }
+    "ForcedNicknames": {
     }
 }
