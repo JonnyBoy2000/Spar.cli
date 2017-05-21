@@ -34,6 +34,14 @@ class Misc:
         await self.sparcli.say(inviteLink)
 
     @commands.command()
+    async def server(self):
+        '''
+        Gives an invite link to the Sparcli server.
+        '''
+
+        await self.sparcli.say('https://discord.gg/esWFTgv')
+
+    @commands.command()
     async def git(self):
         '''
         Gives the link to the bot's GitHub page/code.
