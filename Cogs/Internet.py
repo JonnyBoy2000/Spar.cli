@@ -1,4 +1,4 @@
-from aiohttp import get
+from aiohttp import ClientSession
 from re import finditer
 from random import choice
 from collections import OrderedDict
