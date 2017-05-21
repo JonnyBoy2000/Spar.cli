@@ -2,15 +2,17 @@ from aiohttp import ClientSession
 from discord import Member
 from discord.ext import commands
 from Cogs.Utils.Permissions import permissionChecker, botPermission
-from Cogs.Utils.Configs import getServerJson
+from Cogs.Utils.Configs import getServerJson, saveServerJson
 
 
 class Admin:
 
     def __init__(self, sparcli):
         self.sparcli = sparcli
+        self.session = ClientSession(loop=sparcli.loop)
 
     def __unload(self):
+        self.session.close()
 
     @commands.command(pass_context=True)
     @permissionChecker(check='ban_members', compare=True)
@@ -115,6 +117,48 @@ class Admin:
 
         await self.sparcli.change_nickname(user, name)
         await self.sparcli.say('Name updated successfully.')
+
+    @commands.group(pass_context=True)
+    @permissionChecker(check='manage_nicknames', compare=True)
+    @botPermission(check='manage_nicknames', compare=True)
+    async def forcenickname(self, ctx):
+        '''
+        Forces a nickname on a user
+        '''
+
+        pass
+
+    @forcenickname.command(pass_context=True, name='add')
+    @permissionChecker(check='manage_nicknames', compare=True)
+    @botPermission(check='manage_nicknames', compare=True)
+    async def _add(self, ctx, user:Member, *, nickname:str=None):
+        '''
+        Lets you force a username on a user
+        '''
+
+        serverSettings = getServerJson(ctx.message.server.id)
+        serverSettings['AutoModerator']['ForcedNicknames'][str(user.id)] = nickname
+        saveServerJson(ctx.message.server.id, serverSettings)
+        await self.sparcli.change_nickname(user, nickname)
+        await self.sparcli.say('Nickname `{}` has been forced upon this user.'.format(nickname))
+
+    @forcenickname.command(pass_context=True, name='remove', aliases=['del', 'delete', 'delet', 'rem'])
+    @permissionChecker(check='manage_nicknames', compare=True)
+    @botPermission(check='manage_nicknames', compare=True)
+    async def _rem(self, ctx, user:Member):
+        '''
+        Removes a forced nickname from a user
+        '''
+
+        serverSettings = getServerJson(ctx.message.server.id)
+        try:
+            del serverSettings['AutoModerator']['ForcedNicknames'][str(user.id)]
+        except KeyError:
+            await self.sparcli.say('This user doesn\'t have a forced nickname.')
+            return
+        saveServerJson(ctx.message.server.id, serverSettings)
+        await self.sparcli.change_nickname(user, None)
+        await self.sparcli.say('All forced nicknames have been removed from this user.')
 
     @commands.command(pass_context=True, aliases=['servericon'])
     @permissionChecker(check='manage_server')

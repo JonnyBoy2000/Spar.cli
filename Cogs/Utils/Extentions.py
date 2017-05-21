@@ -1,4 +1,5 @@
-q = ['Cogs.Admin',
+q = [
+     'Cogs.Admin',
      'Cogs.Misc',
      'Cogs.OwnerOnly',
      'Cogs.Internet',
@@ -17,5 +18,6 @@ q = ['Cogs.Admin',
      'Cogs.Event_Members',
      'Cogs.Event_Starboard',
      'Cogs.Event_Errors',
+     'Cogs.AutoModerator',
 ]
 
