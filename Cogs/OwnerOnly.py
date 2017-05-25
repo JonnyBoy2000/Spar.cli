@@ -91,13 +91,13 @@ class OwnerOnly:
 
     @commands.command(pass_context=True, hidden=True)
     @permissionChecker(check='is_owner')
-    async def rld(self, ctx, extention: str=None, doFully:str=False):
+    async def rld(self, ctx, toLoad: str=None, doFully:str=False):
         '''
         Reload an extention on the bot.
         '''
 
         # Get list of loaded extentions
-        if extention == None:
+        if toLoad == None:
             await self.sparcli.say("Currently loaded extentions :: \n```\n{}```".format("\n".join(self.sparcli.cogs)))
             return
 
@@ -106,16 +106,13 @@ class OwnerOnly:
             extention = 'Cogs.' + extention 
 
         else:
-
-            # Load a nicer way of sorting out the extentions
-            # Plonk the initial extentions into a dictionary
-            eF = {i.split('.')[1].lower(): i for i in initialExtentions}
-            # Finish finish them off to be actual real extentions
+            loadedCogs = list(self.sparcli.cogs.keys())
+            toLoad = [i for i in loadedCogs if extention.lower() in i.lower()]
             try:
-                extention = [eF[i] for i in eF.keys() if extention.lower() in i][0]
+                extention = 'Cogs.{}'.format(toLoad[0])
             except IndexError:
-                # await self.sparcli.say('No extention was found by the name `{}`.'.format(extention))
-                extention = 'Cogs.' + extention 
+                await self.sparcli.say('There is no extention by that name.')
+                return
 
         # Unload the extention
         await self.sparcli.say("Reloading extension **{}**...".format(extention))
@@ -139,13 +136,13 @@ class OwnerOnly:
 
     @commands.command(pass_context=True, hidden=True)
     @permissionChecker(check='is_owner')
-    async def uld(self, ctx, extention: str=None, doFully:str=False):
+    async def uld(self, ctx, toLoad: str=None, doFully:str=False):
         '''
         Reload an extention on the bot.
         '''
 
         # Get list of loaded extentions
-        if extention == None:
+        if toLoad == None:
             await self.sparcli.say("Currently loaded extentions :: \n```\n{}```".format("\n".join(self.sparcli.cogs)))
             return
 
@@ -154,16 +151,13 @@ class OwnerOnly:
             extention = 'Cogs.' + extention 
 
         else:
-
-            # Load a nicer way of sorting out the extentions
-            # Plonk the initial extentions into a dictionary
-            eF = {i.split('.')[1].lower(): i for i in initialExtentions}
-            # Finish finish them off to be actual real extentions
+            loadedCogs = list(self.sparcli.cogs.keys())
+            toLoad = [i for i in loadedCogs if extention.lower() in i.lower()]
             try:
-                extention = [eF[i] for i in eF.keys() if extention.lower() in i][0]
+                extention = 'Cogs.{}'.format(toLoad[0])
             except IndexError:
-                # await self.sparcli.say('No extention was found by the name `{}`.'.format(extention))
-                extention = 'Cogs.' + extention 
+                await self.sparcli.say('There is no extention by that name.')
+                return
 
         # Unload the extention
         await self.sparcli.say("Unloading extension **{}**...".format(extention))
