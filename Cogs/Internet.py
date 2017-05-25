@@ -291,6 +291,44 @@ class Internet:
         url = 'https://xkcd.com/{}'.format(number)
         await self.sparcli.say(embed=makeEmbed(author=title, author_url=url, description=alt, image=image))
 
+    @commands.command(pass_context=True)
+    async def currency(self, ctx, base:str, amount:str, target:str):
+        '''
+        Converts from one currency to another
+        '''
+
+        try:
+            float(amount)
+        except ValueError:
+            try:
+                float(base)
+                b = base 
+                base = amount
+                amount = b
+            except ValueError:
+                await self.sparcli.say('Please provide an amount to convert.')
+                return
+
+        base = base.upper(); target = target.upper()
+        url = 'http://api.fixer.io/latest?base={0}&symbols={0},{1}'.format(base, target)
+        async with self.session.get(url) as r:
+            data = await r.json()
+
+        # Format the data into something useful
+        if len(data['rates']) < 1:
+            await self.sparcli.say('One or both of those currency targets aren\'t supported.')
+            return 
+
+        # Get an output
+        o = OrderedDict()
+        o['Base'] = base 
+        o['Target'] = target 
+        o['Exchange Rate'] = '1:%.2f' %data['rates'][target]
+        v = float(data['rates'][target]) * float(amount)
+        o['Exchanged Price'] = '{}{} = {}{}'.format(base, amount, target, '%.2f' %v)
+        e = makeEmbed(fields=o)
+        await self.sparcli.say(embed=e)
+
 
 def setup(bot):
     bot.add_cog(Internet(bot))
