@@ -25,7 +25,8 @@ sparcli = commands.Bot(
     command_prefix=getCommandPrefix, 
     description='ApplePy 2.0, pretty much.', 
     pm_help=True, 
-    formatter=commands.formatter.HelpFormatter(show_check_failure=True)
+    formatter=commands.formatter.HelpFormatter(show_check_failure=True),
+    max_messages=50000
 )
 
 
